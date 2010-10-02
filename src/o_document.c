@@ -1,7 +1,7 @@
 #include "o_document.h"
 #include "o_map.h"
 #include "o_record_internal.h"
-#include <malloc.h>
+#include "o_memory.h"
 
 struct o_document
 {
@@ -12,7 +12,7 @@ struct o_document
 
 struct o_document * o_document_new()
 {
-	struct o_document * new_doc = malloc(sizeof(struct o_document));
+	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
 	o_record_new_internal(o_document_o_record(new_doc));
 	new_doc->fields = o_map_new();
 	new_doc->fields_old_values = 0;
@@ -52,7 +52,7 @@ struct o_document_value ** o_document_field_values(struct o_document * doc, int 
 
 int o_document_contains_field(struct o_document *doc, char * field_name)
 {
-	return (int) o_map_get(doc->fields, field_name);
+	return o_map_get(doc->fields, field_name) != 0;
 }
 
 void o_document_remove_field(struct o_document *doc, char * field_name)
@@ -77,6 +77,6 @@ void o_document_free(struct o_document * doc)
 	if (doc->fields_old_values != 0)
 		o_map_free(doc->fields_old_values);
 	o_record_free_internal(&doc->record);
-	free(doc);
+	o_free(doc);
 }
 

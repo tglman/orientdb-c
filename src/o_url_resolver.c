@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "o_database_errors.h"
+#include "o_memory.h"
 
 enum o_url_type o_url_resolve_type(char * connection_url, struct o_database_error_handler * error_handler)
 {
@@ -34,23 +35,23 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 	case HTTP:
 		connection_url += HTTP_PROTOCOL_PARAMETER_LENGHT;
 		pos = strcspn(connection_url, "/");
-		*path = malloc(pos * sizeof(char));
+		*path = o_malloc(pos * sizeof(char));
 		strncpy(*path, connection_url, pos);
 		connection_url += pos + 1;
 		pos = strcspn(connection_url, "/");
 		connection_url += pos + 1;
 		pos = strcspn(connection_url, "/");
-		*db_name = malloc(pos * sizeof(char));
+		*db_name = o_malloc(pos * sizeof(char));
 		strncpy(*db_name, connection_url, pos);
 		break;
 	case REMOTE:
 		connection_url += HTTP_PROTOCOL_PARAMETER_LENGHT;
 		pos = strcspn(connection_url, "/");
-		*path = malloc(pos * sizeof(char));
+		*path = o_malloc(pos * sizeof(char));
 		strncpy(*path, connection_url, pos);
 		connection_url += pos + 1;
 		pos = strcspn(connection_url, "/");
-		*db_name = malloc(pos * sizeof(char));
+		*db_name = o_malloc(pos * sizeof(char));
 		strncpy(*db_name, connection_url, pos);
 		break;
 	case LOCAL:
@@ -59,10 +60,10 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 		break;
 	default:
 	{
-		char * message = malloc(sizeof(char) * (strlen(connection_url) + strlen(BAD_CONNECTION_URL_MESSAGE)));
+		char * message = o_malloc(sizeof(char) * (strlen(connection_url) + strlen(BAD_CONNECTION_URL_MESSAGE)));
 		sprintf(message, BAD_CONNECTION_URL_MESSAGE, connection_url);
 		o_database_error_handler_notify(error_handler, BAD_CONNECTION_URL_ID, message);
-		free(message);
+		o_free(message);
 		return 0;
 	}
 		break;
@@ -75,13 +76,14 @@ int o_url_resolve_host_port_from_path(char * path, char ** host, int * port, str
 	int pos = strcspn(path, ":");
 	if (pos != -1)
 	{
-		*host = malloc(pos * sizeof(char));
+		*host = o_malloc(pos * sizeof(char));
 		strncpy(*host, path, pos);
 		*port = atoi(path + pos);
 		return 0;
 	}
 	else
 	{
+		//TODO MANAGE WITH SPECILAZEND MALLOC
 		*host = strdup(path);
 		return 1;
 	}

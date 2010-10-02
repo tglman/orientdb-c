@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "o_memory.h"
 
 struct o_exception * o_exception_new(char * message, int code)
 {
-	struct o_exception * new_ex = malloc(sizeof(struct o_exception));
+	struct o_exception * new_ex = o_malloc(sizeof(struct o_exception));
 	o_exception_internal_init(new_ex, message, code);
 	return new_ex;
 }
@@ -13,7 +14,7 @@ struct o_exception * o_exception_new(char * message, int code)
 char * o_exception_what_generator(struct o_exception * exception)
 {
 	int base_size = strlen(exception->message);
-	char * what_string = malloc(sizeof(char) * (base_size + 50));
+	char * what_string = o_malloc(sizeof(char) * (base_size + 50));
 	sprintf(what_string, "error:%i:%s", exception->code, exception->message);
 	return what_string;
 }
@@ -21,7 +22,7 @@ char * o_exception_what_generator(struct o_exception * exception)
 void o_exception_default_free(struct o_exception *exception)
 {
 	o_exception_internal_free(exception);
-	free(exception);
+	o_free(exception);
 }
 
 void o_exception_internal_init(struct o_exception * exception, char * message, int code)
@@ -68,5 +69,5 @@ char * o_exception_what(struct o_exception * exception)
 void o_exception_internal_free(struct o_exception * exception)
 {
 	if (exception->what_cache != 0)
-		free(exception->what_cache);
+		o_free(exception->what_cache);
 }

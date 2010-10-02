@@ -1,9 +1,9 @@
 #include "o_record_internal.h"
-#include <malloc.h>
+#include "o_memory.h"
 
 struct o_record * o_record_new()
 {
-	struct o_record * record = malloc(sizeof(struct o_record));
+	struct o_record * record = o_malloc(sizeof(struct o_record));
 	o_record_new_internal(record);
 	return record;
 }
@@ -22,5 +22,5 @@ void o_record_free_internal(struct o_record * record)
 void o_record_free(struct o_record * record)
 {
 	o_record_free_internal(record);
-	free(record);
+	o_free(record);
 }

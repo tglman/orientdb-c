@@ -1,5 +1,5 @@
 #include "o_record_id.h"
-#include <malloc.h>
+#include "o_memory.h"
 
 #define CLUSTER_ID_INVALID	-1
 #define CLUSTER_POS_INVALID	 -1
@@ -17,7 +17,7 @@ struct o_record_id * o_record_id_new_empty()
 
 struct o_record_id * o_record_id_new(int cluster_id, long long record_id)
 {
-	struct o_record_id * record = malloc(sizeof(struct o_record_id));
+	struct o_record_id * record = o_malloc(sizeof(struct o_record_id));
 	record->cluster_id = cluster_id;
 	record->record_id = record_id;
 	return record;
@@ -35,5 +35,5 @@ long long o_record_id_record_id(struct o_record_id * o_id)
 
 void o_record_id_free(struct o_record_id * o_id)
 {
-	free(o_id);
+	o_free(o_id);
 }

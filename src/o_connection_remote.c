@@ -2,6 +2,7 @@
 #include "o_connection_internal.h"
 #include "socket_interface.h"
 #include "o_storage_remote.h"
+#include "o_memory.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,7 +18,7 @@ struct o_storage * o_connection_remote_storage_open(struct o_connection *connect
 struct o_connection * o_connection_remote_new(char * host, int port, char * username, char * password,
 		struct o_database_error_handler * error_handler)
 {
-	struct o_connection_remote * conn = malloc(sizeof(struct o_connection_remote));
+	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
 	conn->socket = o_database_socket_connect(host, port, error_handler);
 	//TODO: ask username and password validation
@@ -107,6 +108,6 @@ void o_connection_remote_free(struct o_connection *connection)
 {
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
 	o_database_socket_close(remote->socket, connection->error_handler);
-	free(remote);
+	o_free(remote);
 }
 

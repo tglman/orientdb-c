@@ -1,5 +1,5 @@
 #include "o_database_document.h"
-#include <malloc.h>
+#include "o_memory.h"
 #include "o_database_internal.h"
 
 struct o_database_document
@@ -19,7 +19,7 @@ struct o_database_document * o_database_document_new(char * connection_url)
 
 struct o_database_document * o_database_document_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
 {
-	struct o_database_document * new_db = malloc(sizeof(struct o_database_document));
+	struct o_database_document * new_db = o_malloc(sizeof(struct o_database_document));
 	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler);
 	return new_db;
 }
@@ -42,5 +42,5 @@ void o_database_document_save(struct o_database_document *db, struct o_document 
 void o_database_document_free(struct o_database_document * db)
 {
 	o_database_free_internal(o_database_document_to_database(db));
-	free(db);
+	o_free(db);
 }

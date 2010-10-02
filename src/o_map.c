@@ -1,6 +1,6 @@
 #include "o_map.h"
-#include <malloc.h>
 #include <string.h>
+#include "o_memory.h"
 
 #define DEFAULT_ENTRIES_SIZE 10
 
@@ -36,25 +36,25 @@ int o_map_hash_string(struct o_map * map, char * key)
 
 void o_map_clear_caches(struct o_map *map)
 {
-	free(map->cache_keys);
+	o_free(map->cache_keys);
 	map->cache_keys = 0;
-	free(map->cache_values);
+	o_free(map->cache_values);
 	map->cache_values = 0;
 }
 
 struct o_map * o_map_new()
 {
-	struct o_map * new_map = malloc(sizeof(struct o_map));
+	struct o_map * new_map = o_malloc(sizeof(struct o_map));
 	new_map->entries_size = DEFAULT_ENTRIES_SIZE;
-	new_map->entries = malloc(sizeof(struct o_map_entry *) * new_map->entries_size);
+	new_map->entries = o_malloc(sizeof(struct o_map_entry *) * new_map->entries_size);
 	memset(new_map->entries, 0, sizeof(struct o_map_entry *) * new_map->entries_size);
 	return new_map;
 }
 
 void o_map_free_entry(struct o_map_entry * entry)
 {
-	free(entry->key);
-	free(entry);
+	o_free(entry->key);
+	o_free(entry);
 }
 
 struct o_map_entry * o_map_get_entry(struct o_map * map, char * key, int hash)
@@ -76,7 +76,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 		new_entry->value = val;
 		return old_val;
 	}
-	new_entry = malloc(sizeof(struct o_map_entry));
+	new_entry = o_malloc(sizeof(struct o_map_entry));
 
 	new_entry->before = 0;
 	new_entry->map_next = 0;
@@ -88,7 +88,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 		map->first = new_entry;
 
 	int len_key = strlen(key);
-	char * key_copy = malloc(sizeof(char) * len_key);
+	char * key_copy = o_malloc(sizeof(char) * len_key);
 	memcpy(key_copy, key, len_key);
 	new_entry->key = key_copy;
 	new_entry->value = val;
@@ -136,7 +136,7 @@ char ** o_map_keys(struct o_map * map, int * keys_num)
 	if (map->cache_keys == 0)
 	{
 		int i = 0;
-		map->cache_keys = malloc(sizeof(char *) * map->size);
+		map->cache_keys = o_malloc(sizeof(char *) * map->size);
 		struct o_map_entry *iter = map->first;
 		while (iter != 0)
 		{
@@ -154,7 +154,7 @@ void ** o_map_values(struct o_map * map, int * values_num)
 	if (map->cache_values == 0)
 	{
 		int i = 0;
-		map->cache_values = malloc(sizeof(void *) * map->size);
+		map->cache_values = o_malloc(sizeof(void *) * map->size);
 		struct o_map_entry *iter = map->first;
 		while (iter != 0)
 		{
@@ -184,6 +184,6 @@ void o_map_free(struct o_map * map)
 			iter = iter->map_next;
 		}
 	}
-	free(map->entries);
-	free(map);
+	o_free(map->entries);
+	o_free(map);
 }

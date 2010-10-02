@@ -1,6 +1,6 @@
 #include "o_database.h"
 #include "o_database_internal.h"
-#include <malloc.h>
+#include "o_memory.h"
 #include <string.h>
 #include "o_connection.h"
 #include "o_storage.h"
@@ -13,7 +13,7 @@ struct o_database * o_database_new(char * connection_url)
 
 struct o_database * o_database_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
 {
-	struct o_database * new_db = malloc(sizeof(struct o_database));
+	struct o_database * new_db = o_malloc(sizeof(struct o_database));
 	o_database_new_internal(new_db, connection_url, error_handler);
 	return new_db;
 }
@@ -50,5 +50,5 @@ void o_database_free_internal(struct o_database * db)
 void o_database_free(struct o_database * db)
 {
 	o_database_free_internal(db);
-	free(db);
+	o_free(db);
 }

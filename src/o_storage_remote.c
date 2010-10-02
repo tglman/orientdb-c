@@ -3,6 +3,7 @@
 #include "o_exceptions.h"
 #include "o_exception_io.h"
 #include <stdlib.h>
+#include "o_memory.h"
 
 #define CURRENT_VERSION 0;
 
@@ -72,7 +73,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 		o_connection_remote_write_byte(rs->connection, o_record_content_type(content));
 		o_connection_remote_flush(rs->connection);
 	}
-	catch(struct o_exception_io)
+	catch(struct o_exception_io, cur_ex)
 	{
 	}
 	o_storage_release_exclusive_lock(rs);
@@ -117,7 +118,7 @@ void o_storage_remote_free(struct o_storage * storage)
 
 struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, struct o_database_error_handler * error_handler)
 {
-	struct o_storage_remote * storage = malloc(sizeof(struct o_storage_remote));
+	struct o_storage_remote * storage = o_malloc(sizeof(struct o_storage_remote));
 
 	storage->storage.o_storage_create_record = o_storage_remote_create_record;
 	storage->storage.o_storage_read_record = o_storage_remote_read_record;

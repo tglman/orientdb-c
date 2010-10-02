@@ -1,6 +1,7 @@
 #include "socket_interface.h"
 #include "o_exceptions.h"
 #include "o_exception_io.h"
+#include "o_memory.h"
 #include <stdio.h>
 #include <malloc.h>
 #include <memory.h>
@@ -20,7 +21,7 @@ struct o_database_socket * o_database_socket_connect(char * site, short port, st
 	struct sockaddr_in sock_info;
 	//TODO: Retrieve the socket information by the name of site.
 	struct hostent *he = gethostbyname(site);
-	struct o_database_socket *sock = malloc(sizeof(struct o_database_socket));
+	struct o_database_socket *sock =o_malloc(sizeof(struct o_database_socket));
 	sock->socket = socket(AF_INET, SOCK_STREAM, 0);
 	sock_info.sin_family = AF_INET;
 	sock_info.sin_port = htons(port);
@@ -50,5 +51,5 @@ int o_database_socket_has_data(struct o_database_socket * sock, struct o_databas
 void o_database_socket_close(struct o_database_socket * sock, struct o_database_error_handler * error_handler)
 {
 	shutdown(sock->socket, SHUT_RDWR);
-	free(sock);
+	o_free(sock);
 }

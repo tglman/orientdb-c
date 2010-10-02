@@ -1,5 +1,6 @@
 #include "o_exception_io.h"
 #include "o_exception_internal.h"
+#include "o_memory.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -20,12 +21,12 @@ void o_exception_io_free(struct o_exception * ex)
 {
 	o_exception_internal_free(ex);
 	struct o_exception_io * ex_io = (struct o_exception_io *)ex;
-	free(ex_io);
+	o_free(ex_io);
 }
 
 struct o_exception_io *o_exception_io_new(char * message, int code)
 {
-	struct o_exception_io * new_ex = malloc(sizeof(struct o_exception_io));
+	struct o_exception_io * new_ex = o_malloc(sizeof(struct o_exception_io));
 	o_exception_internal_init(&new_ex->base, message, code);
 	new_ex->base.match_type=o_exception_io_match;
 	new_ex->base.free =o_exception_io_free;

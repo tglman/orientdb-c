@@ -8,13 +8,13 @@
  * \param name of the type of exception.
  * \return 1 if the type specified by name match otherwise 0.
  */
-int o_catch_type(char * name);
+int o_catch_type(char * name,void **val,jmp_buf cur_jmp);
 
-/*! \brief Retrieve the poiter of exception.
+/*! \brief push a begin of a try.
  *
- * \return the value of current exception.
+ * \param cur_jmp to push in stack
  */
-void * o_catch_value();
+int o_try_push(jmp_buf cur_jmp);
 
 /*! \brief manage a throw of exception.
  *
@@ -29,27 +29,18 @@ void o_notify_object(char * name, void * value);
  */
 void o_notify_exception(struct o_exception * exception);
 
-/*! \brief the base jmp variable.
- */
-extern __thread jmp_buf exception_try_pos_jmp;
-
 /*! \brief begin block try.
  */
-#define try if(setjmp(exception_try_pos_jmp)==0 && push(exception_try_pos_jmp))
+#define try jmp_buf current_try_pos_jmp;if(setjmp(current_try_pos_jmp)==0 && o_try_push(current_try_pos_jmp))
 
 /*! \brief begin block catch.
  */
-#define catch(VAR)  else if(o_catch_type(#VAR))
-
-/*! \brief retrieve the current exception var.
- *
- */
-#define exception(VAR) (VAR *)o_catch_value()
+#define catch(TYPE,VAR_NAME) TYPE *VAR_NAME; if(o_catch_type(#TYPE,(void **)&VAR_NAME,current_try_pos_jmp))
 
 /*! \brief throw a new exception.
  *
  */
-#define throw_type(TYPE,INSTANCE) o_notify_exception(#TYPE,(TYPE *)INSTANCE)
+#define throw_type(TYPE,INSTANCE) o_notify_object(#TYPE,(TYPE *)INSTANCE)
 
 #define throw(EXCEPTION) o_notify_exception((struct o_exception *)EXCEPTION)
 
