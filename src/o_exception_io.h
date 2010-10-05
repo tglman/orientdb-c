@@ -1,5 +1,6 @@
 #ifndef O_EXCEPTION_IO_H_
 #define O_EXCEPTION_IO_H_
+#include "o_exceptions.h"
 
 struct o_exception_io;
 

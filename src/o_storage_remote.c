@@ -116,7 +116,7 @@ void o_storage_remote_free(struct o_storage * storage)
 
 }
 
-struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, struct o_database_error_handler * error_handler)
+struct o_storage * o_storage_remote_new(struct o_connection_remote * conn)
 {
 	struct o_storage_remote * storage = o_malloc(sizeof(struct o_storage_remote));
 

@@ -8,28 +8,28 @@
 
 struct o_connection_remote
 {
+	//Inerith
 	struct o_connection connection;
 	struct o_database_socket *socket;
 };
 
 void o_connection_remote_free(struct o_connection *connection);
-struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name);
+struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name,char * username, char * password);
 
-struct o_connection * o_connection_remote_new(char * host, int port, char * username, char * password,
-		struct o_database_error_handler * error_handler)
+struct o_connection * o_connection_remote_new(char * host, int port)
 {
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
-	conn->socket = o_database_socket_connect(host, port, error_handler);
-	//TODO: ask username and password validation
+	conn->socket = o_database_socket_connect(host, port);
 	conn->connection.free = o_connection_remote_free;
 	return &conn->connection;
 }
 
-struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name)
+struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name,char * username, char * password)
 {
+	//TODO: ask username and password validation
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	struct o_storage * new_storage = o_storage_remote_new(remote, connection->error_handler);
+	struct o_storage * new_storage = o_storage_remote_new(remote);
 	return new_storage;
 }
 
@@ -107,7 +107,7 @@ void o_connection_remote_write_array_strings(struct o_connection_remote * connec
 void o_connection_remote_free(struct o_connection *connection)
 {
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	o_database_socket_close(remote->socket, connection->error_handler);
+	o_database_socket_close(remote->socket);
 	o_free(remote);
 }
 

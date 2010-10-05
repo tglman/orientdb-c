@@ -3,10 +3,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "o_exception_io.h"
 #include "o_database_errors.h"
 #include "o_memory.h"
 
-enum o_url_type o_url_resolve_type(char * connection_url, struct o_database_error_handler * error_handler)
+enum o_url_type o_url_resolve_type(char * connection_url)
 {
 	char protocol[10];
 	strncpy(connection_url, protocol, 9);
@@ -25,11 +26,10 @@ enum o_url_type o_url_resolve_type(char * connection_url, struct o_database_erro
 
 }
 
-int o_url_resolve_information(char * connection_url, enum o_url_type *type, char **path, char ** db_name,
-		struct o_database_error_handler * error_handler)
+int o_url_resolve_information(char * connection_url, enum o_url_type *type, char **path, char ** db_name)
 {
 	int pos;
-	*type = o_url_resolve_type(connection_url, error_handler);
+	*type = o_url_resolve_type(connection_url);
 	switch (*type)
 	{
 	case HTTP:
@@ -62,8 +62,9 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 	{
 		char * message = o_malloc(sizeof(char) * (strlen(connection_url) + strlen(BAD_CONNECTION_URL_MESSAGE)));
 		sprintf(message, BAD_CONNECTION_URL_MESSAGE, connection_url);
-		o_database_error_handler_notify(error_handler, BAD_CONNECTION_URL_ID, message);
+		struct o_exception_io *ex = o_exception_io_new(message, BAD_CONNECTION_URL_ID);
 		o_free(message);
+		throw(ex);
 		return 0;
 	}
 		break;
@@ -71,7 +72,7 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 	return 1;
 }
 
-int o_url_resolve_host_port_from_path(char * path, char ** host, int * port, struct o_database_error_handler * error_handler)
+int o_url_resolve_host_port_from_path(char * path, char ** host, int * port)
 {
 	int pos = strcspn(path, ":");
 	if (pos != -1)

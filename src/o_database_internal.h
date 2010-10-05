@@ -6,7 +6,6 @@ struct o_database
 {
 	struct o_database_error_handler * error_handler;
 	char * connection_url;
-	struct o_connection * connection;
 	struct o_storage * storage;
 };
 

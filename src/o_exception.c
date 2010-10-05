@@ -27,7 +27,9 @@ void o_exception_default_free(struct o_exception *exception)
 
 void o_exception_internal_init(struct o_exception * exception, char * message, int code)
 {
-	exception->message = message;
+	int len = strlen(message);
+	exception->message = o_malloc(sizeof(char) * len);
+	memcpy(exception->message, message, len);
 	exception->code = code;
 	exception->what_cache = 0;
 	exception->what = o_exception_what_generator;
@@ -70,4 +72,5 @@ void o_exception_internal_free(struct o_exception * exception)
 {
 	if (exception->what_cache != 0)
 		o_free(exception->what_cache);
+	o_free(exception->free);
 }

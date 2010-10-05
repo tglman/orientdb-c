@@ -12,22 +12,20 @@ struct o_connection;
  * Create a new connection to database.
  * @param type of connection.
  * @param path the location for connection, or a file or an host:port string.
- * @param username for current connection.
- * @param password correspondent to username.
- * @param error_handler where signal the errors.
  * @return a new connection or 0 if connectio fail.
  *
  */
-struct o_connection * o_connection_new(enum o_url_type type, char * path, char * username, char * password,
-		struct o_database_error_handler * error_handler);
+struct o_connection * o_connection_new(enum o_url_type type, char * path);
 
 /**
  * Open an storage on connection if exist.
  *
  * @param the name of storage.
+ * @param username for current connection.
+ * @param password correspondent to username.
  * @return the new instance of storage.
  */
-struct o_storage * o_connection_storage_open(struct o_connection * conn,char * name);
+struct o_storage * o_connection_storage_open(struct o_connection * conn,char * name,char * username, char * password);
 
 /**
  * Free a connection structure and close all socket.

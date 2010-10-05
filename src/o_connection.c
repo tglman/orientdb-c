@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct o_connection * o_connection_new(enum o_url_type type, char * path, char * username, char * password,
-		struct o_database_error_handler * error_handler)
+struct o_connection * o_connection_new(enum o_url_type type, char * path)
 {
 	struct o_connection *conn;
 	int port;
@@ -13,23 +12,22 @@ struct o_connection * o_connection_new(enum o_url_type type, char * path, char *
 	switch (type)
 	{
 	case REMOTE:
-		if (!o_url_resolve_host_port_from_path(path, &host, &port, error_handler))
+		if (!o_url_resolve_host_port_from_path(path, &host, &port))
 			port = 2424;
-		conn = o_connection_remote_new(path, port, username, password, error_handler);
+		conn = o_connection_remote_new(path, port);
 		break;
 	case HTTP:
 		break;
 	case LOCAL:
 		break;
 	}
-	conn->error_handler = error_handler;
 	conn->type = type;
 	return conn;
 }
 
-struct o_storage * o_connection_storage_open(struct o_connection * conn, char * name)
+struct o_storage * o_connection_storage_open(struct o_connection * conn, char * name, char * username, char * password)
 {
-	return conn->storage_open(conn, name);
+	return conn->storage_open(conn, name, username, password);
 }
 
 void o_connection_free(struct o_connection * connection)
