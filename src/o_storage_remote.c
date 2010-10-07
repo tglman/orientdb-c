@@ -3,7 +3,9 @@
 #include "o_exceptions.h"
 #include "o_exception_io.h"
 #include <stdlib.h>
+#include <string.h>
 #include "o_memory.h"
+#include "o_connection_remote.h"
 
 #define CURRENT_VERSION 0;
 
@@ -49,6 +51,7 @@ struct o_storage_remote
 {
 	struct o_storage storage;
 	struct o_connection_remote * connection;
+	char * sessionId;
 };
 
 void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
@@ -59,6 +62,14 @@ void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
 void o_storage_release_exclusive_lock(struct o_storage_remote * storage)
 {
 
+}
+
+void o_storage_remote_check_status(struct o_storage_remote * storage)
+{
+	if (o_connection_remote_read_byte(storage->connection) == ERROR)
+	{
+
+	}
 }
 
 long long o_storage_remote_create_record(struct o_storage * storage, int cluster, struct o_record_content * content)
@@ -75,12 +86,14 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	}
 	catch(struct o_exception_io, cur_ex)
 	{
+		o_exception_free((struct o_exception *) cur_ex);
 	}
 	o_storage_release_exclusive_lock(rs);
 	//readStatus();
 	//return network.readLong();
 	return 0;
 }
+
 struct o_record_content * o_storage_remote_read_record(struct o_storage * storage, struct o_record_id * id, int * version)
 {
 	return 0;
@@ -113,24 +126,44 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 
 void o_storage_remote_free(struct o_storage * storage)
 {
-
+	o_storage_internal_free(storage);
+	struct o_storage_remote * storage_remote = (struct o_storage_remote *) storage;
+	o_free(storage_remote->sessionId);
+	o_free(storage_remote);
 }
 
-struct o_storage * o_storage_remote_new(struct o_connection_remote * conn)
+struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char * name, char * username, char * password)
 {
-	struct o_storage_remote * storage = o_malloc(sizeof(struct o_storage_remote));
+	struct o_storage_remote * storage = 0;
+	try
+	{
+		storage = o_malloc(sizeof(struct o_storage_remote));
+		storage->storage.name = name;
+		storage->storage.o_storage_create_record = o_storage_remote_create_record;
+		storage->storage.o_storage_read_record = o_storage_remote_read_record;
+		storage->storage.o_storage_update_record = o_storage_remote_update_record;
 
-	storage->storage.o_storage_create_record = o_storage_remote_create_record;
-	storage->storage.o_storage_read_record = o_storage_remote_read_record;
-	storage->storage.o_storage_update_record = o_storage_remote_update_record;
+		storage->storage.o_storage_delete_record = o_storage_remote_delete_record;
+		storage->storage.o_storage_get_cluster_names = o_storage_remote_get_cluster_names;
+		storage->storage.o_storage_get_cluster_id_by_name = o_storage_remote_get_cluster_id_by_name;
 
-	storage->storage.o_storage_delete_record = o_storage_remote_delete_record;
-	storage->storage.o_storage_get_cluster_names = o_storage_remote_get_cluster_names;
-	storage->storage.o_storage_get_cluster_id_by_name = o_storage_remote_get_cluster_id_by_name;
+		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
+		storage->storage.o_storage_free = o_storage_remote_free;
+		storage->connection = conn;
 
-	storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
-	storage->storage.o_storage_free = o_storage_remote_free;
-	storage->connection = conn;
-
+		o_connection_remote_write_byte(storage->connection, DB_OPEN);
+		o_connection_remote_write_bytes(storage->connection, name, strlen(name));
+		o_connection_remote_write_bytes(storage->connection, username, strlen(username));
+		o_connection_remote_write_bytes(storage->connection, password, strlen(password));
+		o_connection_remote_flush(storage->connection);
+		o_storage_remote_check_status(storage);
+		int readSize;
+		storage->sessionId = o_connection_remote_read_bytes(storage->connection, readSize);
+	}
+	catch(struct o_exception, ex)
+	{
+		o_free(storage);
+		throw(ex);
+	}
 	return &storage->storage;
 }

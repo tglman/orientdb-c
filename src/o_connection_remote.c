@@ -29,7 +29,7 @@ struct o_storage * o_connection_remote_storage_open(struct o_connection *connect
 {
 	//TODO: ask username and password validation
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	struct o_storage * new_storage = o_storage_remote_new(remote);
+	struct o_storage * new_storage = o_storage_remote_new(remote,name,username,password);
 	return new_storage;
 }
 
