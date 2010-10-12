@@ -6,7 +6,7 @@
 
 struct o_connection * o_connection_new(enum o_url_type type, char * path)
 {
-	struct o_connection *conn;
+	struct o_connection *conn = 0;
 	int port;
 	char * host;
 	switch (type)

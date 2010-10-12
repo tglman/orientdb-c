@@ -47,11 +47,21 @@
 // CONSTANTS
 #define RECORD_NULL -2
 
+struct o_storage_remote_cluster
+{
+	char * storage_name;
+	int id;
+	char * type;
+	struct o_storage_remote_cluster *next;
+};
+
 struct o_storage_remote
 {
 	struct o_storage storage;
 	struct o_connection_remote * connection;
 	char * sessionId;
+	int n_cluster;
+	struct o_storage_remote_cluster *clusters;
 };
 
 void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
@@ -158,7 +168,20 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		o_connection_remote_flush(storage->connection);
 		o_storage_remote_check_status(storage);
 		int readSize;
-		storage->sessionId = o_connection_remote_read_bytes(storage->connection, readSize);
+		storage->sessionId = o_connection_remote_read_bytes(storage->connection, &readSize);
+		storage->n_cluster = o_connection_remote_read_int(storage->connection);
+		int i;
+		struct o_storage_remote_cluster **clusters = &storage->clusters;
+		for (i = 0; i < storage->n_cluster; i++)
+		{
+			struct o_storage_remote_cluster *cluster = o_malloc(sizeof(struct o_storage_remote_cluster ));
+			cluster->storage_name=o_connection_remote_read_bytes(storage->connection, &readSize);
+			cluster->id=o_connection_remote_read_int(storage->connection);
+			cluster->type=o_connection_remote_read_bytes(storage->connection, &readSize);
+			*clusters=cluster;
+			clusters=&cluster->next;
+		}
+		//MANAGE DEFAULT CLUSTER.
 	}
 	catch(struct o_exception, ex)
 	{

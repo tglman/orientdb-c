@@ -72,5 +72,11 @@ void o_exception_internal_free(struct o_exception * exception)
 {
 	if (exception->what_cache != 0)
 		o_free(exception->what_cache);
-	o_free(exception->free);
+	if (exception->message != 0)
+		o_free(exception->message);
+}
+
+void o_exception_free(struct o_exception * exception)
+{
+	exception->free(exception);
 }
