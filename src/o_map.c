@@ -45,6 +45,7 @@ void o_map_clear_caches(struct o_map *map)
 struct o_map * o_map_new()
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
+	memset(new_map, 0, sizeof(struct o_map));
 	new_map->entries_size = DEFAULT_ENTRIES_SIZE;
 	new_map->entries = o_malloc(sizeof(struct o_map_entry *) * new_map->entries_size);
 	memset(new_map->entries, 0, sizeof(struct o_map_entry *) * new_map->entries_size);

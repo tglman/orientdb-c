@@ -47,9 +47,9 @@ int o_catch_type(char * name, void **val, jmp_buf cur_jmp)
 int o_try_push(jmp_buf jump)
 {
 	struct jmp_stack * to_push = o_malloc(sizeof(struct jmp_stack));
-	//to_push->cur_jmp = cur_jmp;
 	to_push->cur_jmp = jump;
 	to_push->back = stack_top;
+	stack_top = to_push;
 	return 1;
 }
 

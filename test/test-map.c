@@ -1,7 +1,7 @@
 #include "../src/o_map.h"
 #include <TestFramework/test.h>
 #include "test-map.h"
-
+#include <stdio.h>
 
 void o_map_test()
 {
