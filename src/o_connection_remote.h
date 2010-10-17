@@ -1,7 +1,15 @@
 #ifndef O_CONNECTION_REMOTE_H_
 #define O_CONNECTION_REMOTE_H_
 #include "o_connection_internal.h"
+#include "o_database_socket.h"
 struct o_connection_remote;
+
+/*! \brief Retrieve a new remote connection from an listen socket.
+ *
+ * \param listen_socket the listen socket.
+ * \return the new connection.
+ */
+struct o_connection * o_connection_remote_new_accept(struct o_database_socket * listen_sock);
 
 /**
  * Read an int from connection.

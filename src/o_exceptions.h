@@ -29,6 +29,11 @@ void o_notify_object(char * name, void * value);
  */
 void o_notify_exception(struct o_exception * exception);
 
+/*! \brief if exist not catch exception jump to up catch.
+ *
+ */
+void o_notify_up_catch();
+
 /*! \brief begin block try.
  */
 #define try jmp_buf current_try_pos_jmp;if(setjmp(current_try_pos_jmp)==0 && o_try_push(current_try_pos_jmp))
@@ -43,5 +48,7 @@ void o_notify_exception(struct o_exception * exception);
 #define throw_type(TYPE,INSTANCE) o_notify_object(#TYPE,(TYPE *)INSTANCE)
 
 #define throw(EXCEPTION) o_notify_exception((struct o_exception *)EXCEPTION)
+
+#define end_try o_notify_up_catch()
 
 #endif /* O_EXCEPTIONS_H_ */

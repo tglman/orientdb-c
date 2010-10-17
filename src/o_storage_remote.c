@@ -98,6 +98,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	{
 		o_exception_free((struct o_exception *) cur_ex);
 	}
+	end_try;
 	o_storage_release_exclusive_lock(rs);
 	//readStatus();
 	//return network.readLong();
@@ -188,5 +189,7 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		o_free(storage);
 		throw(ex);
 	}
+	end_try;
+
 	return &storage->storage;
 }

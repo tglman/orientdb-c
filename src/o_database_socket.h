@@ -11,13 +11,28 @@ struct o_database_socket;
  */
 struct o_database_socket * o_database_socket_connect(char * site, short port);
 
+/*! \brief Start a new listen socket.
+ *
+ * \param accepted host conncetion.
+ * \param port listen port.
+ */
+struct o_database_socket * o_database_socket_listen(char * site, short port);
+
+/*! \brief Create a new socket from an listen socket for accept.
+ * 			this function return only after accept.
+ *
+ * \param listen the socket in listening.
+ * \return a new socket from accepted connection.
+ */
+struct o_database_socket * o_database_socket_accept(struct o_database_socket * listen);
+
 /** send a data to a socket.
  *
  * @param sock the destination socket.
  * @param buff the data to send.
  * @param buff_size the length of buffer to write.
  */
-void o_database_socket_send(struct o_database_socket * sock, char * buff, int buff_size);
+void o_database_socket_send(struct o_database_socket * sock, void * buff, int buff_size);
 
 /** Receive the data from a socket.
  *
@@ -25,7 +40,7 @@ void o_database_socket_send(struct o_database_socket * sock, char * buff, int bu
  * @param buff the buffer to fill.
  * @param buff_size the length of buffer to fill.
  */
-void o_database_socket_recv(struct o_database_socket * sock, char * buff, int buff_size);
+void o_database_socket_recv(struct o_database_socket * sock, void * buff, int * buff_size);
 
 /** check if the socket contains data to receive.
  *

@@ -70,7 +70,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 {
 	int hash = o_map_hash_string(map, key);
 	o_map_clear_caches(map);
-	struct o_map_entry * new_entry = o_map_get_entry(map, key,hash);
+	struct o_map_entry * new_entry = o_map_get_entry(map, key, hash);
 	if (new_entry != 0)
 	{
 		void * old_val = new_entry->value;
@@ -88,7 +88,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 	if (map->first == 0)
 		map->first = new_entry;
 
-	int len_key = strlen(key);
+	int len_key = strlen(key) + 1;
 	char * key_copy = o_malloc(sizeof(char) * len_key);
 	memcpy(key_copy, key, len_key);
 	new_entry->key = key_copy;
@@ -105,7 +105,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 void * o_map_get(struct o_map * map, char * key)
 {
 	int hash = o_map_hash_string(map, key);
-	struct o_map_entry * found = o_map_get_entry(map, key,hash);
+	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	if (found != 0)
 		return found->value;
 	return 0;
@@ -114,7 +114,7 @@ void * o_map_get(struct o_map * map, char * key)
 void * o_map_remove(struct o_map * map, char * key)
 {
 	int hash = o_map_hash_string(map, key);
-	struct o_map_entry * found = o_map_get_entry(map, key,hash);
+	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	void *value = 0;
 	if (found != 0)
 	{
