@@ -27,7 +27,7 @@ void o_exception_default_free(struct o_exception *exception)
 
 void o_exception_internal_init(struct o_exception * exception, char * message, int code)
 {
-	int len = strlen(message);
+	int len = strlen(message) + 1;
 	exception->message = o_malloc(sizeof(char) * len);
 	memcpy(exception->message, message, len);
 	exception->code = code;

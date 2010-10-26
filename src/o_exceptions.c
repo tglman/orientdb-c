@@ -2,6 +2,7 @@
 #include "o_exceptions.h"
 #include <string.h>
 #include "o_memory.h"
+#include <stdio.h>
 
 struct jmp_stack
 {
@@ -16,19 +17,22 @@ struct exception
 	char catched;
 };
 
-__thread struct exception cur_exception;
+__thread struct exception cur_exception =
+{ 0, 0, 1 };
 __thread struct jmp_stack *stack_top = 0;
 
 int o_catch_type(char * name, void **val, jmp_buf cur_jmp)
 {
 	if (cur_exception.catched)
 		return 0;
+
 	if (cur_jmp == stack_top->cur_jmp)
 	{
 		struct jmp_stack *stack_free = stack_top;
 		stack_top = stack_top->back;
 		o_free(stack_free);
 	}
+
 	if (cur_exception.name == 0)
 	{
 		if (o_exception_typeof(cur_exception.instance, name))

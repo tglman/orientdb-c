@@ -38,7 +38,6 @@ struct o_connection * o_connection_remote_new(char * host, int port)
 
 struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name, char * username, char * password)
 {
-	//TODO: ask username and password validation
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
 	struct o_storage * new_storage = o_storage_remote_new(remote, name, username, password);
 	return new_storage;
@@ -54,8 +53,11 @@ int o_connection_remote_read_int(struct o_connection_remote * connection)
 
 long long o_connection_remote_read_long64(struct o_connection_remote * connection)
 {
-	//TODO:
-	return 0;
+	long long ret_val;
+	int recv_data = sizeof(ret_val);
+	o_database_socket_recv(connection->socket, &ret_val, &recv_data);
+	ret_val = (((long long)(ntohl((int) ((ret_val << 32) >> 32))) << 32) | (unsigned int) ntohl(((int) (ret_val >> 32))));
+	return ret_val;
 }
 
 char o_connection_remote_read_byte(struct o_connection_remote * connection)
@@ -76,8 +78,10 @@ short o_connection_remote_read_short(struct o_connection_remote * connection)
 
 char * o_connection_remote_read_bytes(struct o_connection_remote * connection, int *byte_read)
 {
-	//TODO:
-	return 0;
+	*byte_read = o_connection_remote_read_int(connection);
+	char * bytes = o_malloc(*byte_read *sizeof(char));
+	o_database_socket_recv(connection->socket,bytes,byte_read);
+	return bytes;
 }
 
 char ** o_connection_remote_read_array_strings(struct o_connection_remote * connection, int *array_size)
@@ -94,7 +98,8 @@ void o_connection_remote_write_int(struct o_connection_remote * connection, int 
 
 void o_connection_remote_write_long64(struct o_connection_remote * connection, long long long_value)
 {
-	//TODO:
+	long_value = (((long long)(ntohl((int) ((long_value << 32) >> 32))) << 32) | (unsigned int) ntohl(((int) (long_value >> 32))));
+	o_database_socket_send(connection->socket, &long_value, sizeof(long_value));
 }
 
 void o_connection_remote_write_byte(struct o_connection_remote * connection, char byte_value)
@@ -104,13 +109,14 @@ void o_connection_remote_write_byte(struct o_connection_remote * connection, cha
 
 void o_connection_remote_write_short(struct o_connection_remote * connection, short short_value)
 {
-	short_value = htonl(short_value);
+	short_value = htons(short_value);
 	o_database_socket_send(connection->socket, &short_value, sizeof(short_value));
 }
 
 void o_connection_remote_write_bytes(struct o_connection_remote * connection, char *byte_array, int length)
 {
-	//TODO:
+	o_connection_remote_write_int(connection,length);
+	o_database_socket_send(connection->socket, byte_array, length);
 }
 
 void o_connection_remote_flush(struct o_connection_remote * connection)
