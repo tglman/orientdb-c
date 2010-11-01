@@ -113,7 +113,55 @@ void test_o_connection_local_data_transfer()
 	end_try;
 }
 
+void test_o_connection_remote_data_transfer()
+{
+	try
+	{
+
+		struct o_connection * client_con = o_connection_remote_new(HOST_TEST, 3333);
+		struct o_connection_remote * client = (struct o_connection_remote *) client_con;
+
+		o_connection_remote_write_int(client, 10);
+		int val = o_connection_remote_read_int(client);
+		assert_true(val == 10, "error transfer int");
+
+		o_connection_remote_write_byte(client, 10);
+		char val_c = o_connection_remote_read_byte(client);
+		assert_true(val_c == 10, "error transfer byte");
+
+		o_connection_remote_write_short(client, 10);
+		short val_s = o_connection_remote_read_short(client);
+		assert_true(val_s == 10, "error transfer short");
+
+		o_connection_remote_write_long64(client, 10);
+		long long val_64 = o_connection_remote_read_long64(client);
+		assert_true(val_64 == 10, "error transfer long 64");
+
+		char to_send[15] =
+		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+		o_connection_remote_write_bytes(client, to_send, 15);
+
+		int number;
+		char *bytes = o_connection_remote_read_bytes(client, &number);
+		assert_true(number == 15, "error transfer size of byte array");
+		int i;
+		for (i = 0; i < 15; ++i)
+			assert_true(bytes[i] == to_send[i], "error transfer content of byte array");
+		o_free(bytes);
+
+		o_connection_free(client_con);
+	}
+	catch (struct o_exception, e)
+	{
+		char buf[512];
+		sprintf(buf, "Error Message %s", o_exception_message(e));
+		fail(buf);
+	}
+	end_try;
+}
+
 void o_connection_remote_suite()
 {
 	ADD_TEST(test_o_connection_local_data_transfer, " test a connection client server data transfer");
+	ADD_TEST(test_o_connection_remote_data_transfer, " test a connection to java server with data transfer");
 }
