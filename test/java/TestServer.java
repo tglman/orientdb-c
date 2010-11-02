@@ -36,15 +36,15 @@ public class TestServer {
 			in.read(content);
 			out.writeInt(number);
 			out.write(content);
-
-			/*
-			char * string = o_connection_remote_read_string(server);
-			o_connection_remote_write_string(server, string);
-			o_free(string);
-*/
-
+			
+			int char_number = in.readInt();
+			byte [] char_content = new byte[char_number];
+			in.read(char_content);
+			String str = new String(char_content);
+			out.writeInt(str.length());
+			out.write(str.getBytes());
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

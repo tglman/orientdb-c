@@ -10,10 +10,10 @@
 enum o_url_type o_url_resolve_type(char * connection_url)
 {
 	char protocol[10];
-	strncpy(connection_url, protocol, 9);
+	strncpy(protocol, connection_url, 9);
 	protocol[9] = 0;
 	int i;
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 9; i++)
 		protocol[i] = toupper(protocol[i]);
 	if (strncmp(protocol, HTTP_PROTOCOL_PARAMETER, HTTP_PROTOCOL_PARAMETER_LENGHT) == 0)
 		return HTTP;
@@ -47,12 +47,14 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 	case REMOTE:
 		connection_url += HTTP_PROTOCOL_PARAMETER_LENGHT;
 		pos = strcspn(connection_url, "/");
-		*path = o_malloc(pos * sizeof(char));
+		*path = o_malloc(pos+1 * sizeof(char));
 		strncpy(*path, connection_url, pos);
+		(*(path))[pos] = 0;
 		connection_url += pos + 1;
 		pos = strcspn(connection_url, "/");
-		*db_name = o_malloc(pos * sizeof(char));
+		*db_name = o_malloc(pos+1 * sizeof(char));
 		strncpy(*db_name, connection_url, pos);
+		(*(db_name))[pos] = 0;
 		break;
 	case LOCAL:
 		connection_url += HTTP_PROTOCOL_PARAMETER_LENGHT;

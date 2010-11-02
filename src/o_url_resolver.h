@@ -15,6 +15,13 @@ enum o_url_type
 	HTTP = 1, REMOTE = 2, LOCAL = 3
 };
 
+/*! \brief Resolve the type of url from path.
+ *
+ * \param connection_url to check.
+ * \return the type of url.
+ */
+enum o_url_type o_url_resolve_type(char * connection_url);
+
 /** Resolve the connection information from url.
  *
  * @param connection_url
