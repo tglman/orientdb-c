@@ -4,11 +4,22 @@
 
 /*! \brief Alloc a new memory area.
  *
+ *\param size to alloc.
+ *\retunr the new allocated data.
  */
 void * o_malloc(size_t size);
 
+/*! \brief Enlarge an existing memory or alloc new and copy content.
+ *
+ * \param cur to expand.
+ * \param new size.
+ * \return cur or a new allocate memory pointer,
+ */
+void * o_realloc(void * cur, int new_size);
+
 /*! \brief Free a memory area.
  *
+ *\param ptr to free.
  */
 void o_free(void * ptr);
 
