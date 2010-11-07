@@ -7,6 +7,11 @@ struct o_database_document
 	struct o_database database;
 };
 
+void o_document_record_writer(struct o_record *record, struct o_string_buffer * buffer)
+{
+
+}
+
 struct o_database * o_database_document_to_database(struct o_database_document * db)
 {
 	return &db->database;
@@ -21,6 +26,7 @@ struct o_database_document * o_database_document_new_error_handler(char * connec
 {
 	struct o_database_document * new_db = o_malloc(sizeof(struct o_database_document));
 	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler);
+	new_db->database.o_record_writer = o_document_record_writer;
 	return new_db;
 }
 

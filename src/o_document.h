@@ -1,10 +1,14 @@
 #ifndef O_DOCUMENT_H_
 #define O_DOCUMENT_H_
 #include "o_record.h"
-
-struct o_document;
+#include "o_string_buffer.h"
 
 struct o_document_value;
+
+/*! \brief A document.
+ *
+ */
+struct o_document;
 
 /**
  * instantiate a new document.
@@ -78,6 +82,13 @@ void o_document_remove_field(struct o_document *doc, char * field_name);
  * @return a new copy of document.
  */
 struct o_document * o_document_copy(struct o_document * doc);
+
+/*! \brief write the document to buffer.
+ *
+ * \param doc to write.
+ * \param buff where write.
+ */
+void o_document_serialize(struct o_document * doc,struct o_string_buffer * buff);
 
 /** deallocate an document with all it structure.
  *

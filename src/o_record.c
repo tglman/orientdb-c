@@ -14,6 +14,11 @@ void o_record_new_internal(struct o_record * record)
 	record->version = 0;
 }
 
+struct o_record_id * o_record_get_id(struct o_record * record)
+{
+	return record->record_id;
+}
+
 void o_record_free_internal(struct o_record * record)
 {
 	o_record_id_free(record->record_id);

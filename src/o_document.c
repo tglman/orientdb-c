@@ -2,6 +2,8 @@
 #include "o_map.h"
 #include "o_record_internal.h"
 #include "o_memory.h"
+#include "o_document_value.h"
+#include "o_string_buffer.h"
 
 struct o_document
 {
@@ -69,6 +71,21 @@ struct o_document * o_document_copy(struct o_document * doc)
 	for (i = 0; i < size; ++i)
 		o_map_put(new_doc->fields, keys[i], o_map_get(new_doc->fields, keys[i]));
 	return new_doc;
+}
+
+void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff)
+{
+	int names_count;
+	char ** names = o_document_field_names(doc, &names_count);
+	int i;
+	for (i = 0; i < names_count; i++)
+	{
+		o_string_buffer_append(buff,names[i]);
+		o_string_buffer_append(buff,":");
+		o_document_value_serialize(o_document_field_get(doc, names[i]), buff);
+		if (i < names_count)
+			o_string_buffer_append(buff,",");
+	}
 }
 
 void o_document_free(struct o_document * doc)

@@ -1,7 +1,6 @@
 #ifndef O_RECORD_INTERNAL_H_
 #define O_RECORD_INTERNAL_H_
 #include "o_record.h"
-#include "o_record_id.h"
 
 struct o_record
 {

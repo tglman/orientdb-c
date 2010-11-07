@@ -1,6 +1,8 @@
 #ifndef O_RECORD_H_
 #define O_RECORD_H_
 
+#include "o_record_id.h"
+
 /**
  * The record.
  */
@@ -12,6 +14,13 @@ struct o_record;
  * @return the new record.
  */
 struct o_record * o_record_new();
+
+/*! \brief Retrieve the record id of record.
+ *
+ * \param record where retrive id.
+ * \return the record id.
+ */
+struct o_record_id * o_record_get_id(struct o_record * record);
 
 /**
  * Free a record.
