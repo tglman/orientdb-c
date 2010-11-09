@@ -1,4 +1,4 @@
-#include "test_connection_remote.h"
+#include "test_o_connection_remote.h"
 #include "../src/o_connection_remote.h"
 #include "../src/o_database_socket.h"
 #include <TestFramework/test.h>

@@ -24,7 +24,7 @@ void o_string_buffer_append(struct o_string_buffer * buff, char * to_append);
  * \param buff where append.
  * \param long_val to append.
  */
-void o_string_buffer_append_long(struct o_string_buffer * buff, long long_val);
+void o_string_buffer_append_long(struct o_string_buffer * buff, long long long_val);
 
 /*! \brief Append double value to buffer.
  *

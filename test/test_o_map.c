@@ -1,6 +1,6 @@
 #include "../src/o_map.h"
 #include <TestFramework/test.h>
-#include "test_map.h"
+#include "test_o_map.h"
 
 void o_map_test()
 {

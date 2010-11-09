@@ -34,18 +34,18 @@ void o_string_buffer_append(struct o_string_buffer * buff, char * to_append)
 	buff->cursor += size;
 }
 
-void o_string_buffer_append_long(struct o_string_buffer * buff, long long_val)
+void o_string_buffer_append_long(struct o_string_buffer * buff, long long long_val)
 {
 	char val[20];
-	sprinf(val,"%i",long_val);
-	o_string_buffer_append(buff,val);
+	sprintf(val, "%Li", long_val);
+	o_string_buffer_append(buff, val);
 }
 
 void o_string_buffer_append_double(struct o_string_buffer * buff, double double_val)
 {
 	char val[20];
-	sprinf(val,"%d",double_val);
-	o_string_buffer_append(buff,val);
+	sprintf(val, "%g", double_val);
+	o_string_buffer_append(buff, val);
 }
 
 char * o_string_buffer_str(struct o_string_buffer * buff)
