@@ -14,8 +14,8 @@ void o_url_resolve_type_test()
 
 void o_url_resolve_information_test()
 {
-	char *path = o_malloc(512);
-	char *database = o_malloc(512);
+	char *path;
+	char *database;
 	enum o_url_type type;
 	o_url_resolve_information(TEST_URL, &type, &path, &database);
 	assert_true(type == REMOTE, "Wrong url Type");
@@ -27,11 +27,24 @@ void o_url_resolve_information_test()
 
 void o_url_resolve_host_port_from_path_test()
 {
-	char *host = o_malloc(512);
+	char *host;
 	int port;
-	o_url_resolve_host_port_from_path("127.0.0.1:2424", &host, &port);
+	int ret = o_url_resolve_host_port_from_path("127.0.0.1:2424", &host, &port);
+	assert_true(ret == 0, "wrong return value");
 	assert_true(strcmp(host, "127.0.0.1") == 0, "wrong host name");
 	assert_true(port == 2424, "wrong port");
+	o_free(host);
+}
+
+void o_url_resolve_host_from_path_test()
+{
+	char *host;
+	int port;
+	int ret = o_url_resolve_host_port_from_path("127.0.0.1", &host, &port);
+	printf("%i",ret);
+	assert_true(ret == 1, "wrong return value");
+	assert_true(strcmp(host, "127.0.0.1") == 0, "wrong host name");
+	o_free(host);
 }
 
 void o_url_resolve_suite()
@@ -39,4 +52,5 @@ void o_url_resolve_suite()
 	ADD_TEST(o_url_resolve_type_test, "Test a resolve of type from url");
 	ADD_TEST(o_url_resolve_information_test, "Test a url resolver information");
 	ADD_TEST(o_url_resolve_host_port_from_path_test, "Test a host and port resolve from path");
+	ADD_TEST(o_url_resolve_host_from_path_test, "Test an only host resolve from path");
 }

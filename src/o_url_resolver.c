@@ -47,12 +47,12 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 	case REMOTE:
 		connection_url += HTTP_PROTOCOL_PARAMETER_LENGHT;
 		pos = strcspn(connection_url, "/");
-		*path = o_malloc(pos+1 * sizeof(char));
+		*path = o_malloc(pos + 1 * sizeof(char));
 		strncpy(*path, connection_url, pos);
 		(*(path))[pos] = 0;
 		connection_url += pos + 1;
 		pos = strcspn(connection_url, "/");
-		*db_name = o_malloc(pos+1 * sizeof(char));
+		*db_name = o_malloc(pos + 1 * sizeof(char));
 		strncpy(*db_name, connection_url, pos);
 		(*(db_name))[pos] = 0;
 		break;
@@ -77,18 +77,19 @@ int o_url_resolve_information(char * connection_url, enum o_url_type *type, char
 int o_url_resolve_host_port_from_path(char * path, char ** host, int * port)
 {
 	int pos = strcspn(path, ":");
-	if (pos != -1)
+	int size = strlen(path);
+	if (pos != size)
 	{
-		*host = o_malloc(pos * sizeof(char));
+		*host = o_malloc(pos * sizeof(char) + 1);
 		strncpy(*host, path, pos);
-		*port = atoi(path + pos);
+		(*host)[pos] = 0;
+		*port = atoi(path + pos + 1);
 		return 0;
 	}
 	else
 	{
-		//TODO MANAGE WITH SPECILAZEND MALLOC
-		*host = strdup(path);
+		*host = o_malloc(size);
+		strcpy(*host, path);
 		return 1;
 	}
-	//return 0;
 }
