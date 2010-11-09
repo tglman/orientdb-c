@@ -243,3 +243,9 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 
 	}
 }
+
+void o_document_value_free(struct o_document_value * to_free)
+{
+	o_free(to_free->value);
+	o_free(to_free);
+}

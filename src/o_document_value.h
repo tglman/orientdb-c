@@ -190,4 +190,10 @@ int o_document_value_get_array_size(struct o_document_value * o_value);
  */
 void o_document_value_serialize(struct o_document_value * o_value, struct o_string_buffer *buff);
 
+/*! \brief free the used memory of document value.
+ *
+ * \param to_free value to free.
+ */
+void o_document_value_free(struct o_document_value * to_free);
+
 #endif /* O_DOCUMENT_VALUE_H_ */
