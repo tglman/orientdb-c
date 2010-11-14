@@ -6,13 +6,13 @@
 #include <stdio.h>
 #define TEST_URL "remote:127.0.0.1:2424/dbname"
 
-void o_url_resolve_type_test()
+void test_o_url_resolve_type()
 {
 	enum o_url_type type = o_url_resolve_type(TEST_URL);
 	assert_true(type == REMOTE, "Wrong url Type");
 }
 
-void o_url_resolve_information_test()
+void test_o_url_resolve_information()
 {
 	char *path;
 	char *database;
@@ -25,7 +25,7 @@ void o_url_resolve_information_test()
 	o_free(database);
 }
 
-void o_url_resolve_host_port_from_path_test()
+void test_o_url_resolve_host_port_from_path()
 {
 	char *host;
 	int port;
@@ -36,7 +36,7 @@ void o_url_resolve_host_port_from_path_test()
 	o_free(host);
 }
 
-void o_url_resolve_host_from_path_test()
+void test_o_url_resolve_host_from_path()
 {
 	char *host;
 	int port;
@@ -49,8 +49,8 @@ void o_url_resolve_host_from_path_test()
 
 void o_url_resolve_suite()
 {
-	ADD_TEST(o_url_resolve_type_test, "Test a resolve of type from url");
-	ADD_TEST(o_url_resolve_information_test, "Test a url resolver information");
-	ADD_TEST(o_url_resolve_host_port_from_path_test, "Test a host and port resolve from path");
-	ADD_TEST(o_url_resolve_host_from_path_test, "Test an only host resolve from path");
+	ADD_TEST(test_o_url_resolve_type, "Test a resolve of type from url");
+	ADD_TEST(test_o_url_resolve_information, "Test a url resolver information");
+	ADD_TEST(test_o_url_resolve_host_port_from_path, "Test a host and port resolve from path");
+	ADD_TEST(test_o_url_resolve_host_from_path, "Test an only host resolve from path");
 }
