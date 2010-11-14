@@ -22,6 +22,13 @@ struct o_record * o_record_new();
  */
 struct o_record_id * o_record_get_id(struct o_record * record);
 
+/*! \brief Retrieve the version of current record.
+ *
+ * \param the record where retrieve the version.
+ * \return the version of record.
+ */
+int o_record_version(struct o_record * record);
+
 /**
  * Free a record.
  *

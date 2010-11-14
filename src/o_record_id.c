@@ -30,7 +30,7 @@ int o_record_id_cluster_id(struct o_record_id * o_id)
 
 long long o_record_id_record_id(struct o_record_id * o_id)
 {
-	return o_id->cluster_id;
+	return o_id->record_id;
 }
 
 void o_record_id_free(struct o_record_id * o_id)
