@@ -4,6 +4,10 @@
 #include "test_o_exceptions.h"
 #include "test_o_url_resolver.h"
 #include "test_o_string_buffer.h"
+#include "test_o_document_value.h"
+#include "test_o_record.h"
+#include "test_o_document.h"
+#include "test_o_input_stream.h"
 
 void initialize()
 {
@@ -12,4 +16,9 @@ void initialize()
 	ADD_SUITE(o_connection_remote_suite, "remote connection tests");
 	ADD_SUITE(o_url_resolve_suite, "url parsing tests");
 	ADD_SUITE(o_string_buffer_suite, "string buffer tests");
+	ADD_SUITE(o_document_value_suite, "document value tests");
+	ADD_SUITE(o_record_suite, "simple record tests");
+	ADD_SUITE(o_document_suite, "document tests");
+	ADD_SUITE(o_input_stream_suite, "input stream test");
+
 }

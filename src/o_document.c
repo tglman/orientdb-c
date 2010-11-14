@@ -12,6 +12,8 @@ struct o_document
 	struct o_map *fields_old_values;
 };
 
+void o_document_free_maps_values(struct o_document * doc);
+
 struct o_document * o_document_new()
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
@@ -80,16 +82,38 @@ void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff
 	int i;
 	for (i = 0; i < names_count; i++)
 	{
-		o_string_buffer_append(buff,names[i]);
-		o_string_buffer_append(buff,":");
+		o_string_buffer_append(buff, names[i]);
+		o_string_buffer_append(buff, ":");
 		o_document_value_serialize(o_document_field_get(doc, names[i]), buff);
 		if (i < names_count)
-			o_string_buffer_append(buff,",");
+			o_string_buffer_append(buff, ",");
+	}
+}
+
+void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream)
+{
+	o_document_free_maps_values(doc);
+}
+
+void o_document_free_maps_values(struct o_document * doc)
+{
+	int values_count;
+	struct o_document_value **values = o_document_field_values(doc, &values_count);
+	int i;
+	for (i = 0; i < values_count; i++)
+		o_document_value_free(values[i]);
+
+	if (doc->fields_old_values != 0)
+	{
+		values = (struct o_document_value **) o_map_values(doc->fields_old_values, &values_count);
+		for (i = 0; i < values_count; i++)
+			o_document_value_free(values[i]);
 	}
 }
 
 void o_document_free(struct o_document * doc)
 {
+	o_document_free_maps_values(doc);
 	o_map_free(doc->fields);
 	if (doc->fields_old_values != 0)
 		o_map_free(doc->fields_old_values);

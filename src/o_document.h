@@ -2,6 +2,7 @@
 #define O_DOCUMENT_H_
 #include "o_record.h"
 #include "o_string_buffer.h"
+#include "o_input_stream.h"
 
 struct o_document_value;
 
@@ -88,7 +89,14 @@ struct o_document * o_document_copy(struct o_document * doc);
  * \param doc to write.
  * \param buff where write.
  */
-void o_document_serialize(struct o_document * doc,struct o_string_buffer * buff);
+void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff);
+
+/*! \brief Read an document from the stream.
+ *
+ * \param doc to fill.
+ * \param stream to read.
+ */
+void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream);
 
 /** deallocate an document with all it structure.
  *

@@ -38,6 +38,13 @@ struct o_document_value * o_document_value_int(int val)
 	return doc_val;
 }
 
+struct o_document_value * o_document_value_short(short val)
+{
+	struct o_document_value * doc_val = o_document_value_new(SHORT, sizeof(int));
+	VALUE(doc_val,short) = val;
+	return doc_val;
+}
+
 struct o_document_value * o_document_value_long(long val)
 {
 	struct o_document_value * doc_val = o_document_value_new(LONG, sizeof(long));
@@ -124,6 +131,11 @@ int o_document_value_get_int(struct o_document_value * o_value)
 	return VALUE_CHECK(o_value,int,INT);
 }
 
+int o_document_value_get_bool(struct o_document_value * o_value)
+{
+	return VALUE_CHECK(o_value,int,BOOL);
+}
+
 long o_document_value_get_long(struct o_document_value * o_value)
 {
 	return VALUE_CHECK(o_value,long,LONG);
@@ -141,7 +153,7 @@ double o_document_value_get_double(struct o_document_value * o_value)
 
 int o_document_value_get_date(struct o_document_value * o_value)
 {
-	return VALUE_CHECK(o_value,int,INT);
+	return VALUE_CHECK(o_value,int,DATE);
 }
 
 char * o_document_value_get_string(struct o_document_value * o_value)

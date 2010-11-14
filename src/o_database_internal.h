@@ -1,5 +1,6 @@
 #ifndef O_DATABASE_INTERNAL_H_
 #define O_DATABASE_INTERNAL_H_
+#include "o_record.h"
 #include "o_database.h"
 #include "o_string_buffer.h"
 
