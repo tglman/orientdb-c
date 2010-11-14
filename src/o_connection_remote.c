@@ -2,6 +2,7 @@
 #include "o_connection_internal.h"
 #include "o_database_socket.h"
 #include "o_storage_remote.h"
+#include "o_input_stream_socket.h"
 #include "o_memory.h"
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +14,7 @@ struct o_connection_remote
 	//Inerith
 	struct o_connection connection;
 	struct o_database_socket *socket;
+	struct o_input_stream * input;
 };
 
 void o_connection_remote_free(struct o_connection *connection);
@@ -23,6 +25,7 @@ struct o_connection * o_connection_remote_new_accept(struct o_database_socket * 
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
 	conn->socket = o_database_socket_accept(listen_sock);
+	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
 	return &conn->connection;
 }
@@ -32,6 +35,7 @@ struct o_connection * o_connection_remote_new(char * host, int port)
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
 	conn->socket = o_database_socket_connect(host, port);
+	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
 	return &conn->connection;
 }
@@ -46,16 +50,14 @@ struct o_storage * o_connection_remote_storage_open(struct o_connection *connect
 int o_connection_remote_read_int(struct o_connection_remote * connection)
 {
 	int toRead;
-	int recv_data = sizeof(toRead);
-	o_database_socket_recv(connection->socket, &toRead, &recv_data);
+	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return ntohl(toRead);
 }
 
 long long o_connection_remote_read_long64(struct o_connection_remote * connection)
 {
 	long long ret_val;
-	int recv_data = sizeof(ret_val);
-	o_database_socket_recv(connection->socket, &ret_val, &recv_data);
+	o_input_stream_read_bytes(connection->input, &ret_val, sizeof(ret_val));
 	ret_val = (((long long) (ntohl((int) ((ret_val << 32) >> 32))) << 32) | (unsigned int) ntohl(((int) (ret_val >> 32))));
 	return ret_val;
 }
@@ -63,16 +65,14 @@ long long o_connection_remote_read_long64(struct o_connection_remote * connectio
 char o_connection_remote_read_byte(struct o_connection_remote * connection)
 {
 	char toRead;
-	int recv_data = sizeof(toRead);
-	o_database_socket_recv(connection->socket, &toRead, &recv_data);
+	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return toRead;
 }
 
 short o_connection_remote_read_short(struct o_connection_remote * connection)
 {
 	short toRead;
-	int recv_data = sizeof(toRead);
-	o_database_socket_recv(connection->socket, &toRead, &recv_data);
+	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return ntohs(toRead);
 }
 
@@ -80,7 +80,7 @@ char * o_connection_remote_read_bytes(struct o_connection_remote * connection, i
 {
 	*byte_read = o_connection_remote_read_int(connection);
 	char * bytes = o_malloc(*byte_read * sizeof(char));
-	o_database_socket_recv(connection->socket, bytes, byte_read);
+	o_input_stream_read_bytes(connection->input, bytes, *byte_read);
 	return bytes;
 }
 
@@ -88,7 +88,7 @@ char * o_connection_remote_read_string(struct o_connection_remote * connection)
 {
 	int byte_to_read = o_connection_remote_read_int(connection);
 	char * bytes = o_malloc((byte_to_read + 1) * sizeof(char));
-	o_database_socket_recv(connection->socket, bytes, &byte_to_read);
+	o_input_stream_read_bytes(connection->input, bytes, byte_to_read);
 	bytes[byte_to_read] = 0;
 	return bytes;
 }
