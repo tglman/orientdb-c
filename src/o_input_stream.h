@@ -8,7 +8,7 @@ struct o_input_stream;
  * \param bytes content.
  * \param lenght the lenght of content.
  */
-struct o_input_stream * o_input_stream_new_bytes(char * bytes, int lenght);
+struct o_input_stream * o_input_stream_new_bytes(unsigned char * bytes, int lenght);
 
 /*! \brief Read an byte from stream
  *
@@ -16,6 +16,15 @@ struct o_input_stream * o_input_stream_new_bytes(char * bytes, int lenght);
  * \return the value readed.
  */
 int o_input_stream_read(struct o_input_stream * stream);
+
+/*! \brief Read size bytes from input stream
+ *
+ * \param stream where read.
+ * \param bytes to fill.
+ * \param size of bytes to fill.
+ * \return readed size.
+ */
+int o_input_stream_read_bytes(struct o_input_stream * stream, void * bytes, int size);
 
 /*! \brief the Input stream to free.
  *
