@@ -119,13 +119,16 @@ void o_database_socket_send(struct o_database_socket * sock, void * buff, int bu
 	}
 }
 
-void o_database_socket_recv(struct o_database_socket * sock, void * buff, int *buff_size)
+void o_database_socket_recv(struct o_database_socket * sock, void * buff, int *buff_size, int params)
 {
+	int sock_par = 0;
 	int already_receved = 0;
 	int cur_ret = 0;
+	if (params == READ_PEEK)
+		sock_par = MSG_PEEK;
 	while (already_receved < *buff_size && cur_ret != -1)
 	{
-		cur_ret = recv(sock->socket, buff + already_receved, (*buff_size) - already_receved, 0);
+		cur_ret = recv(sock->socket, buff + already_receved, (*buff_size) - already_receved, sock_par);
 		if (cur_ret != -1)
 			already_receved += cur_ret;
 	}

@@ -4,6 +4,7 @@
 #include "../src/o_document_value.h"
 #include <string.h>
 #include <stdio.h>
+#include "../src/o_memory.h"
 void test_o_document_new()
 {
 	struct o_document * doc = o_document_new();
@@ -32,9 +33,24 @@ void test_o_document_property_managment()
 	o_document_free(doc);
 }
 
+void test_o_document_serialize()
+{
+	struct o_document * doc = o_document_new();
+	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
+	o_document_field_set(doc, "stringVal", o_document_value_string("popo"));
+	struct o_string_buffer * buff = o_string_buffer_new();
+	o_document_serialize(doc, buff);
+	char * content = o_string_buffer_str(buff);
+	assert_true(strcmp(content, "boolVal:true,stringVal:\"popo\"") == 0, "the serialization not is the expected");
+	o_free(content);
+	o_string_buffer_free(buff);
+	o_document_free(doc);
+}
+
 void o_document_suite()
 {
 	ADD_TEST(test_o_document_new, "test a simple o_document new and free");
 	ADD_TEST(test_o_document_property_managment, "test property  management on o_document ");
+	ADD_TEST(test_o_document_serialize, "test o_document native serialization");
 }
 

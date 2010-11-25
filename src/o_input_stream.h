@@ -17,6 +17,13 @@ struct o_input_stream * o_input_stream_new_bytes(unsigned char * bytes, int leng
  */
 int o_input_stream_read(struct o_input_stream * stream);
 
+/*! \brief Read an byte from stream but not remove it from streem.
+ *
+ * \param stream where read.
+ * \return the byte readed.
+ */
+int o_input_stream_peek(struct o_input_stream * stream);
+
 /*! \brief Read size bytes from input stream
  *
  * \param stream where read.

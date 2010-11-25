@@ -4,10 +4,10 @@
 
 struct o_output_stream
 {
-	void (*o_output_stream_write)(struct o_output_stream * stream, char c);
 	void (*o_output_stream_write_bytes)(struct o_output_stream * stream, void *bytes, int nbytes);
 	void (*o_output_stream_flush)(struct o_output_stream * stream);
 	void (*o_output_stream_free)(struct o_output_stream * stream);
+	char type;
 };
 
 #endif /* O_OUTPUT_STREAM_INTERNAL_H_ */

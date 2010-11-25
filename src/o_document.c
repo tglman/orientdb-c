@@ -4,6 +4,7 @@
 #include "o_memory.h"
 #include "o_document_value.h"
 #include "o_string_buffer.h"
+#include <string.h>
 
 struct o_document
 {
@@ -14,10 +15,21 @@ struct o_document
 
 void o_document_free_maps_values(struct o_document * doc);
 
+void o_document_record_serialize(struct o_record * rec, struct o_output_stream * buff)
+{
+	struct o_string_buffer *b = o_string_buffer_new();
+	o_document_serialize((struct o_document *)rec, b);
+	char * bytes = o_string_buffer_str(b);
+	o_output_stream_write_bytes(buff, bytes, strlen(bytes));
+	o_free(bytes);
+	o_string_buffer_free(b);
+}
+
 struct o_document * o_document_new()
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
-	o_record_new_internal(o_document_o_record(new_doc));
+	o_record_new_internal(o_document_o_record(new_doc), 'd');
+	new_doc->record.o_record_serialize = o_document_record_serialize;
 	new_doc->fields = o_map_new();
 	new_doc->fields_old_values = 0;
 	return new_doc;
@@ -85,7 +97,7 @@ void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff
 		o_string_buffer_append(buff, names[i]);
 		o_string_buffer_append(buff, ":");
 		o_document_value_serialize(o_document_field_get(doc, names[i]), buff);
-		if (i < names_count)
+		if (i < names_count-1)
 			o_string_buffer_append(buff, ",");
 	}
 }

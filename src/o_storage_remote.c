@@ -82,7 +82,7 @@ void o_storage_remote_check_status(struct o_storage_remote * storage)
 	}
 }
 
-long long o_storage_remote_create_record(struct o_storage * storage, int cluster, struct o_record_content * content)
+long long o_storage_remote_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
 {
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
@@ -90,8 +90,10 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	{
 		o_connection_remote_write_byte(rs->connection, RECORD_CREATE);
 		o_connection_remote_write_short(rs->connection, cluster);
-		o_connection_remote_write_bytes(rs->connection, o_record_content_bytes(content), o_record_content_bytes_length(content));
-		o_connection_remote_write_byte(rs->connection, o_record_content_type(content));
+		int size;
+		char * buff = o_raw_buffer_content(content, &size);
+		o_connection_remote_write_bytes(rs->connection, buff, size);
+		o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
 		o_connection_remote_flush(rs->connection);
 	}
 	catch(struct o_exception_io, cur_ex)
@@ -105,12 +107,12 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	return 0;
 }
 
-struct o_record_content * o_storage_remote_read_record(struct o_storage * storage, struct o_record_id * id, int * version)
+struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, struct o_record_id * id)
 {
 	return 0;
 }
 
-int o_storage_remote_update_record(struct o_storage * storage, struct o_record_id * id, int version, struct o_record_content * content)
+int o_storage_remote_update_record(struct o_storage * storage, struct o_record_id * id, struct o_raw_buffer * content)
 {
 	return 0;
 }
@@ -175,12 +177,12 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		struct o_storage_remote_cluster **clusters = &storage->clusters;
 		for (i = 0; i < storage->n_cluster; i++)
 		{
-			struct o_storage_remote_cluster *cluster = o_malloc(sizeof(struct o_storage_remote_cluster ));
-			cluster->storage_name=o_connection_remote_read_bytes(storage->connection, &readSize);
-			cluster->id=o_connection_remote_read_int(storage->connection);
-			cluster->type=o_connection_remote_read_bytes(storage->connection, &readSize);
-			*clusters=cluster;
-			clusters=&cluster->next;
+			struct o_storage_remote_cluster *cluster = o_malloc(sizeof(struct o_storage_remote_cluster));
+			cluster->storage_name = o_connection_remote_read_bytes(storage->connection, &readSize);
+			cluster->id = o_connection_remote_read_int(storage->connection);
+			cluster->type = o_connection_remote_read_bytes(storage->connection, &readSize);
+			*clusters = cluster;
+			clusters = &cluster->next;
 		}
 		//MANAGE DEFAULT CLUSTER.
 	}

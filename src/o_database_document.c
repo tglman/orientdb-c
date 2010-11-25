@@ -42,7 +42,6 @@ void o_database_document_reset_error_handler(struct o_database_document * db, st
 
 void o_database_document_save(struct o_database_document *db, struct o_document * doc)
 {
-	//o_storage_update_record(db->storage,o_do)
 }
 
 void o_database_document_free(struct o_database_document * db)

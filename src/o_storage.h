@@ -1,6 +1,6 @@
 #ifndef O_STORAGE_H_
 #define O_STORAGE_H_
-#include "o_record_content.h"
+#include "o_row_buffer.h"
 #include "o_database_error_handler.h"
 #include "o_record_id.h"
 #include "o_transaction.h"
@@ -15,7 +15,7 @@ struct o_storage;
  * @param the record content.
  * @return the new identifier of created record.
  */
-long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_record_content * content);
+long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
 
 /**
  * Read a record from the storage
@@ -26,18 +26,17 @@ long long o_storage_create_record(struct o_storage * storage, int cluster, struc
  * @return the content of read record
  *
  */
-struct o_record_content * o_storage_read_record(struct o_storage * storage, struct o_record_id * id, int * version);
+struct o_raw_buffer * o_storage_read_record(struct o_storage * storage, struct o_record_id * id);
 
 /**
  * Update a record to the storage.
  *
  * @param storage where create the record.
  * @param id of record to update.
- * @param version of record to update.
  * @param content the record content.
  * @return the new number of version of updated record.
  */
-int o_storage_update_record(struct o_storage * storage, struct o_record_id * id, int version, struct o_record_content * content);
+int o_storage_update_record(struct o_storage * storage, struct o_record_id * id, struct o_raw_buffer * content);
 
 /**
  * Delete a record from a storage.
@@ -64,6 +63,13 @@ char ** o_storage_get_cluster_names(struct o_storage * storage, int * names_coun
  * @return the identifier of cluster.
  */
 int o_storage_get_cluster_id_by_name(struct o_storage * storage, char * name);
+
+/*! Retrieve the default cluster id.
+ *
+ * \param storege where search
+ * \return the identifier of default cluster.
+ */
+int o_storage_get_default_cluser_id(struct o_storage * storage);
 
 /**
  * Commit a transaction to the storage.

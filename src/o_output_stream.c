@@ -2,7 +2,7 @@
 
 void o_output_stream_write(struct o_output_stream * stream, char c)
 {
-	stream->o_output_stream_write(stream, c);
+	o_output_stream_write_bytes(stream, &c, 1);
 }
 
 void o_output_stream_write_bytes(struct o_output_stream * stream, void *bytes, int nbytes)

@@ -31,6 +31,13 @@ int o_record_id_cluster_id(struct o_record_id * o_id);
  */
 long long o_record_id_record_id(struct o_record_id * o_id);
 
+/** Retrieve if the id represent a persistent or transient id.
+ *
+ * \param id to check.
+ * \return 1 if is transient 0 if persistent.
+ */
+int o_record_id_is_new(struct o_record_id * o_id);
+
 /** Free an record id.
  *
  * @param o_id the record id to free.

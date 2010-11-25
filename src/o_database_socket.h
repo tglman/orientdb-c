@@ -1,6 +1,7 @@
 #ifndef SOCKET_INTERFACE_H_
 #define SOCKET_INTERFACE_H_
 #include "o_database_error_handler.h"
+#define READ_PEEK 1
 
 struct o_database_socket;
 
@@ -40,7 +41,7 @@ void o_database_socket_send(struct o_database_socket * sock, void * buff, int bu
  * @param buff the buffer to fill.
  * @param buff_size the length of buffer to fill.
  */
-void o_database_socket_recv(struct o_database_socket * sock, void * buff, int * buff_size);
+void o_database_socket_recv(struct o_database_socket * sock, void * buff, int * buff_size, int params);
 
 /** check if the socket contains data to receive.
  *

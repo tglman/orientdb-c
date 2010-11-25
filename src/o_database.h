@@ -2,6 +2,7 @@
 #define O_DATABASE_H_
 
 #include "o_database_error_handler.h"
+#include "o_record.h"
 
 /**
  * Rapresent a database.
@@ -37,6 +38,21 @@ void o_database_reset_error_handler(struct o_database * db, struct o_database_er
  * @param password the password of specified username.
  */
 void o_database_open(struct o_database * db, char * username, char * password);
+
+/*! Save an record to database.
+ *
+ * \param db where save
+ * \param record to save.
+ */
+void o_database_save(struct o_database * db, struct o_record * record);
+
+/*! Save an record to database.
+ *
+ * \param db where save
+ * \param record to save.
+ * \param cluster_name the name of cluster where save.
+ */
+void o_database_save_cluster(struct o_database * db, struct o_record * record,char * cluster_name);
 
 /** Free the database structure with all data.
  *

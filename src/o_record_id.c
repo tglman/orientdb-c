@@ -33,6 +33,11 @@ long long o_record_id_record_id(struct o_record_id * o_id)
 	return o_id->record_id;
 }
 
+int o_record_id_is_new(struct o_record_id * o_id)
+{
+	return o_id->record_id < 0;
+}
+
 void o_record_id_free(struct o_record_id * o_id)
 {
 	o_free(o_id);
