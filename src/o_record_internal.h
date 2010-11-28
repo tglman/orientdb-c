@@ -18,6 +18,14 @@ struct o_record
  */
 void o_record_new_internal(struct o_record * record, char type);
 
+/*! \brief Create a new record with id.
+ *
+ * \param record.
+ * \param type of record.
+ * \param rid the current record id.
+ */
+void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid);
+
 /**
  * Use to actuate free operation on a record.
  *

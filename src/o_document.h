@@ -18,6 +18,12 @@ struct o_document;
  */
 struct o_document * o_document_new();
 
+/*! \brief Create a new document with id
+ *
+ * \param rid the record id.
+ */
+struct o_document * o_document_new_id(struct o_record_id * rid);
+
 /**
  * Cast a document to record.
  *
@@ -97,6 +103,13 @@ void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff
  * \param stream to read.
  */
 void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream);
+
+/*! \brief Retreive the document class name.
+ *
+ * \param doc where retrieve the name.
+ * \return the name of class of document.
+ */
+char * o_document_get_class_name(struct o_document * doc);
 
 /** deallocate an document with all it structure.
  *

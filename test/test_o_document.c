@@ -47,10 +47,40 @@ void test_o_document_serialize()
 	o_document_free(doc);
 }
 
+void test_o_document_serialize_deserialize()
+{
+	struct o_document * doc = o_document_new();
+	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
+	o_document_field_set(doc, "stringVal", o_document_value_string("popo"));
+	struct o_string_buffer * buff = o_string_buffer_new();
+	o_document_serialize(doc, buff);
+	char * content = o_string_buffer_str(buff);
+	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, strlen(content));
+	o_document_free(doc);
+	doc = o_document_new();
+	printf("%s","ser ");
+	fflush(stdout);
+	o_document_deserialize(doc, os);
+	printf("%s"," after der");
+	fflush(stdout);
+	//assert_true(strcmp(content, "boolVal:true,stringVal:\"popo\"") == 0, "the serialization not is the expected");
+	o_free(content);
+	struct o_document_value *v = o_document_field_get(doc, "boolVal");
+	assert_true(o_document_value_get_bool(v) == 1, "the boolean value failed after serialization");
+	v = o_document_field_get(doc, "stringVal");
+	assert_true(strcmp(o_document_value_get_string(v), "popo") == 0, "the string value failed after serialization");
+	o_string_buffer_free(buff);
+	o_document_free(doc);
+	o_input_stream_free(os);
+
+}
+
 void o_document_suite()
 {
 	ADD_TEST(test_o_document_new, "test a simple o_document new and free");
 	ADD_TEST(test_o_document_property_managment, "test property  management on o_document ");
 	ADD_TEST(test_o_document_serialize, "test o_document native serialization");
+	ADD_TEST(test_o_document_serialize_deserialize, "test a base o_document native serialization and deserialization");
+
 }
 

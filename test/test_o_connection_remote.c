@@ -49,7 +49,6 @@ void *test_o_connection_private_listen_thread(void * par)
 		char buf[512];
 		printf(buf, "Thread fail unsupported -> Error Message: %s", o_exception_message(e));
 		fflush(stdout);
-		//fail(buf);
 	}
 	end_try;
 
@@ -169,7 +168,7 @@ void test_o_connection_remote_data_transfer()
 
 void o_connection_remote_suite()
 {
-	ADD_TEST(test_o_connection_local_data_transfer, " test a connection client server data transfer");
+	//ADD_TEST(test_o_connection_local_data_transfer, " test a connection client server data transfer");
 	//Remote test commented for unaviable server.
 	//ADD_TEST(test_o_connection_remote_data_transfer, " test a connection to java server with data transfer");
 }

@@ -33,6 +33,19 @@ void o_string_buffer_append_long(struct o_string_buffer * buff, long long long_v
  */
 void o_string_buffer_append_double(struct o_string_buffer * buff, double double_val);
 
+/*! \brief Append an character to the buffer.
+ *
+ * \param buff where append.
+ * \parma ch to append.
+ */
+void o_string_buffer_append_char(struct o_string_buffer * buff, char ch);
+
+/*! \brief Clear the content from the buffer.
+ *
+ * \param buff to clear.
+ */
+void o_string_buffer_clear(struct o_string_buffer * buff);
+
 /*! \brief Retrieve the global str from buffer.
  *
  * \param buff buffer to transform in string.

@@ -48,6 +48,17 @@ void o_string_buffer_append_double(struct o_string_buffer * buff, double double_
 	o_string_buffer_append(buff, val);
 }
 
+void o_string_buffer_append_char(struct o_string_buffer * buff, char ch)
+{
+	char val[2] = { ch, 0 };
+	o_string_buffer_append(buff, val);
+}
+
+void o_string_buffer_clear(struct o_string_buffer * buff)
+{
+	buff->cursor = 0;
+}
+
 char * o_string_buffer_str(struct o_string_buffer * buff)
 {
 	char * new_str = o_malloc(buff->cursor + 1);

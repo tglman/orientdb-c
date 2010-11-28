@@ -39,7 +39,7 @@ void test_o_document_value_create()
 	o_document_value_free(val);
 
 	//fake pointer only test!!
-	struct o_document *doc = (struct o_document *) 10;
+	struct o_document *doc = 0;
 	val = o_document_value_embedded(doc);
 	assert_true(o_document_value_get_embedded(val) == doc, "embedded document value not is the expected");
 	o_document_value_free(val);

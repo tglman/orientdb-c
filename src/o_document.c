@@ -4,11 +4,13 @@
 #include "o_memory.h"
 #include "o_document_value.h"
 #include "o_string_buffer.h"
+#include <stdio.h>
 #include <string.h>
 
 struct o_document
 {
 	struct o_record record;
+	char * class_name;
 	struct o_map *fields;
 	struct o_map *fields_old_values;
 };
@@ -18,7 +20,7 @@ void o_document_free_maps_values(struct o_document * doc);
 void o_document_record_serialize(struct o_record * rec, struct o_output_stream * buff)
 {
 	struct o_string_buffer *b = o_string_buffer_new();
-	o_document_serialize((struct o_document *)rec, b);
+	o_document_serialize((struct o_document *) rec, b);
 	char * bytes = o_string_buffer_str(b);
 	o_output_stream_write_bytes(buff, bytes, strlen(bytes));
 	o_free(bytes);
@@ -34,6 +36,16 @@ struct o_document * o_document_new()
 	new_doc->fields_old_values = 0;
 	return new_doc;
 }
+struct o_document * o_document_new_id(struct o_record_id * rid)
+{
+	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
+	o_record_new_internal_id(o_document_o_record(new_doc), 'd', rid);
+	new_doc->record.o_record_serialize = o_document_record_serialize;
+	new_doc->fields = o_map_new();
+	new_doc->fields_old_values = 0;
+	return new_doc;
+}
+
 struct o_record * o_document_o_record(struct o_document * doc)
 {
 	return &doc->record;
@@ -97,14 +109,50 @@ void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff
 		o_string_buffer_append(buff, names[i]);
 		o_string_buffer_append(buff, ":");
 		o_document_value_serialize(o_document_field_get(doc, names[i]), buff);
-		if (i < names_count-1)
+		if (i < names_count - 1)
 			o_string_buffer_append(buff, ",");
 	}
 }
 
+char * o_document_get_class_name(struct o_document * doc)
+{
+	return doc->class_name;
+}
+
+void o_document_deserialize_internal(struct o_document * doc, struct o_input_stream * stream, int embeddd)
+{
+	struct o_string_buffer * buff = o_string_buffer_new();
+	int isfirst = 1;
+	int readed;
+	do
+	{
+		readed = o_input_stream_read(stream);
+		if (isfirst && readed == '@')
+		{
+			char * str = o_string_buffer_str(buff);
+			doc->class_name = str;
+			o_string_buffer_clear(buff);
+		}
+		else if (readed == ':')
+		{
+			isfirst = 0;
+			char * str = o_string_buffer_str(buff);
+			struct o_document_value * val = o_document_value_deserialize(stream);
+			o_document_field_set(doc, str, val);
+			o_free(str);
+			o_string_buffer_clear(buff);
+		}
+		else if (readed != -1)
+		{
+			o_string_buffer_append_char(buff, readed);
+		}
+	} while (readed != -1);
+	o_string_buffer_free(buff);
+}
+
 void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream)
 {
-	o_document_free_maps_values(doc);
+	o_document_deserialize_internal(doc, stream, 0);
 }
 
 void o_document_free_maps_values(struct o_document * doc)

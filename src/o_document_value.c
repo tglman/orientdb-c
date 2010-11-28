@@ -2,8 +2,12 @@
 #include "o_document.h"
 #include "o_record.h"
 #include "o_memory.h"
+#include "o_exceptions.h"
+#include <string.h>
 #define VALUE(obb,type) *((type *)obb->value)
 #define VALUE_CHECK(OBB,TYPE,E_TYPE) E_TYPE==OBB->type?*((TYPE *)OBB->value):(TYPE)0
+
+struct o_document_value * o_document_value_deserialize(struct o_input_stream * stream);
 
 struct o_document_value
 {
@@ -84,7 +88,10 @@ struct o_document_value * o_document_value_string(char * val)
 {
 	struct o_document_value * doc_val = o_document_value_new(STRING, sizeof(char *));
 	//TODO: strdup
-	VALUE(doc_val,char *) = val;
+	int size = strlen(val) + 1;
+	char * new_val = o_malloc(sizeof(char) * size);
+	memcpy(new_val, val, size);
+	VALUE(doc_val,char *) = new_val;
 	return doc_val;
 }
 
@@ -106,7 +113,8 @@ struct o_document_value * o_document_value_array(struct o_document_value * array
 {
 	struct o_document_value * doc_val = o_document_value_new(ARRAY, sizeof(struct o_document_value_array));
 	struct o_document_value_array * val = doc_val->value;
-	val->array = array;
+	val->array = o_malloc(sizeof(struct o_document_value *) * size);
+	memcpy(val->array, array, sizeof(struct o_document_value *) * size);
 	val->size = size;
 	return doc_val;
 }
@@ -198,7 +206,13 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		break;
 	case STRING:
 		o_string_buffer_append(buff, "\"");
-		o_string_buffer_append(buff, VALUE(o_value,char *));
+		char * val = VALUE(o_value,char *);
+		while (*val != 0)
+		{
+			if (*val == '"' || *val == '\'' || *val == '\\')
+				o_string_buffer_append_char(buff, '\\');
+			o_string_buffer_append_char(buff, *val++);
+		}
 		o_string_buffer_append(buff, "\"");
 		break;
 	case BYTE:
@@ -256,8 +270,193 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 	}
 }
 
+struct o_document_value * o_document_value_embedded_deserialize(struct o_input_stream * stream)
+{
+	struct o_document *doc = o_document_new();
+	o_document_deserialize(doc, stream);
+	o_input_stream_read(stream);//remove , from the input stream.
+	return o_document_value_embedded(doc);
+}
+
+struct o_document_value * o_document_value_string_deserialize(struct o_input_stream * stream)
+{
+	int readed;
+	struct o_string_buffer * buff = o_string_buffer_new();
+	while ((readed = o_input_stream_read(stream)) != '"')
+	{
+		if (readed == '\\')
+			readed = o_input_stream_read(stream);
+		o_string_buffer_append_char(buff, readed);
+	}
+	o_input_stream_read(stream);//remove , from the input stream.
+	char * str = o_string_buffer_str(buff);
+	struct o_document_value *value = o_document_value_string(str);
+	o_free(str);
+	o_string_buffer_free(buff);
+	return value;
+}
+
+struct o_document_value * o_document_value_link_deserialize(struct o_input_stream * stream)
+{
+	int readed;
+	int cid;
+	long long rid;
+	struct o_string_buffer * buff = o_string_buffer_new();
+	while ((readed = o_input_stream_read(stream)) != ',')
+	{
+		if (readed == ':')
+		{
+			char * ca = o_string_buffer_str(buff);
+			cid = atol(ca);
+			o_free(ca);
+			o_string_buffer_clear(buff);
+			readed = o_input_stream_read(stream);
+		}
+		else if ((readed < '0' || readed > '9'))
+		{
+			o_string_buffer_free(buff);
+			throw(o_exception_new("wrong link parsing", 0));
+		}
+		o_string_buffer_append_char(buff, readed);
+	}
+	char * ca = o_string_buffer_str(buff);
+	rid = atol(ca);
+	o_free(ca);
+	o_string_buffer_free(buff);
+	struct o_record_id * o_rid = o_record_id_new(cid, rid);
+	return o_document_value_link(o_document_new_id(o_rid));
+}
+
+struct o_document_value * o_document_value_number_deserialize(struct o_input_stream * stream)
+{
+	int readed;
+	struct o_string_buffer * buff = o_string_buffer_new();
+	short doubleVal = 0;
+	do
+	{
+		o_string_buffer_append_char(buff, readed);
+		if (readed == '.')
+			doubleVal = 1;
+		else if ((readed < '0' || readed > '9'))
+		{
+			o_string_buffer_free(buff);
+			throw(o_exception_new("wrong number parsing", 0));
+		}
+		readed = o_input_stream_read(stream);
+	} while (readed != ',');
+	char * ca = o_string_buffer_str(buff);
+	struct o_document_value *value;
+	if (doubleVal)
+	{
+		double val = atof(ca);
+		value = o_document_value_long(val);
+	}
+	else
+	{
+		long val = atol(ca);
+		value = o_document_value_long(val);
+	}
+	o_free(ca);
+	o_string_buffer_free(buff);
+
+	return value;
+}
+struct o_document_value_list
+{
+	struct o_document_value *val;
+	struct o_document_value_list * next;
+};
+
+struct o_document_value * o_document_value_array_deserialize(struct o_input_stream * stream)
+{
+	struct o_document_value_list *value_list = 0;
+	struct o_document_value_list *root = 0;
+	int size = 0;
+	struct o_document_value *value = 0;
+	int readed;
+	do
+	{
+		struct o_document_value *cur = o_document_value_deserialize(stream);
+		if (value_list == 0)
+			root = value_list = o_malloc(sizeof(struct o_document_value_list));
+		else
+			value_list = value_list->next = o_malloc(sizeof(struct o_document_value_list));
+		value_list->val = cur;
+		size++;
+		readed = o_input_stream_read(stream);
+	} while (readed != ']');
+	o_input_stream_read(stream);//remove , from the input stream.
+
+	struct o_document_value ** array = o_malloc(sizeof(struct o_document_value *) * size);
+	int i = 0;
+	value_list = root;
+	while (i < size)
+	{
+		array[i++] = value_list->val;
+		struct o_document_value_list *cur = value_list;
+		value_list = value_list->next;
+		o_free(cur);
+	}
+	value = o_document_value_array(array, size);
+	o_free(array);
+	return value;
+}
+
+struct o_document_value * o_document_value_map_deserialize(struct o_input_stream * stream)
+{
+	struct o_document_value *value = 0;
+	int readed;
+	do
+	{
+		readed = o_input_stream_read(stream);
+	} while (readed != '}');
+	o_input_stream_read(stream);//remove , from the input stream.
+	return value;
+}
+struct o_document_value * o_document_value_bool_deserialize(struct o_input_stream * stream, int istrue)
+{
+	o_input_stream_read(stream);
+	o_input_stream_read(stream);
+	o_input_stream_read(stream);
+	o_input_stream_read(stream);
+	if (!istrue)
+	{
+		o_input_stream_read(stream);
+	}
+	return o_document_value_bool(istrue);
+}
+
+struct o_document_value * o_document_value_deserialize(struct o_input_stream * stream)
+{
+	int readed = o_input_stream_read(stream);
+	switch (readed)
+	{
+	case '*':
+		return o_document_value_embedded_deserialize(stream);
+	case ',':
+		return 0;
+	case '"':
+		return o_document_value_string_deserialize(stream);
+	case '#':
+		return o_document_value_link_deserialize(stream);
+	case '[':
+		return o_document_value_array_deserialize(stream);
+	case '{':
+		return o_document_value_map_deserialize(stream);
+	case 't':
+	case 'f':
+		return o_document_value_bool_deserialize(stream, readed == 't');
+	default:
+		return o_document_value_number_deserialize(stream);
+	}
+}
 void o_document_value_free(struct o_document_value * to_free)
 {
+	/*if (to_free->type == LINK || to_free->type == EMBEDDED)
+	 o_document_free(VALUE(to_free,struct o_document *));
+
+	 else*/if (to_free->type == STRING)
+		o_free(VALUE(to_free,char *));
 	o_free(to_free->value);
 	o_free(to_free);
 }

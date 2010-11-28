@@ -16,6 +16,13 @@ void o_record_new_internal(struct o_record * record, char type)
 	record->version = 0;
 }
 
+void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid)
+{
+	record->record_id = rid;
+	record->type = type;
+	record->version = 0;
+}
+
 struct o_record_id * o_record_get_id(struct o_record * record)
 {
 	return record->record_id;

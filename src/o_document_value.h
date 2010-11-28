@@ -2,6 +2,7 @@
 #define O_DOCUMENT_VALUE_H_
 #include "o_document.h"
 #include "o_string_buffer.h"
+#include "o_input_stream.h"
 
 enum o_document_value_type
 {
@@ -189,6 +190,13 @@ int o_document_value_get_array_size(struct o_document_value * o_value);
  * \param buff where serialize.
  */
 void o_document_value_serialize(struct o_document_value * o_value, struct o_string_buffer *buff);
+
+/*! \brief deserialize a document value from an stream.
+ *
+ * \param stream where read.
+ * \return a new document value.
+ */
+struct o_document_value * o_document_value_deserialize(struct o_input_stream * stream);
 
 /*! \brief free the used memory of document value.
  *
