@@ -91,7 +91,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 		o_connection_remote_write_byte(rs->connection, RECORD_CREATE);
 		o_connection_remote_write_short(rs->connection, cluster);
 		int size;
-		char * buff = o_raw_buffer_content(content, &size);
+		unsigned char * buff = o_raw_buffer_content(content, &size);
 		o_connection_remote_write_bytes(rs->connection, buff, size);
 		o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
 		o_connection_remote_flush(rs->connection);
@@ -165,9 +165,9 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->connection = conn;
 
 		o_connection_remote_write_byte(storage->connection, DB_OPEN);
-		o_connection_remote_write_bytes(storage->connection, name, strlen(name));
-		o_connection_remote_write_bytes(storage->connection, username, strlen(username));
-		o_connection_remote_write_bytes(storage->connection, password, strlen(password));
+		o_connection_remote_write_bytes(storage->connection, (unsigned char*) name, strlen(name));
+		o_connection_remote_write_bytes(storage->connection, (unsigned char*) username, strlen(username));
+		o_connection_remote_write_bytes(storage->connection, (unsigned char*) password, strlen(password));
 		o_connection_remote_flush(storage->connection);
 		o_storage_remote_check_status(storage);
 		int readSize;

@@ -16,7 +16,7 @@ int o_raw_buffer_content_size(struct o_raw_buffer * buff);
  * \param content_size readed.
  * \return the content of buffer.
  */
-char * o_raw_buffer_content(struct o_raw_buffer * buff, int * content_size);
+unsigned char * o_raw_buffer_content(struct o_raw_buffer * buff, int * content_size);
 
 /*! \brief Retrieve the version of content in buffer.
  *
@@ -30,5 +30,11 @@ int o_raw_buffer_version(struct o_raw_buffer * buff);
  * \return the type of content in buffer.
  */
 char o_raw_buffer_type(struct o_raw_buffer * buff);
+
+/*! \brief free the raw buffer.
+ *
+ * \param buffer to free.
+ */
+void o_raw_buffer_free(struct o_raw_buffer * buff);
 
 #endif /* O_ROW_BUFFER_H_ */

@@ -102,7 +102,7 @@ void o_connection_remote_write_short(struct o_connection_remote * connection, sh
  * @param byte_array to write.
  * @param lenght the length of byte to string
  */
-void o_connection_remote_write_bytes(struct o_connection_remote * connection, char *byte_array, int length);
+void o_connection_remote_write_bytes(struct o_connection_remote * connection,unsigned char *byte_array, int length);
 
 /*! \brief Write a  null terminated string to connection.
  *

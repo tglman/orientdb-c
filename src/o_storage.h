@@ -1,6 +1,6 @@
 #ifndef O_STORAGE_H_
 #define O_STORAGE_H_
-#include "o_row_buffer.h"
+#include "o_raw_buffer.h"
 #include "o_database_error_handler.h"
 #include "o_record_id.h"
 #include "o_transaction.h"

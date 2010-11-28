@@ -30,7 +30,7 @@ void o_document_record_serialize(struct o_record * rec, struct o_output_stream *
 struct o_document * o_document_new()
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
-	o_record_new_internal(o_document_o_record(new_doc), 'd');
+	o_record_new_internal(o_document_o_record(new_doc), DOCUMENT_RECORD_TYPE);
 	new_doc->record.o_record_serialize = o_document_record_serialize;
 	new_doc->fields = o_map_new();
 	new_doc->fields_old_values = 0;
@@ -39,7 +39,7 @@ struct o_document * o_document_new()
 struct o_document * o_document_new_id(struct o_record_id * rid)
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
-	o_record_new_internal_id(o_document_o_record(new_doc), 'd', rid);
+	o_record_new_internal_id(o_document_o_record(new_doc), DOCUMENT_RECORD_TYPE, rid);
 	new_doc->record.o_record_serialize = o_document_record_serialize;
 	new_doc->fields = o_map_new();
 	new_doc->fields_old_values = 0;

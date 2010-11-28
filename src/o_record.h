@@ -1,8 +1,9 @@
 #ifndef O_RECORD_H_
 #define O_RECORD_H_
 #include "o_record_id.h"
-#include "o_row_buffer.h"
+#include "o_raw_buffer.h"
 #include "o_output_stream.h"
+#include "o_input_stream.h"
 
 /**
  * The record.
@@ -49,6 +50,13 @@ struct o_raw_buffer * o_record_content(struct o_record * record);
  * \param output where write;
  */
 void o_record_serialize(struct o_record * record, struct o_output_stream * output);
+
+/*! \brief fill a record whith deserialized data.
+ *
+ * \param record to fill.
+ * \param output from read.
+ */
+void o_record_deserialize(struct o_record * record, struct o_input_stream * input);
 
 /**
  * Free a record.

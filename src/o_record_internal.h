@@ -9,6 +9,7 @@ struct o_record
 	char type;
 	int version;
 	void (*o_record_serialize)(struct o_record * record, struct o_output_stream * stream);
+	void (*o_record_deserialize)(struct o_record * record, struct o_input_stream * stream);
 };
 
 /**

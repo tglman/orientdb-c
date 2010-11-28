@@ -130,7 +130,7 @@ void o_connection_remote_write_short(struct o_connection_remote * connection, sh
 	o_output_stream_write_bytes(connection->output, &short_value, sizeof(short_value));
 }
 
-void o_connection_remote_write_bytes(struct o_connection_remote * connection, char *byte_array, int length)
+void o_connection_remote_write_bytes(struct o_connection_remote * connection,unsigned char *byte_array, int length)
 {
 	o_connection_remote_write_int(connection, length);
 	o_output_stream_write_bytes(connection->output, byte_array, length);

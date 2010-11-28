@@ -5,6 +5,8 @@
 #include "o_engine.h"
 #include "o_storage.h"
 #include "o_url_resolver.h"
+#include "o_raw_buffer.h"
+#include "o_input_stream.h"
 
 struct o_database * o_database_new(char * connection_url)
 {
@@ -54,6 +56,24 @@ void o_database_save_cluster(struct o_database * db, struct o_record * record, c
 	{
 		o_storage_update_record(db->storage, o_record_get_id(record), 0);
 	}
+}
+
+void o_database_delete(struct o_database * db, struct o_record * record)
+{
+	o_storage_delete_record(db->storage, o_record_get_id(record), o_record_version(record));
+}
+
+struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
+{
+	struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
+	struct o_record * record = 0;//instance record using factory.
+	int size;
+	unsigned char * bytes = o_raw_buffer_content(row, &size);
+	struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
+	o_record_deserialize(record, stream);
+	o_input_stream_free(stream);
+	o_raw_buffer_free(row);
+	return record;
 }
 
 void o_database_free_internal(struct o_database * db)

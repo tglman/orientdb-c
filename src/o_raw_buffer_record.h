@@ -1,6 +1,6 @@
 #ifndef O_RAW_BUFFER_RECORD_H_
 #define O_RAW_BUFFER_RECORD_H_
-#include "o_row_buffer.h"
+#include "o_raw_buffer.h"
 #include "o_record.h"
 
 /*! \brief Create an row buffer on a record.

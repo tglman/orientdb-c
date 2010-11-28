@@ -52,7 +52,22 @@ void o_database_save(struct o_database * db, struct o_record * record);
  * \param record to save.
  * \param cluster_name the name of cluster where save.
  */
-void o_database_save_cluster(struct o_database * db, struct o_record * record,char * cluster_name);
+void o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name);
+
+/*! \brief Delete an record from the database.
+ *
+ * \param db where delete.
+ * \param record to delete.
+ */
+void o_database_delete(struct o_database * db, struct o_record * record);
+
+/*! \brief Retrieve a record from the id.
+ *
+ * \param db the database.
+ * \param rid the record identifier.
+ * \return the persistent record.
+ */
+struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
 
 /** Free the database structure with all data.
  *
