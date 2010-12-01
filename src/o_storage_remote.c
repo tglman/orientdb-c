@@ -6,6 +6,7 @@
 #include <string.h>
 #include "o_memory.h"
 #include "o_connection_remote.h"
+#include "o_string_buffer.h"
 
 #define CURRENT_VERSION 0;
 
@@ -78,7 +79,28 @@ void o_storage_remote_check_status(struct o_storage_remote * storage)
 {
 	if (o_connection_remote_read_byte(storage->connection) == ERROR)
 	{
+		short start = 1;
+		struct o_string_buffer * buff = o_string_buffer_new();
+		while (o_connection_remote_read_byte(storage->connection) == 1)
+		{
+			char * ex_name = o_connection_remote_read_string(storage->connection);
+			char * ex_msg = o_connection_remote_read_string(storage->connection);
+			if (!start)
+			{
+				o_string_buffer_append(buff,"\n -> ");
+			}
+			else
+				start = 0;
+			o_string_buffer_append(buff,ex_name);
+			o_string_buffer_append(buff,":");
+			o_string_buffer_append(buff,ex_msg);
+			o_free(ex_name);
+			o_free(ex_msg);
 
+		}
+		char * messg = o_string_buffer_str(buff);
+		throw(o_exception_new(messg,30));
+		o_string_buffer_free(buff);
 	}
 }
 

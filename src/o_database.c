@@ -7,6 +7,7 @@
 #include "o_url_resolver.h"
 #include "o_raw_buffer.h"
 #include "o_input_stream.h"
+#include "o_record_factory.h"
 
 struct o_database * o_database_new(char * connection_url)
 {
@@ -66,7 +67,7 @@ void o_database_delete(struct o_database * db, struct o_record * record)
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
 {
 	struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
-	struct o_record * record = 0;//instance record using factory.
+	struct o_record * record = o_record_factory(o_raw_buffer_type(row));
 	int size;
 	unsigned char * bytes = o_raw_buffer_content(row, &size);
 	struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);

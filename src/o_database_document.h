@@ -60,7 +60,7 @@ void o_database_document_delete(struct o_database_document * db, struct o_docume
  * @param id of record to load.
  * @return loaded record
  */
-struct o_database_document * o_database_document_load(struct o_database_document * db, struct o_record * id);
+struct o_database_document * o_database_document_load(struct o_database_document * db, struct o_record_id * id);
 
 /** Free the database structure with all data.
  *

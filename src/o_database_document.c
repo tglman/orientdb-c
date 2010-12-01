@@ -50,7 +50,7 @@ void o_database_document_delete(struct o_database_document * db, struct o_docume
 	o_database_delete(o_database_document_to_database(db), o_document_o_record(doc));
 }
 
-struct o_database_document * o_database_document_load(struct o_database_document * db, struct o_record * id)
+struct o_database_document * o_database_document_load(struct o_database_document * db, struct o_record_id * id)
 {
 	struct o_record * record = o_database_load(o_database_document_to_database(db), id);
 	if (o_record_type(record) != DOCUMENT_RECORD_TYPE)

@@ -1,5 +1,5 @@
-#ifndef O_ROW_BUFFER_H_
-#define O_ROW_BUFFER_H_
+#ifndef O_RAW_BUFFER_H_
+#define O_RAW_BUFFER_H_
 
 struct o_raw_buffer;
 
@@ -37,4 +37,4 @@ char o_raw_buffer_type(struct o_raw_buffer * buff);
  */
 void o_raw_buffer_free(struct o_raw_buffer * buff);
 
-#endif /* O_ROW_BUFFER_H_ */
+#endif /* O_RAW_BUFFER_H_ */

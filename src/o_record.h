@@ -10,13 +10,6 @@
  */
 struct o_record;
 
-/**
- * create a new record.
- *
- * @return the new record.
- */
-struct o_record * o_record_new();
-
 /*! \brief Retrieve the record id of record.
  *
  * \param record where retrive id.

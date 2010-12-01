@@ -33,7 +33,7 @@ void *test_o_connection_private_listen_thread(void * par)
 
 		int number;
 		char *bytes = o_connection_remote_read_bytes(server, &number);
-		o_connection_remote_write_bytes(server, bytes, number);
+		o_connection_remote_write_bytes(server, (unsigned char *)bytes, number);
 		o_free(bytes);
 
 		char * string = o_connection_remote_read_string(server);
@@ -84,7 +84,7 @@ void test_o_connection_local_data_transfer()
 		long long val_64 = o_connection_remote_read_long64(client);
 		assert_true(val_64 == 10, "error transfer long 64");
 
-		char to_send[15] =
+		unsigned char to_send[15] =
 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 		o_connection_remote_write_bytes(client, to_send, 15);
 
@@ -137,7 +137,7 @@ void test_o_connection_remote_data_transfer()
 		long long val_64 = o_connection_remote_read_long64(client);
 		assert_true(val_64 == 10, "error transfer long 64");
 
-		char to_send[15] =
+		unsigned char to_send[15] =
 		{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 		o_connection_remote_write_bytes(client, to_send, 15);
 

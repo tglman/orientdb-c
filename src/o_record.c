@@ -2,13 +2,6 @@
 #include "o_raw_buffer_record.h"
 #include "o_memory.h"
 
-struct o_record * o_record_new()
-{
-	struct o_record * record = o_malloc(sizeof(struct o_record));
-	o_record_new_internal(record, 'b');
-	return record;
-}
-
 void o_record_new_internal(struct o_record * record, char type)
 {
 	record->record_id = o_record_id_new_empty();

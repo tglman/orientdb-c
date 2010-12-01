@@ -1,5 +1,5 @@
 #ifndef O_ROW_BUFFER_INTERNAL_H_
-#define O_ROW_BUFFER_INTERNAL_H_
+#define O_RAW_BUFFER_INTERNAL_H_
 #include "o_raw_buffer.h"
 
 struct o_raw_buffer
@@ -11,4 +11,4 @@ struct o_raw_buffer
 	void (*o_raw_buffer_free)(struct o_raw_buffer * buff);
 };
 
-#endif /* O_ROW_BUFFER_INTERNAL_H_ */
+#endif /* O_RAW_BUFFER_INTERNAL_H_ */

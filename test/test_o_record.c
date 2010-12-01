@@ -1,6 +1,7 @@
 #include "test_o_record.h"
 #include "../src/o_record.h"
 #include "../src/o_record_id.h"
+#include "../src/o_record_factory.h"
 #include <TestFramework/test.h>
 
 void test_o_record_id_new()
@@ -26,7 +27,7 @@ void o_record_id_suite()
 
 void test_o_record_new()
 {
-	struct o_record * rec = o_record_new();
+	struct o_record * rec = o_record_factory('d');
 	struct o_record_id * id = o_record_get_id(rec);
 	assert_true(o_record_id_cluster_id(id) == -1, "not the same cluster id of default");
 	assert_true(o_record_id_record_id(id) == -1, "not the same record id of default");
