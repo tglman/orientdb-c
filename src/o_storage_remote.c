@@ -7,6 +7,13 @@
 #include "o_memory.h"
 #include "o_connection_remote.h"
 #include "o_string_buffer.h"
+#include "o_native_lock.h"
+#include "o_raw_buffer_byte.h"
+
+#define CLUSTER_INTERNAL_NAME "internal"
+#define CLUSTER_INDEX_NAME "index"
+#define CLUSTER_DEFAULT_NAME "default"
+#define DATA_DEFAULT_NAME "default"
 
 #define CURRENT_VERSION 0;
 
@@ -60,24 +67,26 @@ struct o_storage_remote
 {
 	struct o_storage storage;
 	struct o_connection_remote * connection;
-	char * sessionId;
+	struct o_native_lock * exclusive_lock;
+	int session_id;
 	int n_cluster;
 	struct o_storage_remote_cluster *clusters;
+	int default_cluster_id;
 };
 
 void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
 {
-
+	o_native_lock_lock(storage->exclusive_lock);
 }
 
 void o_storage_release_exclusive_lock(struct o_storage_remote * storage)
 {
-
+	o_native_lock_unlock(storage->exclusive_lock);
 }
 
-void o_storage_remote_check_status(struct o_storage_remote * storage)
+void o_storage_remote_begin_response(struct o_storage_remote * storage)
 {
-	if (o_connection_remote_read_byte(storage->connection) == ERROR)
+	if (o_connection_remote_begin_read_session(storage->connection, storage->session_id) == ERROR)
 	{
 		short start = 1;
 		struct o_string_buffer * buff = o_string_buffer_new();
@@ -87,13 +96,13 @@ void o_storage_remote_check_status(struct o_storage_remote * storage)
 			char * ex_msg = o_connection_remote_read_string(storage->connection);
 			if (!start)
 			{
-				o_string_buffer_append(buff,"\n -> ");
+				o_string_buffer_append(buff, "\n -> ");
 			}
 			else
 				start = 0;
-			o_string_buffer_append(buff,ex_name);
-			o_string_buffer_append(buff,":");
-			o_string_buffer_append(buff,ex_msg);
+			o_string_buffer_append(buff, ex_name);
+			o_string_buffer_append(buff, ":");
+			o_string_buffer_append(buff, ex_msg);
 			o_free(ex_name);
 			o_free(ex_msg);
 
@@ -110,38 +119,91 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	o_storage_acquire_exclusive_lock(rs);
 	try
 	{
-		o_connection_remote_write_byte(rs->connection, RECORD_CREATE);
+		o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_CREATE);
 		o_connection_remote_write_short(rs->connection, cluster);
 		int size;
 		unsigned char * buff = o_raw_buffer_content(content, &size);
 		o_connection_remote_write_bytes(rs->connection, buff, size);
 		o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
-		o_connection_remote_flush(rs->connection);
+		o_connection_remote_end_write(rs->connection);
 	}
 	catch(struct o_exception_io, cur_ex)
 	{
 		o_exception_free((struct o_exception *) cur_ex);
 	}
 	end_try;
+
+	o_storage_remote_begin_response(rs);
+	long long val = o_connection_remote_read_long64(rs->connection);
+	o_connection_remote_end_read(rs->connection);
 	o_storage_release_exclusive_lock(rs);
-	//readStatus();
-	//return network.readLong();
-	return 0;
+	return val;
 }
 
 struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, struct o_record_id * id)
 {
-	return 0;
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	o_storage_acquire_exclusive_lock(rs);
+
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_LOAD);
+	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
+	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
+	o_connection_remote_write_string(rs->connection, "");
+	o_connection_remote_end_write(rs->connection);
+
+	o_storage_remote_begin_response(rs);
+	char res = o_connection_remote_read_byte(rs->connection);
+	if (res == 0)
+		return 0;
+	int size;
+	unsigned char * o_p = o_connection_remote_read_bytes(rs->connection, &size);
+	int version = o_connection_remote_read_int(rs->connection);
+	int type = o_connection_remote_read_int(rs->connection);
+	o_connection_remote_end_read(rs->connection);
+
+	o_storage_release_exclusive_lock(rs);
+	return o_raw_buffer_byte(type, version, o_p, size);
 }
 
 int o_storage_remote_update_record(struct o_storage * storage, struct o_record_id * id, struct o_raw_buffer * content)
 {
-	return 0;
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	o_storage_acquire_exclusive_lock(rs);
+
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_UPDATE);
+	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
+	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
+	int size;
+	unsigned char* bytes = o_raw_buffer_content(content, &size);
+	o_connection_remote_write_bytes(rs->connection, bytes, size);
+	o_connection_remote_write_int(rs->connection, o_raw_buffer_version(content));
+	o_connection_remote_write_int(rs->connection, o_raw_buffer_type(content));
+	o_connection_remote_end_write(rs->connection);
+
+	o_storage_remote_begin_response(rs);
+	int res = o_connection_remote_read_int(rs->connection);
+	o_connection_remote_end_read(rs->connection);
+
+	o_storage_release_exclusive_lock(rs);
+	return res;
 }
 
 int o_storage_remote_delete_record(struct o_storage * storage, struct o_record_id * id, int version)
 {
-	return 0;
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	o_storage_acquire_exclusive_lock(rs);
+
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_DELETE);
+	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
+	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
+	o_connection_remote_write_int(rs->connection, version);
+	o_connection_remote_end_write(rs->connection);
+
+	o_storage_remote_begin_response(rs);
+	int res = o_connection_remote_read_int(rs->connection);
+	o_connection_remote_end_read(rs->connection);
+	o_storage_release_exclusive_lock(rs);
+	return res == 1;
 }
 
 char ** o_storage_remote_get_cluster_names(struct o_storage * storage, int * names_count)
@@ -151,7 +213,15 @@ char ** o_storage_remote_get_cluster_names(struct o_storage * storage, int * nam
 
 int o_storage_remote_get_cluster_id_by_name(struct o_storage * storage, char * name)
 {
-	return 0;
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	struct o_storage_remote_cluster * clusters_iterator = rs->clusters;
+	while (clusters_iterator != 0)
+	{
+		if (strcmp(clusters_iterator->storage_name, name) == 0)
+			return clusters_iterator->id;
+		clusters_iterator = clusters_iterator->next;
+	}
+	return -1;
 }
 
 void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_transaction * transaction)
@@ -163,7 +233,17 @@ void o_storage_remote_free(struct o_storage * storage)
 {
 	o_storage_internal_free(storage);
 	struct o_storage_remote * storage_remote = (struct o_storage_remote *) storage;
-	o_free(storage_remote->sessionId);
+	o_native_lock_free(storage_remote->exclusive_lock);
+	struct o_storage_remote_cluster * clusters_iterator = storage_remote->clusters;
+	struct o_storage_remote_cluster * next_iterator;
+	while (clusters_iterator != 0)
+	{
+		next_iterator = clusters_iterator->next;
+		o_free(clusters_iterator->storage_name);
+		o_free(clusters_iterator->type);
+		o_free(clusters_iterator);
+		clusters_iterator = next_iterator;
+	}
 	o_free(storage_remote);
 }
 
@@ -185,28 +265,32 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
 		storage->storage.o_storage_free = o_storage_remote_free;
 		storage->connection = conn;
+		storage->session_id = 0;
+		storage->exclusive_lock = o_native_lock_new();
 
-		o_connection_remote_write_byte(storage->connection, DB_OPEN);
+		o_connection_remote_begin_write_session(storage->connection, storage->session_id, DB_OPEN);
 		o_connection_remote_write_bytes(storage->connection, (unsigned char*) name, strlen(name));
 		o_connection_remote_write_bytes(storage->connection, (unsigned char*) username, strlen(username));
 		o_connection_remote_write_bytes(storage->connection, (unsigned char*) password, strlen(password));
-		o_connection_remote_flush(storage->connection);
-		o_storage_remote_check_status(storage);
-		int readSize;
-		storage->sessionId = o_connection_remote_read_bytes(storage->connection, &readSize);
+		o_connection_remote_end_write(storage->connection);
+
+		o_storage_remote_begin_response(storage);
+		storage->session_id = o_connection_remote_read_int(storage->connection);
 		storage->n_cluster = o_connection_remote_read_int(storage->connection);
 		int i;
 		struct o_storage_remote_cluster **clusters = &storage->clusters;
 		for (i = 0; i < storage->n_cluster; i++)
 		{
 			struct o_storage_remote_cluster *cluster = o_malloc(sizeof(struct o_storage_remote_cluster));
-			cluster->storage_name = o_connection_remote_read_bytes(storage->connection, &readSize);
+			cluster->storage_name = o_connection_remote_read_string(storage->connection);
 			cluster->id = o_connection_remote_read_int(storage->connection);
-			cluster->type = o_connection_remote_read_bytes(storage->connection, &readSize);
+			cluster->type = o_connection_remote_read_string(storage->connection);
 			*clusters = cluster;
 			clusters = &cluster->next;
+			cluster->next = 0;
 		}
-		//MANAGE DEFAULT CLUSTER.
+		o_connection_remote_end_read(storage->connection);
+		storage->default_cluster_id = o_storage_remote_get_cluster_id_by_name(&storage->storage, CLUSTER_DEFAULT_NAME);
 	}
 	catch(struct o_exception, ex)
 	{

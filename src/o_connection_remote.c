@@ -4,6 +4,7 @@
 #include "o_storage_remote.h"
 #include "o_input_stream_socket.h"
 #include "o_output_stream_socket.h"
+#include "o_native_lock.h"
 #include "o_memory.h"
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,13 @@ struct o_connection_remote
 	struct o_database_socket *socket;
 	struct o_input_stream * input;
 	struct o_output_stream * output;
+	struct o_native_lock * read_lock;
+	struct o_native_lock * write_lock;
+	struct o_native_lock * lock;
+	struct o_native_cond * cond;
+	int session_id;
+	char response_id;
+	char readed;
 };
 
 void o_connection_remote_free(struct o_connection *connection);
@@ -80,10 +88,10 @@ short o_connection_remote_read_short(struct o_connection_remote * connection)
 	return ntohs(toRead);
 }
 
-char * o_connection_remote_read_bytes(struct o_connection_remote * connection, int *byte_read)
+unsigned char * o_connection_remote_read_bytes(struct o_connection_remote * connection, int *byte_read)
 {
 	*byte_read = o_connection_remote_read_int(connection);
-	char * bytes = o_malloc(*byte_read * sizeof(char));
+	unsigned char * bytes = o_malloc(*byte_read * sizeof(unsigned char));
 	o_input_stream_read_bytes(connection->input, bytes, *byte_read);
 	return bytes;
 }
@@ -152,6 +160,51 @@ void o_connection_remote_write_array_strings(struct o_connection_remote * connec
 	int i;
 	for (i = 0; i < length; i++)
 		o_connection_remote_write_string(connection, strings_array[i]);
+}
+
+int o_connection_remote_begin_read_session(struct o_connection_remote * connection, int session_id)
+{
+	do
+	{
+		o_native_lock_lock(connection->read_lock);
+		if (!connection->readed)
+		{
+			connection->readed = 1;
+			connection->response_id = o_connection_remote_read_byte(connection);
+			connection->session_id = o_connection_remote_read_int(connection);
+		}
+		if (connection->session_id == session_id)
+			return connection->response_id;
+
+		o_native_lock_unlock(connection->read_lock);
+		o_native_lock_lock(connection->lock);
+		o_native_cond_wait(connection->cond, connection->lock);
+		o_native_lock_unlock(connection->lock);
+	} while (1);
+	//never executed remove only warning.
+	return 0;
+}
+
+void o_connection_remote_end_read(struct o_connection_remote * connection)
+{
+	connection->readed = 0;
+	o_native_lock_unlock(connection->read_lock);
+	o_native_lock_lock(connection->lock);
+	o_native_cond_broadcast(connection->cond);
+	o_native_lock_unlock(connection->lock);
+}
+
+void o_connection_remote_begin_write_session(struct o_connection_remote * connection, int session_id, char command)
+{
+	o_native_lock_lock(connection->write_lock);
+	o_connection_remote_write_byte(connection, command);
+	o_connection_remote_write_int(connection, session_id);
+}
+
+void o_connection_remote_end_write(struct o_connection_remote * connection)
+{
+	o_connection_remote_flush(connection);
+	o_native_lock_unlock(connection->write_lock);
 }
 
 void o_connection_remote_free(struct o_connection *connection)

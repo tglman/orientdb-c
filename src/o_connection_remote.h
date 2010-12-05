@@ -50,7 +50,7 @@ short o_connection_remote_read_short(struct o_connection_remote * connection);
  * @param byte_read the nunmber of byte read.
  * @return a new array of byte/char filled.
  */
-char * o_connection_remote_read_bytes(struct o_connection_remote * connection, int *byte_read);
+unsigned char * o_connection_remote_read_bytes(struct o_connection_remote * connection, int *byte_read);
 
 /*! \brief Read a null terminated string from connection.
  *
@@ -102,7 +102,7 @@ void o_connection_remote_write_short(struct o_connection_remote * connection, sh
  * @param byte_array to write.
  * @param lenght the length of byte to string
  */
-void o_connection_remote_write_bytes(struct o_connection_remote * connection,unsigned char *byte_array, int length);
+void o_connection_remote_write_bytes(struct o_connection_remote * connection, unsigned char *byte_array, int length);
 
 /*! \brief Write a  null terminated string to connection.
  *
@@ -118,6 +118,34 @@ void o_connection_remote_write_string(struct o_connection_remote * connection, c
  * @param the length of array to write.
  */
 void o_connection_remote_write_array_strings(struct o_connection_remote * connection, char * *strings_array, int length);
+
+/*! \brief Start a read of an session from connection.
+ *
+ * \param connection where read.
+ * \param session_id session to read from socket.
+ * \return the response status.
+ */
+int o_connection_remote_begin_read_session(struct o_connection_remote * connection, int session_id);
+
+/*! \biref End a read of socket.
+ *
+ * \param connectio where read.
+ */
+void o_connection_remote_end_read(struct o_connection_remote * connection);
+
+/*! \brief Start a write command to remote connection for session.
+ *
+ * \param cennection where communicate.
+ * \param session_id identifier of session in writing.
+ * \parma command the command sent to remote.
+ */
+void o_connection_remote_begin_write_session(struct o_connection_remote * connection, int session_id, char command);
+
+/*! \brief End a write action on connection.
+ *
+ * \param connection where writed.
+ */
+void o_connection_remote_end_write(struct o_connection_remote * connection);
 
 /**
  * Flush buffered data on connection.
