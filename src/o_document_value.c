@@ -1,9 +1,13 @@
 #include "o_document_value.h"
 #include "o_document.h"
+#include "o_document_internal.h"
 #include "o_record.h"
 #include "o_memory.h"
 #include "o_exceptions.h"
 #include <string.h>
+#include "o_string_printer.h"
+#include "o_string_buffer.h"
+
 #define VALUE(obb,type) *((type *)obb->value)
 #define VALUE_CHECK(OBB,TYPE,E_TYPE) E_TYPE==OBB->type?*((TYPE *)OBB->value):(TYPE)0
 
@@ -194,64 +198,64 @@ int o_document_value_get_array_size(struct o_document_value * o_value)
 		return ((struct o_document_value_array *) o_value->value)->size;
 }
 
-void o_document_value_serialize(struct o_document_value * o_value, struct o_string_buffer *buff)
+void o_document_value_serialize(struct o_document_value * o_value, struct o_string_printer *buff)
 {
 	switch (o_value->type)
 	{
 	case BOOL:
 		if (VALUE(o_value,int))
-			o_string_buffer_append(buff, "true");
+			o_string_printer_print(buff, "true");
 		else
-			o_string_buffer_append(buff, "false");
+			o_string_printer_print(buff, "false");
 		break;
 	case STRING:
-		o_string_buffer_append(buff, "\"");
+		o_string_printer_print(buff, "\"");
 		char * val = VALUE(o_value,char *);
 		while (*val != 0)
 		{
 			if (*val == '"' || *val == '\'' || *val == '\\')
-				o_string_buffer_append_char(buff, '\\');
-			o_string_buffer_append_char(buff, *val++);
+				o_string_printer_print_char(buff, '\\');
+			o_string_printer_print_char(buff, *val++);
 		}
-		o_string_buffer_append(buff, "\"");
+		o_string_printer_print(buff, "\"");
 		break;
 	case BYTE:
-		o_string_buffer_append_long(buff, VALUE(o_value,char));
+		o_string_printer_print_long(buff, VALUE(o_value,char));
 		break;
 	case INT:
-		o_string_buffer_append_long(buff, VALUE(o_value,int));
+		o_string_printer_print_long(buff, VALUE(o_value,int));
 		break;
 	case LONG:
-		o_string_buffer_append_long(buff, VALUE(o_value,long));
+		o_string_printer_print_long(buff, VALUE(o_value,long));
 		break;
 	case SHORT:
-		o_string_buffer_append_long(buff, VALUE(o_value,short));
+		o_string_printer_print_long(buff, VALUE(o_value,short));
 		break;
 	case FLOAT:
-		o_string_buffer_append_double(buff, VALUE(o_value,float));
+		o_string_printer_print_double(buff, VALUE(o_value,float));
 		break;
 	case DOUBLE:
-		o_string_buffer_append_double(buff, VALUE(o_value,double));
+		o_string_printer_print_double(buff, VALUE(o_value,double));
 		break;
 	case EMBEDDED:
-		o_string_buffer_append(buff, "*");
-		o_document_serialize(VALUE(o_value,struct o_document *), buff);
-		o_string_buffer_append(buff, "*");
+		o_string_printer_print(buff, "{");
+		o_document_serialize_printer(VALUE(o_value,struct o_document *), buff);
+		o_string_printer_print(buff, "}");
 		break;
 	case LINK:
 	{
 		struct o_record *rec = o_document_o_record(VALUE(o_value,struct o_document *));
 		struct o_record_id * id = o_record_get_id(rec);
-		o_string_buffer_append(buff, "#");
-		o_string_buffer_append_long(buff, o_record_id_cluster_id(id));
-		o_string_buffer_append(buff, ":");
-		o_string_buffer_append_long(buff, o_record_id_record_id(id));
+		o_string_printer_print(buff, "#");
+		o_string_printer_print_long(buff, o_record_id_cluster_id(id));
+		o_string_printer_print(buff, ":");
+		o_string_printer_print_long(buff, o_record_id_record_id(id));
 	}
 		break;
 
 	case ARRAY:
 	{
-		o_string_buffer_append(buff, "[");
+		o_string_printer_print(buff, "[");
 		int s = o_document_value_get_array_size(o_value);
 		int i;
 		struct o_document_value ** array = o_document_value_get_array(o_value);
@@ -259,9 +263,9 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		{
 			o_document_value_serialize(array[i], buff);
 			if (i < s)
-				o_string_buffer_append(buff, ",");
+				o_string_printer_print(buff, ",");
 		}
-		o_string_buffer_append(buff, "]");
+		o_string_printer_print(buff, "]");
 	}
 		break;
 	case DATE:

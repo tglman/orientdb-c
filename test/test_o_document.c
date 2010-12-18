@@ -5,10 +5,13 @@
 #include <string.h>
 #include <stdio.h>
 #include "../src/o_memory.h"
+#include "../src/o_string_printer.h"
+#include "../src/o_string_printer_stream.h"
+#include "../src/o_output_stream_byte.h"
 void test_o_document_new()
 {
 	struct o_document * doc = o_document_new();
-	o_document_free(doc);
+	o_document_release(doc);
 }
 
 void test_o_document_property_managment()
@@ -30,7 +33,7 @@ void test_o_document_property_managment()
 	assert_true(o_document_value_get_int(val1) == 30, "the get of value of key 'prova' fail ");
 	struct o_document_value * val2 = o_document_field_get(doc, "prova1");
 	assert_true(o_document_value_get_int(val2) == 31, "the get of value of key 'prova1' fail ");
-	o_document_free(doc);
+	o_document_release(doc);
 }
 
 void test_o_document_serialize()
@@ -38,13 +41,17 @@ void test_o_document_serialize()
 	struct o_document * doc = o_document_new();
 	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
 	o_document_field_set(doc, "stringVal", o_document_value_string("popo"));
-	struct o_string_buffer * buff = o_string_buffer_new();
-	o_document_serialize(doc, buff);
-	char * content = o_string_buffer_str(buff);
-	assert_true(strcmp(content, "boolVal:true,stringVal:\"popo\"") == 0, "the serialization not is the expected");
-	o_free(content);
-	o_string_buffer_free(buff);
-	o_document_free(doc);
+	struct o_output_stream * out = o_output_stream_byte_buffer();
+	o_document_serialize(doc, out);
+	int size;
+	char * content = o_output_stream_byte_content(out, &size);
+	char *mem = o_malloc(size + 1);
+	memcpy(mem, content, size);
+	mem[size] = 0;
+	assert_true(strcmp(mem, "boolVal:true,stringVal:\"popo\"") == 0, "the serialization not is the expected");
+	o_free(mem);
+	o_output_stream_free(out);
+	o_document_release(doc);
 }
 
 void test_o_document_serialize_deserialize()
@@ -52,25 +59,20 @@ void test_o_document_serialize_deserialize()
 	struct o_document * doc = o_document_new();
 	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
 	o_document_field_set(doc, "stringVal", o_document_value_string("popo"));
-	struct o_string_buffer * buff = o_string_buffer_new();
-	o_document_serialize(doc, buff);
-	char * content = o_string_buffer_str(buff);
-	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, strlen(content));
-	o_document_free(doc);
+	struct o_output_stream * out = o_output_stream_byte_buffer();
+	o_document_serialize(doc, out);
+	int size;
+	char * content = o_output_stream_byte_content(out, &size);
+	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, size);
+	o_document_release(doc);
 	doc = o_document_new();
-	printf("%s","ser ");
-	fflush(stdout);
 	o_document_deserialize(doc, os);
-	printf("%s"," after der");
-	fflush(stdout);
-	//assert_true(strcmp(content, "boolVal:true,stringVal:\"popo\"") == 0, "the serialization not is the expected");
-	o_free(content);
 	struct o_document_value *v = o_document_field_get(doc, "boolVal");
 	assert_true(o_document_value_get_bool(v) == 1, "the boolean value failed after serialization");
 	v = o_document_field_get(doc, "stringVal");
 	assert_true(strcmp(o_document_value_get_string(v), "popo") == 0, "the string value failed after serialization");
-	o_string_buffer_free(buff);
-	o_document_free(doc);
+	o_document_release(doc);
+	o_output_stream_free(out);
 	o_input_stream_free(os);
 
 }

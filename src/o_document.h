@@ -1,7 +1,7 @@
 #ifndef O_DOCUMENT_H_
 #define O_DOCUMENT_H_
 #include "o_record.h"
-#include "o_string_buffer.h"
+#include "o_output_stream.h"
 #include "o_input_stream.h"
 #define DOCUMENT_RECORD_TYPE 'd'
 
@@ -96,7 +96,7 @@ struct o_document * o_document_copy(struct o_document * doc);
  * \param doc to write.
  * \param buff where write.
  */
-void o_document_serialize(struct o_document * doc, struct o_string_buffer * buff);
+void o_document_serialize(struct o_document * doc, struct o_output_stream * output);
 
 /*! \brief Read an document from the stream.
  *
@@ -112,11 +112,17 @@ void o_document_deserialize(struct o_document * doc, struct o_input_stream * str
  */
 char * o_document_get_class_name(struct o_document * doc);
 
-/** deallocate an document with all it structure.
+/** release the reference to document.
  *
- * @param doc to free.
+ * @param doc to release.
  */
-void o_document_free(struct o_document * doc);
+void o_document_release(struct o_document * doc);
+
+/*! \brief increment an reference counter to document.
+ *
+ * \param doc to reverence
+ */
+void o_document_refer(struct o_document * doc);
 
 #endif /* O_DOCUMENT_H_ */
 

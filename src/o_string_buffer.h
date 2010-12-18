@@ -12,6 +12,7 @@ struct o_string_buffer;
  */
 struct o_string_buffer * o_string_buffer_new();
 
+
 /*! \brief Append a string to buffer.
  *
  * \param buff where append string.

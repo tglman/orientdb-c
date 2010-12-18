@@ -7,6 +7,7 @@ void o_record_new_internal(struct o_record * record, char type)
 	record->record_id = o_record_id_new_empty();
 	record->type = type;
 	record->version = 0;
+	record->ref_count = 1;
 }
 
 void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid)
@@ -14,6 +15,7 @@ void o_record_new_internal_id(struct o_record * record, char type, struct o_reco
 	record->record_id = rid;
 	record->type = type;
 	record->version = 0;
+	record->ref_count = 1;
 }
 
 struct o_record_id * o_record_get_id(struct o_record * record)
@@ -51,8 +53,15 @@ void o_record_deserialize(struct o_record * record, struct o_input_stream * inpu
 	record->o_record_deserialize(record, input);
 }
 
-void o_record_free(struct o_record * record)
+void o_record_refer(struct o_record * record)
 {
-	o_record_free_internal(record);
-	o_free(record);
+	record->ref_count++;
 }
+
+void o_record_release(struct o_record * record)
+{
+	record->ref_count--;
+	if (record->ref_count == 0)
+		record->o_record_free(record);
+}
+

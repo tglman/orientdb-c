@@ -8,6 +8,7 @@
 #include "test_o_record.h"
 #include "test_o_document.h"
 #include "test_o_input_stream.h"
+#include "test_o_string_printer.h"
 
 void initialize()
 {
@@ -18,6 +19,7 @@ void initialize()
 	ADD_SUITE(o_string_buffer_suite, "string buffer tests");
 	ADD_SUITE(o_document_value_suite, "document value tests");
 	ADD_SUITE(o_record_suite, "simple record tests");
+	ADD_SUITE(o_string_printer_suite, "printer test");
 	ADD_SUITE(o_document_suite, "document tests");
 	ADD_SUITE(o_input_stream_suite, "input stream test");
 

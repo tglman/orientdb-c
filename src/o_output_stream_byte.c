@@ -39,7 +39,7 @@ void o_output_stream_byte_free(struct o_output_stream * stream)
 char * o_output_stream_byte_content(struct o_output_stream * stream, int * content_size)
 {
 	struct o_output_stream_byte *buff = (struct o_output_stream_byte *) stream;
-	*content_size = buff->size;
+	*content_size = buff->cursor;
 	return buff->content;
 }
 

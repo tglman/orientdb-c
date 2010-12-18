@@ -32,7 +32,7 @@ void test_o_record_new()
 	assert_true(o_record_id_cluster_id(id) == -1, "not the same cluster id of default");
 	assert_true(o_record_id_record_id(id) == -1, "not the same record id of default");
 	assert_true(o_record_version(rec) == 0, "the version not is the default");
-	o_record_free(rec);
+	o_record_release(rec);
 }
 
 void o_record_suite()

@@ -51,11 +51,16 @@ void o_record_serialize(struct o_record * record, struct o_output_stream * outpu
  */
 void o_record_deserialize(struct o_record * record, struct o_input_stream * input);
 
-/**
- * Free a record.
+/*! \brief Increase a reference to record.
  *
- * @param record to free.
+ * \param record to increase reference.
  */
-void o_record_free(struct o_record * record);
+void o_record_refer(struct o_record * record);
+
+/*! \brief Decrease a reference to record.
+ *
+ * \param record to increase reference.
+ */
+void o_record_release(struct o_record * record);
 
 #endif /* O_RECORD_H_ */

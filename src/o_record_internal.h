@@ -8,8 +8,10 @@ struct o_record
 	struct o_record_id * record_id;
 	char type;
 	int version;
+	int ref_count;
 	void (*o_record_serialize)(struct o_record * record, struct o_output_stream * stream);
 	void (*o_record_deserialize)(struct o_record * record, struct o_input_stream * stream);
+	void (*o_record_free)(struct o_record * record);
 };
 
 /**
@@ -33,5 +35,6 @@ void o_record_new_internal_id(struct o_record * record, char type, struct o_reco
  * @param record to free.
  */
 void o_record_free_internal(struct o_record * record);
+
 
 #endif /* O_RECORD_INTERNAL_H_ */
