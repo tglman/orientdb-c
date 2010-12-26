@@ -238,9 +238,9 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		o_string_printer_print_double(buff, VALUE(o_value,double));
 		break;
 	case EMBEDDED:
-		o_string_printer_print(buff, "{");
+		o_string_printer_print(buff, "(");
 		o_document_serialize_printer(VALUE(o_value,struct o_document *), buff);
-		o_string_printer_print(buff, "}");
+		o_string_printer_print(buff, ")");
 		break;
 	case LINK:
 	{
@@ -447,6 +447,8 @@ struct o_document_value * o_document_value_deserialize(struct o_input_stream * s
 		return o_document_value_array_deserialize(stream);
 	case '{':
 		return o_document_value_map_deserialize(stream);
+	case '(':
+		return o_document_value_embedded_deserialize(stream);
 	case 't':
 	case 'f':
 		return o_document_value_bool_deserialize(stream, readed == 't');

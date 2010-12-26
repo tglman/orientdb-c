@@ -1,10 +1,14 @@
 #ifndef O_CONNECTION_INTERNAL_H_
 #define O_CONNECTION_INTERNAL_H_
 #include "o_connection.h"
+#include "o_map.h"
 
 struct o_connection
 {
 	enum o_url_type type;
+	char * path;
+	char * last_user;
+	struct o_map * storages;
 	void (*free)(struct o_connection *conn);
 	struct o_storage * (*storage_open)(struct o_connection *conn, char * storage_name, char * username, char * password);
 };

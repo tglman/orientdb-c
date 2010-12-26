@@ -6,10 +6,11 @@
 #include "o_output_stream_socket.h"
 #include "o_native_lock.h"
 #include "o_memory.h"
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <netinet/in.h>
+#include "o_exceptions.h"
+
+#define CURRENT_PROTOCOL 2
 
 struct o_connection_remote
 {
@@ -18,9 +19,9 @@ struct o_connection_remote
 	struct o_database_socket *socket;
 	struct o_input_stream * input;
 	struct o_output_stream * output;
-	struct o_native_lock * read_lock;
-	struct o_native_lock * write_lock;
-	struct o_native_lock * lock;
+	struct o_native_lock * input_lock;
+	struct o_native_lock * output_lock;
+	struct o_native_lock * cond_lock;
 	struct o_native_cond * cond;
 	int session_id;
 	char response_id;
@@ -38,6 +39,11 @@ struct o_connection * o_connection_remote_new_accept(struct o_database_socket * 
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
+	conn->connection.storage_open = o_connection_remote_storage_open;
+	conn->input_lock = o_native_lock_new();
+	conn->output_lock = o_native_lock_new();
+	conn->cond_lock = o_native_lock_new();
+	conn->cond = o_native_cond_new();
 	return &conn->connection;
 }
 
@@ -49,6 +55,14 @@ struct o_connection * o_connection_remote_new(char * host, int port)
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
+	conn->connection.storage_open = o_connection_remote_storage_open;
+	conn->input_lock = o_native_lock_new();
+	conn->output_lock = o_native_lock_new();
+	conn->cond_lock = o_native_lock_new();
+	conn->cond = o_native_cond_new();
+
+	if (o_connection_remote_read_short(conn) != CURRENT_PROTOCOL)
+		throw(o_exception_new("Wrong protocol version", 1));
 	return &conn->connection;
 }
 
@@ -61,14 +75,14 @@ struct o_storage * o_connection_remote_storage_open(struct o_connection *connect
 
 int o_connection_remote_read_int(struct o_connection_remote * connection)
 {
-	int toRead;
+	int toRead = 0;
 	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return ntohl(toRead);
 }
 
 long long o_connection_remote_read_long64(struct o_connection_remote * connection)
 {
-	long long ret_val;
+	long long ret_val = 0;
 	o_input_stream_read_bytes(connection->input, &ret_val, sizeof(ret_val));
 	ret_val = (((long long) (ntohl((int) ((ret_val << 32) >> 32))) << 32) | (unsigned int) ntohl(((int) (ret_val >> 32))));
 	return ret_val;
@@ -76,14 +90,14 @@ long long o_connection_remote_read_long64(struct o_connection_remote * connectio
 
 char o_connection_remote_read_byte(struct o_connection_remote * connection)
 {
-	char toRead;
+	char toRead = 0;
 	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return toRead;
 }
 
 short o_connection_remote_read_short(struct o_connection_remote * connection)
 {
-	short toRead;
+	short toRead = 0;
 	o_input_stream_read_bytes(connection->input, &toRead, sizeof(toRead));
 	return ntohs(toRead);
 }
@@ -123,7 +137,7 @@ void o_connection_remote_write_int(struct o_connection_remote * connection, int 
 
 void o_connection_remote_write_long64(struct o_connection_remote * connection, long long long_value)
 {
-	long_value = (((long long) (ntohl((int) ((long_value << 32) >> 32))) << 32) | (unsigned int) ntohl(((int) (long_value >> 32))));
+	long_value = (((long long) (htonl((int) ((long_value << 32) >> 32))) << 32) | (unsigned int) htonl(((int) (long_value >> 32))));
 	o_output_stream_write_bytes(connection->output, &long_value, sizeof(long_value));
 }
 
@@ -166,7 +180,7 @@ int o_connection_remote_begin_read_session(struct o_connection_remote * connecti
 {
 	do
 	{
-		o_native_lock_lock(connection->read_lock);
+		o_native_lock_lock(connection->input_lock);
 		if (!connection->readed)
 		{
 			connection->readed = 1;
@@ -174,12 +188,15 @@ int o_connection_remote_begin_read_session(struct o_connection_remote * connecti
 			connection->session_id = o_connection_remote_read_int(connection);
 		}
 		if (connection->session_id == session_id)
+		{
+			connection->readed = 0;
 			return connection->response_id;
+		}
 
-		o_native_lock_unlock(connection->read_lock);
-		o_native_lock_lock(connection->lock);
-		o_native_cond_wait(connection->cond, connection->lock);
-		o_native_lock_unlock(connection->lock);
+		o_native_lock_unlock(connection->input_lock);
+		o_native_lock_lock(connection->cond_lock);
+		o_native_cond_wait(connection->cond, connection->cond_lock);
+		o_native_lock_unlock(connection->cond_lock);
 	} while (1);
 	//never executed remove only warning.
 	return 0;
@@ -188,15 +205,15 @@ int o_connection_remote_begin_read_session(struct o_connection_remote * connecti
 void o_connection_remote_end_read(struct o_connection_remote * connection)
 {
 	connection->readed = 0;
-	o_native_lock_unlock(connection->read_lock);
-	o_native_lock_lock(connection->lock);
+	o_native_lock_unlock(connection->input_lock);
+	o_native_lock_lock(connection->cond_lock);
 	o_native_cond_broadcast(connection->cond);
-	o_native_lock_unlock(connection->lock);
+	o_native_lock_unlock(connection->cond_lock);
 }
 
 void o_connection_remote_begin_write_session(struct o_connection_remote * connection, int session_id, char command)
 {
-	o_native_lock_lock(connection->write_lock);
+	o_native_lock_lock(connection->output_lock);
 	o_connection_remote_write_byte(connection, command);
 	o_connection_remote_write_int(connection, session_id);
 }
@@ -204,7 +221,7 @@ void o_connection_remote_begin_write_session(struct o_connection_remote * connec
 void o_connection_remote_end_write(struct o_connection_remote * connection)
 {
 	o_connection_remote_flush(connection);
-	o_native_lock_unlock(connection->write_lock);
+	o_native_lock_unlock(connection->output_lock);
 }
 
 void o_connection_remote_free(struct o_connection *connection)
@@ -213,6 +230,10 @@ void o_connection_remote_free(struct o_connection *connection)
 	o_database_socket_close(remote->socket);
 	o_input_stream_free(remote->input);
 	o_output_stream_free(remote->output);
+	o_native_lock_free(remote->output_lock);
+	o_native_lock_free(remote->input_lock);
+	o_native_lock_free(remote->cond_lock);
+	o_native_cond_free(remote->cond);
 	o_free(remote);
 }
 

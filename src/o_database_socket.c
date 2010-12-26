@@ -2,7 +2,6 @@
 #include "o_exceptions.h"
 #include "o_exception_io.h"
 #include "o_memory.h"
-#include <stdio.h>
 #include <malloc.h>
 #include <memory.h>
 #include <sys/types.h>
@@ -43,6 +42,7 @@ struct o_database_socket * o_database_socket_connect(char * site, short port)
 		o_free(sock);
 		throw(ex);
 	}
+	end_try;
 	return sock;
 }
 

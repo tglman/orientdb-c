@@ -25,10 +25,10 @@ struct o_map
 	void ** cache_values;
 };
 
-int o_map_hash_string(struct o_map * map, char * key)
+unsigned int o_map_hash_string(struct o_map * map, char * key)
 {
-	int h, i;
-	int len = strlen(key);
+	unsigned int h, i;
+	unsigned int len = strlen(key);
 	for (h = 0, i = 0; i < len; i++)
 		h = 31 * h + key[i++];
 	return h % map->entries_size;
@@ -58,7 +58,7 @@ void o_map_free_entry(struct o_map_entry * entry)
 	o_free(entry);
 }
 
-struct o_map_entry * o_map_get_entry(struct o_map * map, char * key, int hash)
+struct o_map_entry * o_map_get_entry(struct o_map * map, char * key, unsigned int hash)
 {
 	struct o_map_entry * cur = map->entries[hash];
 	while (cur != 0 && strcmp(cur->key, key) != 0)
@@ -68,7 +68,7 @@ struct o_map_entry * o_map_get_entry(struct o_map * map, char * key, int hash)
 
 void * o_map_put(struct o_map * map, char * key, void * val)
 {
-	int hash = o_map_hash_string(map, key);
+	unsigned int hash = o_map_hash_string(map, key);
 	o_map_clear_caches(map);
 	struct o_map_entry * new_entry = o_map_get_entry(map, key, hash);
 	if (new_entry != 0)
@@ -104,7 +104,7 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 
 void * o_map_get(struct o_map * map, char * key)
 {
-	int hash = o_map_hash_string(map, key);
+	unsigned int hash = o_map_hash_string(map, key);
 	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	if (found != 0)
 		return found->value;
@@ -113,7 +113,7 @@ void * o_map_get(struct o_map * map, char * key)
 
 void * o_map_remove(struct o_map * map, char * key)
 {
-	int hash = o_map_hash_string(map, key);
+	unsigned int hash = o_map_hash_string(map, key);
 	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	void *value = 0;
 	if (found != 0)

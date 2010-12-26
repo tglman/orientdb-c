@@ -69,6 +69,12 @@ void o_database_delete(struct o_database * db, struct o_record * record);
  */
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
 
+/** Close the current database session
+ *
+ * @param db to close.
+ */
+void o_database_close(struct o_database * db);
+
 /** Free the database structure with all data.
  *
  * @param db to free.

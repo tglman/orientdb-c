@@ -1,5 +1,6 @@
 #include "o_database.h"
 #include "o_database_internal.h"
+#include "o_database_error_handler.h"
 #include "o_memory.h"
 #include <string.h>
 #include "o_engine.h"
@@ -8,6 +9,8 @@
 #include "o_raw_buffer.h"
 #include "o_input_stream.h"
 #include "o_record_factory.h"
+#include "o_exceptions.h"
+#include "o_exception.h"
 
 struct o_database * o_database_new(char * connection_url)
 {
@@ -35,7 +38,15 @@ void o_database_reset_error_handler(struct o_database * db, struct o_database_er
 
 void o_database_open(struct o_database * db, char * username, char * password)
 {
-	db->storage = o_engine_get_storage(db->connection_url, username, password);
+	try
+	{
+		db->storage = o_engine_get_storage(db->connection_url, username, password);
+	}
+	catch(struct o_exception , ex)
+	{
+		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+	}
+	end_try;
 }
 
 void o_database_save(struct o_database * db, struct o_record * record)
@@ -79,8 +90,13 @@ struct o_record * o_database_load(struct o_database * db, struct o_record_id * r
 
 void o_database_free_internal(struct o_database * db)
 {
+	o_database_close(db);
+}
+
+void o_database_close(struct o_database * db)
+{
 	if (db->storage != 0)
-		o_storage_free(db->storage);
+		o_storage_release(db->storage);
 }
 
 void o_database_free(struct o_database * db)

@@ -9,6 +9,8 @@
 #include "test_o_document.h"
 #include "test_o_input_stream.h"
 #include "test_o_string_printer.h"
+#include "test_o_database.h"
+#include "test_o_native_lock.h"
 
 void initialize()
 {
@@ -22,5 +24,6 @@ void initialize()
 	ADD_SUITE(o_string_printer_suite, "printer test");
 	ADD_SUITE(o_document_suite, "document tests");
 	ADD_SUITE(o_input_stream_suite, "input stream test");
-
+	ADD_SUITE(o_native_lock_suite, "basic native lock test suite");
+	ADD_SUITE(o_database_suite, "test on base database");
 }

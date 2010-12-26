@@ -66,7 +66,7 @@ int o_storage_get_cluster_id_by_name(struct o_storage * storage, char * name);
 
 /*! Retrieve the default cluster id.
  *
- * \param storege where search
+ * \param storage where search
  * \return the identifier of default cluster.
  */
 int o_storage_get_default_cluser_id(struct o_storage * storage);
@@ -78,6 +78,25 @@ int o_storage_get_default_cluser_id(struct o_storage * storage);
  * @param transaction to commit.
  */
 void o_storage_commit_transaction(struct o_storage *storage, struct o_transaction * transaction);
+
+/*! \brief Release the current storage.
+ * reference count decrement.
+ *
+ * \param storage to release.
+ */
+void o_storage_release(struct o_storage * storage);
+
+/*! \brief increase an reference to the storage.
+ *
+ * \param storage to refer.
+ */
+void o_storage_reference(struct o_storage * storage);
+
+/*! \brief Close the current storage.
+ *
+ * \param storage to close.
+ */
+void o_storage_close(struct o_storage * storage);
 
 /** Free the storage structure.
  *

@@ -1,17 +1,7 @@
 #ifndef O_ENGINE_H_
 #define O_ENGINE_H_
 #include "o_storage.h"
-
-/*! \brief The main engine structure.
- *
- */
-struct o_engine;
-
-/*! \brief Retrieve the main engine structure and increment reference count.
- *
- * \return the main engine reference.
- */
-struct o_engine * o_engine_get_instance();
+#include "o_connection.h"
 
 /*! \brief Instanziate a new storage on a connection.
  *
@@ -22,10 +12,10 @@ struct o_engine * o_engine_get_instance();
  */
 struct o_storage * o_engine_get_storage(char * connection_url, char * username, char * password);
 
-/*! \brief Release the main engine reference (count--).
+/*! \brief Release an connection on engine.
  *
- * \param engine to release.
+ * \param connection to release.
  */
-void o_engine_release();
+void o_engine_release_connection(struct o_connection * connection);
 
 #endif /* O_ENGINE_H_ */

@@ -1,5 +1,6 @@
 #include "o_storage_internal.h"
 #include "o_url_resolver.h"
+#include "o_memory.h"
 
 long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
 {
@@ -39,6 +40,40 @@ int o_storage_get_default_cluser_id(struct o_storage * storage)
 void o_storage_commit_transaction(struct o_storage *storage, struct o_transaction * transaction)
 {
 	return storage->o_storage_commit_transaction(storage, transaction);
+}
+
+void o_storage_release(struct o_storage * storage)
+{
+	storage->ref_count--;
+	if (storage->ref_count == 0)
+		storage->o_storage_final_release(storage);
+}
+void o_storage_internal_free(struct o_storage *storage)
+{
+	o_free(storage->name);
+	o_free(storage->user);
+}
+
+char * o_storage_get_name(struct o_storage *storage)
+{
+	return storage->name;
+}
+
+char * o_storage_get_user(struct o_storage *storage)
+{
+	return storage->user;
+}
+
+void o_storage_internal_new(struct o_storage *storage, char * name, char * user)
+{
+	storage->name = name;
+	storage->user = user;
+	storage->ref_count = 0;
+}
+
+void o_storage_reference(struct o_storage * storage)
+{
+	storage->ref_count++;
 }
 
 void o_storage_free(struct o_storage * storage)
