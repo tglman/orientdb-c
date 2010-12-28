@@ -119,7 +119,10 @@ void * o_map_remove(struct o_map * map, char * key)
 	if (found != 0)
 	{
 		value = found->value;
-		found->map_before->map_next = found->map_next;
+		if (found->map_before == 0)
+			map->first = found->map_next;
+		else
+			found->map_before->map_next = found->map_next;
 		if (found->before != 0)
 			found->before->next = found->next;
 		else

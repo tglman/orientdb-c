@@ -13,10 +13,11 @@ struct o_storage
 	int (*o_storage_delete_record)(struct o_storage * storage, struct o_record_id * id, int version);
 	char ** (*o_storage_get_cluster_names)(struct o_storage * storage, int * names_count);
 	int (*o_storage_get_cluster_id_by_name)(struct o_storage * storage, char * name);
-	int (*o_storage_get_default_cluser_id)(struct o_storage * storage);
+	int (*o_storage_get_default_cluster_id)(struct o_storage * storage);
 	void (*o_storage_commit_transaction)(struct o_storage *storage, struct o_transaction * transaction);
-	void (*o_storage_free)(struct o_storage * storage);
 	void (*o_storage_final_release)(struct o_storage * storage);
+	void (*o_storage_close)(struct o_storage * storage);
+	void (*o_storage_free)(struct o_storage * storage);
 };
 
 /*! \brief Initialize the storage with the base data.

@@ -44,7 +44,7 @@ void o_database_open(struct o_database * db, char * username, char * password);
  * \param db where save
  * \param record to save.
  */
-void o_database_save(struct o_database * db, struct o_record * record);
+struct o_record_id * o_database_save(struct o_database * db, struct o_record * record);
 
 /*! Save an record to database.
  *
@@ -52,7 +52,7 @@ void o_database_save(struct o_database * db, struct o_record * record);
  * \param record to save.
  * \param cluster_name the name of cluster where save.
  */
-void o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name);
+struct o_record_id * o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name);
 
 /*! \brief Delete an record from the database.
  *
@@ -68,6 +68,12 @@ void o_database_delete(struct o_database * db, struct o_record * record);
  * \return the persistent record.
  */
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
+
+/*! \brief create a new raw record.
+ *
+ * \return the new record.
+ */
+struct o_record * o_database_record_new();
 
 /** Close the current database session
  *

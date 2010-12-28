@@ -126,22 +126,15 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 {
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
+
 	int req_id = o_storage_remote_new_request_id();
-	try
-	{
-		o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_CREATE);
-		o_connection_remote_write_short(rs->connection, cluster);
-		int size;
-		unsigned char * buff = o_raw_buffer_content(content, &size);
-		o_connection_remote_write_bytes(rs->connection, buff, size);
-		o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
-		o_connection_remote_end_write(rs->connection);
-	}
-	catch(struct o_exception_io, cur_ex)
-	{
-		o_exception_free((struct o_exception *) cur_ex);
-	}
-	end_try;
+	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_CREATE);
+	o_connection_remote_write_short(rs->connection, cluster);
+	int size;
+	unsigned char * buff = o_raw_buffer_content(content, &size);
+	o_connection_remote_write_bytes(rs->connection, buff, size);
+	o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
+	o_connection_remote_end_write(rs->connection);
 
 	o_storage_remote_begin_response(rs, req_id);
 	long long val = o_connection_remote_read_long64(rs->connection);
@@ -265,6 +258,20 @@ void o_storage_remote_free(struct o_storage * storage)
 	o_free(storage_remote);
 }
 
+void o_storage_remote_close(struct o_storage * storage)
+{
+	struct o_storage_remote * rs = (struct o_storage_remote *) storage;
+	int req_id = o_storage_remote_new_request_id();
+	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_DELETE);
+	o_connection_remote_end_write(rs->connection);
+}
+
+int o_storage_remote_get_default_cluster_id(struct o_storage * storage)
+{
+	struct o_storage_remote * rs = (struct o_storage_remote *) storage;
+	return rs->default_cluster_id;
+}
+
 struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char * name, char * username, char * password)
 {
 	struct o_storage_remote * storage = 0;
@@ -279,9 +286,14 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->storage.o_storage_delete_record = o_storage_remote_delete_record;
 		storage->storage.o_storage_get_cluster_names = o_storage_remote_get_cluster_names;
 		storage->storage.o_storage_get_cluster_id_by_name = o_storage_remote_get_cluster_id_by_name;
+		storage->storage.o_storage_get_default_cluster_id = o_storage_remote_get_default_cluster_id;
 
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
+
+		storage->storage.o_storage_final_release = o_storage_remote_internal_release;
+		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;
+
 		storage->connection = conn;
 		storage->session_id = 0;
 		storage->exclusive_lock = o_native_lock_new();

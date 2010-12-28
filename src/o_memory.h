@@ -15,7 +15,14 @@ void * o_malloc(size_t size);
  * \param new size.
  * \return cur or a new allocate memory pointer,
  */
-void * o_realloc(void * cur, int new_size);
+void * o_realloc(void * cur, size_t new_size);
+
+/*! \brief Duplicate a content in a new allocated memory.
+ *
+ * \param to_dup memory to duplicate.
+ * \param dup_len the length of memory to duplicate.
+ */
+void * memdup(void * to_dup, size_t dup_len);
 
 /*! \brief Free a memory area.
  *
