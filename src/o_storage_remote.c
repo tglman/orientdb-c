@@ -162,7 +162,9 @@ struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, s
 	int size;
 	unsigned char * o_p = o_connection_remote_read_bytes(rs->connection, &size);
 	int version = o_connection_remote_read_int(rs->connection);
-	int type = o_connection_remote_read_int(rs->connection);
+	char type = o_connection_remote_read_byte(rs->connection);
+	//?????? Protocol .....
+	o_connection_remote_read_byte(rs->connection);
 	o_connection_remote_end_read(rs->connection);
 
 	o_storage_release_exclusive_lock(rs);
@@ -181,7 +183,7 @@ int o_storage_remote_update_record(struct o_storage * storage, struct o_record_i
 	unsigned char* bytes = o_raw_buffer_content(content, &size);
 	o_connection_remote_write_bytes(rs->connection, bytes, size);
 	o_connection_remote_write_int(rs->connection, o_raw_buffer_version(content));
-	o_connection_remote_write_int(rs->connection, o_raw_buffer_type(content));
+	o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
 	o_connection_remote_end_write(rs->connection);
 
 	o_storage_remote_begin_response(rs, req_id);
@@ -205,7 +207,7 @@ int o_storage_remote_delete_record(struct o_storage * storage, struct o_record_i
 	o_connection_remote_end_write(rs->connection);
 
 	o_storage_remote_begin_response(rs, req_id);
-	int res = o_connection_remote_read_int(rs->connection);
+	char res = o_connection_remote_read_byte(rs->connection);
 	o_connection_remote_end_read(rs->connection);
 	o_storage_release_exclusive_lock(rs);
 	return res == 1;
@@ -262,7 +264,7 @@ void o_storage_remote_close(struct o_storage * storage)
 {
 	struct o_storage_remote * rs = (struct o_storage_remote *) storage;
 	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_DELETE);
+	o_connection_remote_begin_write_session(rs->connection, req_id, DB_CLOSE);
 	o_connection_remote_end_write(rs->connection);
 }
 
@@ -320,6 +322,10 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 			clusters = &cluster->next;
 			cluster->next = 0;
 		}
+		int size;
+		unsigned char * content = o_connection_remote_read_bytes(storage->connection, &size);
+		if (content != 0)
+			o_free(content);
 		o_connection_remote_end_read(storage->connection);
 		storage->default_cluster_id = o_storage_remote_get_cluster_id_by_name(&storage->storage, CLUSTER_DEFAULT_NAME);
 	}

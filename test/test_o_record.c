@@ -7,7 +7,7 @@
 void test_o_record_id_new()
 {
 	struct o_record_id * id = o_record_id_new_empty();
-	o_record_id_free(id);
+	o_record_id_release(id);
 }
 
 void test_o_record_id_managment()
@@ -15,7 +15,7 @@ void test_o_record_id_managment()
 	struct o_record_id * id = o_record_id_new(10, 20);
 	assert_true(o_record_id_cluster_id(id) == 10, "not the same cluster id of inserted");
 	assert_true(o_record_id_record_id(id) == 20, "not the same record id of inserted");
-	o_record_id_free(id);
+	o_record_id_release(id);
 }
 
 void o_record_id_suite()
