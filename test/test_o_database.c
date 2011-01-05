@@ -21,7 +21,7 @@ void test_o_database_new_open_close()
 	o_database_free(db);
 }
 
-void test_o_database_new_open_write_read_close()
+void test_o_database_new_open_crud_close()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/demo", errorHandler);
@@ -29,17 +29,30 @@ void test_o_database_new_open_write_read_close()
 	struct o_record * record = o_database_record_new();
 	int size = strlen("content content");
 	o_record_raw_reset(record, "content content", size);
-	struct o_record_id *id = o_database_save(db, record);
+	struct o_record_id *id;
+	o_database_save(db, record ,&id);
 	struct o_record * load_rec = o_database_load(db, id);
 
 	int load_size;
 	char * content = o_record_raw_content(load_rec, &load_size);
 	assert_true(size == load_size, "readed have not same size of writed");
-
 	assert_true(memcmp(content, "content content", load_size) == 0, "readed have not same content of writed");
+
+	int test_size = strlen("test test");
+	o_record_raw_reset(load_rec, "test test", test_size);
+	o_database_save(db, load_rec, 0);
+	struct o_record * load_rec2 = o_database_load(db, id);
+
+	content = o_record_raw_content(load_rec2, &load_size);
+	assert_true(test_size == load_size, "readed have not same size of writed");
+	assert_true(memcmp(content, "test test", load_size) == 0, "readed have not same content of writed");
+
+	o_database_delete(db, load_rec2);
+
 	o_record_release(record);
 	o_record_release(load_rec);
-	o_record_id_free(id);
+	o_record_release(load_rec2);
+	o_record_id_release(id);
 	o_database_close(db);
 	o_database_free(db);
 }
@@ -47,5 +60,5 @@ void test_o_database_new_open_write_read_close()
 void o_database_suite()
 {
 	ADD_TEST(test_o_database_new_open_close, "Test a database new open close and free");
-	ADD_TEST(test_o_database_new_open_write_read_close, "Test a database new open write read close and free");
+	ADD_TEST(test_o_database_new_open_crud_close, "Test a database new open write read close and free");
 }
