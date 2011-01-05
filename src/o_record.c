@@ -25,7 +25,7 @@ struct o_record_id * o_record_get_id(struct o_record * record)
 
 void o_record_free_internal(struct o_record * record)
 {
-	o_record_id_free(record->record_id);
+	o_record_id_release(record->record_id);
 }
 
 int o_record_version(struct o_record * record)
@@ -36,6 +36,11 @@ int o_record_version(struct o_record * record)
 char o_record_type(struct o_record * record)
 {
 	return record->type;
+}
+
+void o_record_reset_version(struct o_record * record, int new_version)
+{
+	record->version = new_version;
 }
 
 struct o_raw_buffer * o_record_content(struct o_record * record)

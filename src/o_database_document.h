@@ -39,12 +39,13 @@ void o_database_document_reset_error_handler(struct o_database_document * db, st
 void o_database_document_open(struct o_database_document * db, char * username, char * password);
 
 /**
- * Save a document to the database.
+ * \brief Save a document to the database.
  *
- * @param db where save.
- * @param doc to save.
+ * \param db where save.
+ * \param doc to save.
+ *
  */
-void o_database_document_save(struct o_database_document *db, struct o_document * doc);
+void o_database_document_save(struct o_database_document *db, struct o_document * doc, struct o_record_id **id);
 
 /**
  * Delete an document from the database.

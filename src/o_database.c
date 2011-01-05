@@ -6,9 +6,10 @@
 #include "o_engine.h"
 #include "o_storage.h"
 #include "o_url_resolver.h"
-#include "o_raw_buffer.h"
+#include "o_raw_buffer_record.h"
 #include "o_input_stream.h"
 #include "o_record_factory.h"
+#include "o_record_internal.h"
 #include "o_record_raw.h"
 #include "o_exceptions.h"
 #include "o_exception.h"
@@ -50,32 +51,48 @@ void o_database_open(struct o_database * db, char * username, char * password)
 	end_try;
 }
 
-struct o_record_id * o_database_save(struct o_database * db, struct o_record * record)
+int o_database_save(struct o_database * db, struct o_record * record, struct o_record_id ** rid)
 {
-	return o_database_save_cluster(db, record, NULL);
+	return o_database_save_cluster(db, record, NULL, rid);
 }
 
-struct o_record_id * o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name)
+int o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name, struct o_record_id ** rid)
 {
-	struct o_record_id *rec_id = o_record_get_id(record);
-	int is_new = o_record_id_is_new(rec_id);
-	struct o_record_id *id;
-	struct o_raw_buffer * buff = o_raw_buffer_record(record);
-	if (is_new)
+	try
 	{
-		int cluster_id = cluster_name != 0 ? o_storage_get_cluster_id_by_name(db->storage, cluster_name) : o_storage_get_default_cluser_id(
-				db->storage);
+		struct o_record_id *rec_id = o_record_get_id(record);
+		int is_new = o_record_id_is_new(rec_id);
+		struct o_raw_buffer * buff = o_raw_buffer_record(record);
+		if (is_new)
+		{
+			int cluster_id = cluster_name != 0 ? o_storage_get_cluster_id_by_name(db->storage, cluster_name) : o_storage_get_default_cluser_id(
+					db->storage);
 
-		long long pos = o_storage_create_record(db->storage, cluster_id, buff);
-		id = o_record_id_new(cluster_id, pos);
+			long long pos = o_storage_create_record(db->storage, cluster_id, buff);
+			if (rid != 0)
+				*rid = o_record_id_new(cluster_id, pos);
+		}
+		else
+		{
+			struct o_record_id *id = o_record_get_id(record);
+			int new_version = o_storage_update_record(db->storage, id, buff);
+			o_record_reset_version(record, new_version);
+			if (rid != 0)
+			{
+				o_record_id_refer(id);
+				*rid = id;
+			}
+		}
+		o_raw_buffer_free(buff);
 	}
-	else
+	catch( struct o_exception ,ex)
 	{
-		id = o_record_get_id(record);
-		o_storage_update_record(db->storage, id, buff);
+		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+		return 0;
 	}
-	o_raw_buffer_free(buff);
-	return id;
+	end_try;
+	return 1;
 }
 
 void o_database_delete(struct o_database * db, struct o_record * record)
@@ -86,7 +103,8 @@ void o_database_delete(struct o_database * db, struct o_record * record)
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
 {
 	struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
-	struct o_record * record = o_record_factory(o_raw_buffer_type(row));
+	struct o_record * record = o_record_factory_id(o_raw_buffer_type(row), rid);
+	o_record_reset_version(record,o_raw_buffer_version(row));
 	int size;
 	unsigned char * bytes = o_raw_buffer_content(row, &size);
 	struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);

@@ -29,7 +29,7 @@ struct o_database_document * o_database_document_new_error_handler(char * connec
 	new_db->database.o_record_writer = o_document_record_writer;
 	return new_db;
 }
-struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
+
 void o_database_document_open(struct o_database_document * db, char * username, char * password)
 {
 	o_database_open(o_database_document_to_database(db), username, password);
@@ -40,9 +40,9 @@ void o_database_document_reset_error_handler(struct o_database_document * db, st
 	o_database_reset_error_handler(o_database_document_to_database(db), error_handler);
 }
 
-void o_database_document_save(struct o_database_document *db, struct o_document * doc)
+void o_database_document_save(struct o_database_document *db, struct o_document * doc,struct o_record_id **id)
 {
-	o_database_save(o_database_document_to_database(db), o_document_o_record(doc));
+	o_database_save(o_database_document_to_database(db), o_document_o_record(doc),id);
 }
 
 void o_database_document_delete(struct o_database_document * db, struct o_document * doc)

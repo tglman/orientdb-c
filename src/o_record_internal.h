@@ -29,12 +29,18 @@ void o_record_new_internal(struct o_record * record, char type);
  */
 void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid);
 
+/*! \brief Reset the record with a new version.
+ *
+ * \param record to reset.
+ * \param new_version to set.
+ */
+void o_record_reset_version(struct o_record * record, int new_version);
+
 /**
  * Use to actuate free operation on a record.
  *
  * @param record to free.
  */
 void o_record_free_internal(struct o_record * record);
-
 
 #endif /* O_RECORD_INTERNAL_H_ */

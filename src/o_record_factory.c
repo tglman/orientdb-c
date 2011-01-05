@@ -17,3 +17,17 @@ struct o_record * o_record_factory(char record_type)
 	//Never executed only remove warning.
 	return 0;
 }
+
+struct o_record * o_record_factory_id(char record_type, struct o_record_id * id)
+{
+	switch (record_type)
+	{
+	case RAW_RECORD_TYPE:
+		return o_record_raw_new_id(id);
+	case DOCUMENT_RECORD_TYPE:
+		return o_document_o_record(o_document_new_id(id));
+	}
+	throw(o_exception_new("Unsupported record type",20));
+	//Never executed only remove warning.
+	return 0;
+}

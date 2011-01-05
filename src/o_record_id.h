@@ -38,10 +38,16 @@ long long o_record_id_record_id(struct o_record_id * o_id);
  */
 int o_record_id_is_new(struct o_record_id * o_id);
 
-/** Free an record id.
+/*! \brief Increment a reference to record id.
  *
- * @param o_id the record id to free.
+ * \param o_id to increment reference.
  */
-void o_record_id_free(struct o_record_id * o_id);
+void o_record_id_refer(struct o_record_id * o_id);
+
+/** Release an reference to record id.
+ *
+ * @param o_id the record id to release.
+ */
+void o_record_id_release(struct o_record_id * o_id);
 
 #endif /* O_RECORD_ID_H_ */
