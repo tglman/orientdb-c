@@ -22,7 +22,7 @@ void * o_realloc(void * cur, size_t new_size);
  * \param to_dup memory to duplicate.
  * \param dup_len the length of memory to duplicate.
  */
-void * memdup(void * to_dup, size_t dup_len);
+void * o_memdup(void * to_dup, size_t dup_len);
 
 /*! \brief Free a memory area.
  *

@@ -74,7 +74,30 @@ void test_o_document_serialize_deserialize()
 	o_document_release(doc);
 	o_output_stream_free(out);
 	o_input_stream_free(os);
+}
 
+void test_o_document_serialize_deserialize_complex()
+{
+	struct o_document * doc = o_document_new();
+	struct o_document * doc_emb = o_document_new();
+	o_document_field_set(doc_emb, "string", o_document_value_string("try"));
+	o_document_field_set(doc, "provaEmb", o_document_value_embedded(doc_emb));
+	struct o_output_stream * out = o_output_stream_byte_buffer();
+	o_document_serialize(doc, out);
+	int size;
+	char * content = o_output_stream_byte_content(out, &size);
+	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, size);
+	o_document_release(doc_emb);
+	o_document_release(doc);
+	doc = o_document_new();
+	o_document_deserialize(doc, os);
+	doc_emb = o_document_value_get_embedded(o_document_field_get(doc, "provaEmb"));
+	assert_true(doc_emb != 0, "The embedded document not was deserialized");
+	char * val = o_document_value_get_string(o_document_field_get(doc_emb, "string"));
+	assert_true(strcmp(val, "try") == 0, "Value writed in embedded not is the same readed.");
+	o_document_release(doc);
+	o_output_stream_free(out);
+	o_input_stream_free(os);
 }
 
 void o_document_suite()
@@ -83,6 +106,7 @@ void o_document_suite()
 	ADD_TEST(test_o_document_property_managment, "test property  management on o_document ");
 	ADD_TEST(test_o_document_serialize, "test o_document native serialization");
 	ADD_TEST(test_o_document_serialize_deserialize, "test a base o_document native serialization and deserialization");
+	ADD_TEST(test_o_document_serialize_deserialize_complex, "test a complex o_document native serialization and deserialization");
 
 }
 

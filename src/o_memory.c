@@ -11,7 +11,7 @@ void * o_realloc(void * cur, size_t new_size)
 	return realloc(cur, new_size);
 }
 
-void * memdup(void * to_dup, size_t dup_len)
+void * o_memdup(void * to_dup, size_t dup_len)
 {
 	void * new_mem = o_malloc(dup_len);
 	memcpy(new_mem, to_dup, dup_len);

@@ -3,6 +3,7 @@
 #include "o_record.h"
 #include "o_output_stream.h"
 #include "o_input_stream.h"
+
 #define DOCUMENT_RECORD_TYPE 'd'
 
 struct o_document_value;

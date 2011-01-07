@@ -38,6 +38,12 @@ void o_database_document_reset_error_handler(struct o_database_document * db, st
  */
 void o_database_document_open(struct o_database_document * db, char * username, char * password);
 
+/*! \brief Close the currente database instance.
+ *
+ * \param db to close.
+ */
+void o_database_document_close(struct o_database_document * db);
+
 /**
  * \brief Save a document to the database.
  *
@@ -45,7 +51,7 @@ void o_database_document_open(struct o_database_document * db, char * username, 
  * \param doc to save.
  *
  */
-void o_database_document_save(struct o_database_document *db, struct o_document * doc, struct o_record_id **id);
+int o_database_document_save(struct o_database_document *db, struct o_document * doc, struct o_record_id **id);
 
 /**
  * Delete an document from the database.
@@ -61,7 +67,7 @@ void o_database_document_delete(struct o_database_document * db, struct o_docume
  * @param id of record to load.
  * @return loaded record
  */
-struct o_database_document * o_database_document_load(struct o_database_document * db, struct o_record_id * id);
+struct o_document * o_database_document_load(struct o_database_document * db, struct o_record_id * id);
 
 /** Free the database structure with all data.
  *

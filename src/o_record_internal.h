@@ -6,11 +6,14 @@
 struct o_record
 {
 	struct o_record_id * record_id;
+	struct o_database * owner;
 	char type;
 	int version;
 	int ref_count;
 	void (*o_record_serialize)(struct o_record * record, struct o_output_stream * stream);
 	void (*o_record_deserialize)(struct o_record * record, struct o_input_stream * stream);
+	void (*o_record_before_save)(struct o_record * record);
+	void (*o_record_after_save)(struct o_record * record);
 	void (*o_record_free)(struct o_record * record);
 };
 
@@ -35,6 +38,32 @@ void o_record_new_internal_id(struct o_record * record, char type, struct o_reco
  * \param new_version to set.
  */
 void o_record_reset_version(struct o_record * record, int new_version);
+
+/*! \brief invoke listener on record before save action.
+ *
+ * \param record saved.
+ */
+void o_record_before_save(struct o_record * record);
+
+/*! \brief Reset the identifier of record
+ *
+ * \param record where reset identifier.
+ * \param new_id to set.
+ */
+void o_record_reset_id(struct o_record * record, struct o_record_id *new_id);
+
+/*! \brief invoke listener on record after save action.
+ *
+ * \param record saved.
+ */
+void o_record_after_save(struct o_record * record);
+
+/*! \brief Retrieve the owner of this record.
+ *
+ * \param record to retrieve the owner.
+ * \return the owner of record.
+ */
+struct o_database * o_record_owner(struct o_record * record);
 
 /**
  * Use to actuate free operation on a record.

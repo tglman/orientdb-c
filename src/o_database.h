@@ -43,23 +43,26 @@ void o_database_open(struct o_database * db, char * username, char * password);
  *
  * \param db where save
  * \param record to save.
+ * \return 1 if operation is run correctly otherwise 0;
  */
-int o_database_save(struct o_database * db, struct o_record * record,struct o_record_id ** rid);
+int o_database_save(struct o_database * db, struct o_record * record, struct o_record_id ** rid);
 
 /*! Save an record to database.
  *
  * \param db where save
  * \param record to save.
  * \param cluster_name the name of cluster where save.
+ * \return 1 if operation is run correctly otherwise 0.
  */
-int o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name,struct o_record_id ** rid);
+int o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name, struct o_record_id ** rid);
 
 /*! \brief Delete an record from the database.
  *
  * \param db where delete.
  * \param record to delete.
+ * \return 1 if operation is run correctly otherwise 0.
  */
-void o_database_delete(struct o_database * db, struct o_record * record);
+int o_database_delete(struct o_database * db, struct o_record * record);
 
 /*! \brief Retrieve a record from the id.
  *
@@ -69,11 +72,26 @@ void o_database_delete(struct o_database * db, struct o_record * record);
  */
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
 
-/*! \brief create a new raw record.
+/*! \brief create a new raw record and associate it to this database.
  *
+ * \param db to associate.
  * \return the new record.
  */
-struct o_record * o_database_record_new();
+struct o_record * o_database_record_new(struct o_database * db);
+
+/*! \brief create a new empty record of specified type and associate it to this database.
+ *
+ * \param database to associate.
+ * \param type of record must be created.
+ * \return the new empty record created.
+ */
+struct o_record * o_database_record_new_type(struct o_database * db, char type);
+
+/*! \brief Retrieve the db from the current context.
+ *
+ * \return the database in current context.
+ */
+struct o_database * o_database_context_database();
 
 /** Close the current database session
  *

@@ -53,6 +53,6 @@ void o_record_id_refer(struct o_record_id * o_id)
 void o_record_id_release(struct o_record_id * o_id)
 {
 	o_id->ref_count--;
-	if (o_id->ref_count)
+	if (o_id->ref_count == 0)
 		o_record_id_free(o_id);
 }

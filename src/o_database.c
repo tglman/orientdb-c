@@ -14,6 +14,18 @@
 #include "o_exceptions.h"
 #include "o_exception.h"
 
+__thread struct o_database * context_database = 0;
+
+struct o_database * o_database_context_database()
+{
+	return context_database;
+}
+
+void o_database_context_database_init(struct o_database * to_set)
+{
+	context_database = to_set;
+}
+
 struct o_database * o_database_new(char * connection_url)
 {
 	return o_database_new_error_handler(connection_url, 0);
@@ -47,6 +59,7 @@ void o_database_open(struct o_database * db, char * username, char * password)
 	catch(struct o_exception , ex)
 	{
 		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
 	}
 	end_try;
 }
@@ -58,8 +71,11 @@ int o_database_save(struct o_database * db, struct o_record * record, struct o_r
 
 int o_database_save_cluster(struct o_database * db, struct o_record * record, char * cluster_name, struct o_record_id ** rid)
 {
+	int result = 0;
+	o_database_context_database_init(db);
 	try
 	{
+		o_record_before_save(record);
 		struct o_record_id *rec_id = o_record_get_id(record);
 		int is_new = o_record_id_is_new(rec_id);
 		struct o_raw_buffer * buff = o_raw_buffer_record(record);
@@ -69,8 +85,10 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 					db->storage);
 
 			long long pos = o_storage_create_record(db->storage, cluster_id, buff);
+			struct o_record_id * new_rid = o_record_id_new(cluster_id, pos);
+			o_record_reset_id(record, new_rid);
 			if (rid != 0)
-				*rid = o_record_id_new(cluster_id, pos);
+				*rid = new_rid;
 		}
 		else
 		{
@@ -78,45 +96,80 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 			int new_version = o_storage_update_record(db->storage, id, buff);
 			o_record_reset_version(record, new_version);
 			if (rid != 0)
-			{
-				o_record_id_refer(id);
 				*rid = id;
-			}
 		}
 		o_raw_buffer_free(buff);
+		o_record_after_save(record);
+		result = 1;
 	}
 	catch( struct o_exception ,ex)
 	{
 		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
-		return 0;
 	}
 	end_try;
-	return 1;
+	o_database_context_database_init(0);
+	return result;
 }
 
-void o_database_delete(struct o_database * db, struct o_record * record)
+int o_database_delete(struct o_database * db, struct o_record * record)
 {
-	o_storage_delete_record(db->storage, o_record_get_id(record), o_record_version(record));
+	int result = 0;
+	o_database_context_database_init(db);
+	try
+	{
+		o_storage_delete_record(db->storage, o_record_get_id(record), o_record_version(record));
+		result = 1;
+	}
+	catch( struct o_exception ,ex)
+	{
+		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	o_database_context_database_init(0);
+	return result;
 }
 
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
 {
-	struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
-	struct o_record * record = o_record_factory_id(o_raw_buffer_type(row), rid);
-	o_record_reset_version(record,o_raw_buffer_version(row));
-	int size;
-	unsigned char * bytes = o_raw_buffer_content(row, &size);
-	struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
-	o_record_deserialize(record, stream);
-	o_input_stream_free(stream);
-	o_raw_buffer_free(row);
+	struct o_record * record = 0;
+	o_database_context_database_init(db);
+	try
+	{
+		struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
+		o_record_id_refer(rid);
+		record = o_record_factory_id(o_raw_buffer_type(row), rid);
+		o_record_reset_version(record, o_raw_buffer_version(row));
+		int size;
+		unsigned char * bytes = o_raw_buffer_content(row, &size);
+		struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
+		o_record_deserialize(record, stream);
+		o_input_stream_free(stream);
+		o_raw_buffer_free(row);
+	}
+	catch( struct o_exception ,ex)
+	{
+		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	o_database_context_database_init(0);
 	return record;
+
 }
 
-struct o_record * o_database_record_new()
+struct o_record * o_database_record_new_type(struct o_database *db, char type)
 {
-	return o_record_factory(RAW_RECORD_TYPE);
+	o_database_context_database_init(db);
+	struct o_record * new_rec = o_record_factory(type);
+	o_database_context_database_init(0);
+	return new_rec;
+}
+
+struct o_record * o_database_record_new(struct o_database *db)
+{
+	return o_database_record_new_type(db, RAW_RECORD_TYPE);
 }
 
 void o_database_free_internal(struct o_database * db)
@@ -126,8 +179,18 @@ void o_database_free_internal(struct o_database * db)
 
 void o_database_close(struct o_database * db)
 {
-	if (db->storage != 0)
-		o_storage_release(db->storage);
+	try
+	{
+		if (db->storage != 0)
+			o_storage_release(db->storage);
+	}
+	catch(struct o_exception , ex)
+	{
+		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+
 }
 
 void o_database_free(struct o_database * db)

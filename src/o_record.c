@@ -1,14 +1,7 @@
 #include "o_record_internal.h"
 #include "o_raw_buffer_record.h"
+#include "o_database.h"
 #include "o_memory.h"
-
-void o_record_new_internal(struct o_record * record, char type)
-{
-	record->record_id = o_record_id_new_empty();
-	record->type = type;
-	record->version = 0;
-	record->ref_count = 1;
-}
 
 void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid)
 {
@@ -16,11 +9,24 @@ void o_record_new_internal_id(struct o_record * record, char type, struct o_reco
 	record->type = type;
 	record->version = 0;
 	record->ref_count = 1;
+	record->owner = o_database_context_database();
+}
+
+void o_record_new_internal(struct o_record * record, char type)
+{
+	o_record_new_internal_id(record, type, o_record_id_new_empty());
 }
 
 struct o_record_id * o_record_get_id(struct o_record * record)
 {
 	return record->record_id;
+}
+
+void o_record_reset_id(struct o_record * record, struct o_record_id *new_id)
+{
+	if (record->record_id != 0)
+		o_record_id_release(record->record_id);
+	record->record_id = new_id;
 }
 
 void o_record_free_internal(struct o_record * record)
@@ -58,9 +64,24 @@ void o_record_deserialize(struct o_record * record, struct o_input_stream * inpu
 	record->o_record_deserialize(record, input);
 }
 
+void o_record_before_save(struct o_record * record)
+{
+	record->o_record_before_save(record);
+}
+
+void o_record_after_save(struct o_record * record)
+{
+	record->o_record_after_save(record);
+}
+
 void o_record_refer(struct o_record * record)
 {
 	record->ref_count++;
+}
+
+struct o_database * o_record_owner(struct o_record * record)
+{
+	return record->owner;
 }
 
 void o_record_release(struct o_record * record)

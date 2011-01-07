@@ -9,7 +9,6 @@ struct o_database
 	struct o_database_error_handler * error_handler;
 	char * connection_url;
 	struct o_storage * storage;
-	void (*o_record_writer)(struct o_record *, struct o_string_buffer *);
 };
 
 /** Fill a new instance of a database and associate an error hendler

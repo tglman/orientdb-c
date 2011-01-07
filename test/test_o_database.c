@@ -26,7 +26,7 @@ void test_o_database_new_open_crud_close()
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/demo", errorHandler);
 	o_database_open(db, "admin", "admin");
-	struct o_record * record = o_database_record_new();
+	struct o_record * record = o_database_record_new(db);
 	int size = strlen("content content");
 	o_record_raw_reset(record, "content content", size);
 	struct o_record_id *id;
@@ -52,7 +52,6 @@ void test_o_database_new_open_crud_close()
 	o_record_release(record);
 	o_record_release(load_rec);
 	o_record_release(load_rec2);
-	o_record_id_release(id);
 	o_database_close(db);
 	o_database_free(db);
 }

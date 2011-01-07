@@ -36,9 +36,11 @@ unsigned int o_map_hash_string(struct o_map * map, char * key)
 
 void o_map_clear_caches(struct o_map *map)
 {
-	o_free(map->cache_keys);
+	if (map->cache_keys != 0)
+		o_free(map->cache_keys);
 	map->cache_keys = 0;
-	o_free(map->cache_values);
+	if (map->cache_values != 0)
+		o_free(map->cache_values);
 	map->cache_values = 0;
 }
 
@@ -88,11 +90,11 @@ void * o_map_put(struct o_map * map, char * key, void * val)
 	if (map->first == 0)
 		map->first = new_entry;
 
-	int len_key = strlen(key) + 1;
-	char * key_copy = o_malloc(sizeof(char) * len_key);
-	memcpy(key_copy, key, len_key);
-	new_entry->key = key_copy;
+	new_entry->key = o_memdup(key, strlen(key) + 1);
 	new_entry->value = val;
+
+	if (new_entry == map->entries[hash])
+		*((int *) 0) = +1;
 
 	new_entry->next = map->entries[hash];
 	if (new_entry->next != 0)
@@ -123,10 +125,19 @@ void * o_map_remove(struct o_map * map, char * key)
 			map->first = found->map_next;
 		else
 			found->map_before->map_next = found->map_next;
+
+		if (found->map_next == 0)
+			map->last = found->map_before;
+		else
+			found->map_next->map_before = found->map_before;
+
 		if (found->before != 0)
 			found->before->next = found->next;
 		else
 			map->entries[hash] = found->next;
+
+		if (found->next != 0)
+			found->next->before = found->before;
 
 		o_map_free_entry(found);
 	}
@@ -166,7 +177,6 @@ void ** o_map_values(struct o_map * map, int * values_num)
 			++i;
 			iter = iter->map_next;
 		}
-
 	}
 	*values_num = map->size;
 	return map->cache_values;

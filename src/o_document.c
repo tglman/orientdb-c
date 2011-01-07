@@ -5,6 +5,8 @@
 #include "o_document_value.h"
 #include "o_string_buffer.h"
 #include "o_string_printer_stream.h"
+#include "o_database.h"
+#include "o_database_document.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -17,7 +19,7 @@ struct o_document
 };
 
 void o_document_free(struct o_document * doc);
-void o_document_free_maps_values(struct o_document * doc);
+
 void o_document_record_serialize(struct o_record * rec, struct o_output_stream* out)
 {
 	o_document_serialize((struct o_document *) rec, out);
@@ -33,17 +35,27 @@ void o_document_record_free(struct o_record * rec)
 	o_document_free((struct o_document *) rec);
 }
 
-struct o_document * o_document_new()
+void o_document_before_save(struct o_record * rec)
 {
-	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
-	o_record_new_internal(o_document_o_record(new_doc), DOCUMENT_RECORD_TYPE);
-	new_doc->record.o_record_serialize = o_document_record_serialize;
-	new_doc->record.o_record_deserialize = o_document_record_deserialize;
-	new_doc->record.o_record_free = o_document_record_free;
-	new_doc->fields = o_map_new();
-	new_doc->fields_old_values = 0;
-	return new_doc;
+	struct o_document * doc = (struct o_document *) rec;
+	int values_count;
+	struct o_document_value **values = o_document_field_values(doc, &values_count);
+	int i;
+	for (i = 0; i < values_count; i++)
+	{
+		if (o_document_value_type(values[i]) == LINK)
+		{
+			struct o_database_document * db = (struct o_database_document *) o_database_context_database();
+			struct o_document *link_doc = o_document_value_get_link(values[i]);
+			o_database_document_save(db, link_doc, 0);
+		}
+	}
 }
+
+void o_document_after_save(struct o_record * rec)
+{
+}
+
 struct o_document * o_document_new_id(struct o_record_id * rid)
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
@@ -51,9 +63,16 @@ struct o_document * o_document_new_id(struct o_record_id * rid)
 	new_doc->record.o_record_serialize = o_document_record_serialize;
 	new_doc->record.o_record_deserialize = o_document_record_deserialize;
 	new_doc->record.o_record_free = o_document_record_free;
+	new_doc->record.o_record_before_save = o_document_before_save;
+	new_doc->record.o_record_after_save = o_document_after_save;
 	new_doc->fields = o_map_new();
 	new_doc->fields_old_values = 0;
 	return new_doc;
+}
+
+struct o_document * o_document_new()
+{
+	return o_document_new_id(o_record_id_new_empty());
 }
 
 struct o_record * o_document_o_record(struct o_document * doc)
@@ -164,7 +183,7 @@ void o_document_deserialize_internal(struct o_document * doc, struct o_input_str
 		{
 			o_string_buffer_append_char(buff, readed);
 		}
-	} while (readed != -1);
+	} while (readed != -1 && readed != ')');
 	o_string_buffer_free(buff);
 }
 
