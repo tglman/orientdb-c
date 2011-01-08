@@ -20,6 +20,13 @@ struct o_database
  */
 void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler);
 
+/*! \biref load an existent record instance from db.
+ *
+ * \param db from load.
+ * \param record to load.
+ */
+void o_database_load_record(struct o_database * db, struct o_record * record);
+
 /** Clear the database structure .
  *
  * @param db to clear.

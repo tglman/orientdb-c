@@ -10,6 +10,7 @@ struct o_record
 	char type;
 	int version;
 	int ref_count;
+	char loaded;
 	void (*o_record_serialize)(struct o_record * record, struct o_output_stream * stream);
 	void (*o_record_deserialize)(struct o_record * record, struct o_input_stream * stream);
 	void (*o_record_before_save)(struct o_record * record);
@@ -64,6 +65,12 @@ void o_record_after_save(struct o_record * record);
  * \return the owner of record.
  */
 struct o_database * o_record_owner(struct o_record * record);
+
+/*! \brief Check if the record is loaded otherwise load it.
+ *
+ * \param record to check.
+ */
+void o_record_check_load(struct o_record * record);
 
 /**
  * Use to actuate free operation on a record.

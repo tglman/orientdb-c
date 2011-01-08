@@ -131,20 +131,20 @@ int o_database_delete(struct o_database * db, struct o_record * record)
 	return result;
 }
 
-struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
+struct o_record * o_database_internal_load_record(struct o_database * db, struct o_record_id * rid, struct o_record * to_fill)
 {
-	struct o_record * record = 0;
 	o_database_context_database_init(db);
 	try
 	{
 		struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
 		o_record_id_refer(rid);
-		record = o_record_factory_id(o_raw_buffer_type(row), rid);
-		o_record_reset_version(record, o_raw_buffer_version(row));
+		if (to_fill == 0)
+			to_fill = o_record_factory_id(o_raw_buffer_type(row), rid);
+		o_record_reset_version(to_fill, o_raw_buffer_version(row));
 		int size;
 		unsigned char * bytes = o_raw_buffer_content(row, &size);
 		struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
-		o_record_deserialize(record, stream);
+		o_record_deserialize(to_fill, stream);
 		o_input_stream_free(stream);
 		o_raw_buffer_free(row);
 	}
@@ -155,8 +155,17 @@ struct o_record * o_database_load(struct o_database * db, struct o_record_id * r
 	}
 	end_try;
 	o_database_context_database_init(0);
-	return record;
+	return to_fill;
+}
 
+void o_database_load_record(struct o_database * db, struct o_record * record)
+{
+	o_database_internal_load_record(db, o_record_get_id(record), record);
+}
+
+struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
+{
+	return o_database_internal_load_record(db, rid, 0);
 }
 
 struct o_record * o_database_record_new_type(struct o_database *db, char type)

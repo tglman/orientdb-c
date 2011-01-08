@@ -1,6 +1,6 @@
 #include "o_record_internal.h"
 #include "o_raw_buffer_record.h"
-#include "o_database.h"
+#include "o_database_internal.h"
 #include "o_memory.h"
 
 void o_record_new_internal_id(struct o_record * record, char type, struct o_record_id *rid)
@@ -9,6 +9,7 @@ void o_record_new_internal_id(struct o_record * record, char type, struct o_reco
 	record->type = type;
 	record->version = 0;
 	record->ref_count = 1;
+	record->loaded = 0;
 	record->owner = o_database_context_database();
 }
 
@@ -61,6 +62,7 @@ void o_record_serialize(struct o_record * record, struct o_output_stream * outpu
 
 void o_record_deserialize(struct o_record * record, struct o_input_stream * input)
 {
+	record->loaded = 1;
 	record->o_record_deserialize(record, input);
 }
 
@@ -77,6 +79,12 @@ void o_record_after_save(struct o_record * record)
 void o_record_refer(struct o_record * record)
 {
 	record->ref_count++;
+}
+
+void o_record_check_load(struct o_record * record)
+{
+	if (!o_record_id_is_new(record->record_id) && !record->loaded && record->owner != 0)
+		o_database_load_record(record->owner, record);
 }
 
 struct o_database * o_record_owner(struct o_record * record)

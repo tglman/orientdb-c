@@ -82,12 +82,14 @@ struct o_record * o_document_o_record(struct o_document * doc)
 
 struct o_document_value * o_document_field_get(struct o_document * doc, char * field_name)
 {
+	o_record_check_load(&doc->record);
 	void * val = o_map_get(doc->fields, field_name);
 	return (struct o_document_value *) val;
 }
 
 void o_document_field_set(struct o_document * doc, char * field_name, struct o_document_value* value)
 {
+	o_record_check_load(&doc->record);
 	struct o_document_value * old = o_map_put(doc->fields, field_name, value);
 	if (old != 0)
 	{
@@ -99,26 +101,31 @@ void o_document_field_set(struct o_document * doc, char * field_name, struct o_d
 
 char ** o_document_field_names(struct o_document * doc, int *names_count)
 {
+	o_record_check_load(&doc->record);
 	return o_map_keys(doc->fields, names_count);
 }
 
 struct o_document_value ** o_document_field_values(struct o_document * doc, int *values_count)
 {
+	o_record_check_load(&doc->record);
 	return (struct o_document_value **) o_map_values(doc->fields, values_count);
 }
 
 int o_document_contains_field(struct o_document *doc, char * field_name)
 {
+	o_record_check_load(&doc->record);
 	return o_map_get(doc->fields, field_name) != 0;
 }
 
 void o_document_remove_field(struct o_document *doc, char * field_name)
 {
+	o_record_check_load(&doc->record);
 	o_map_remove(doc->fields, field_name);
 }
 
 struct o_document * o_document_copy(struct o_document * doc)
 {
+	o_record_check_load(&doc->record);
 	struct o_document * new_doc = o_document_new();
 	int i;
 	int size;
@@ -194,6 +201,7 @@ void o_document_deserialize(struct o_document * doc, struct o_input_stream * str
 
 void o_document_free_maps_values(struct o_document * doc)
 {
+	o_record_check_load(&doc->record);
 	int values_count;
 	struct o_document_value **values = o_document_field_values(doc, &values_count);
 	int i;
