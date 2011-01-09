@@ -14,6 +14,8 @@
 #include "o_exceptions.h"
 #include "o_exception.h"
 
+#define DB_ERROR_NOTIFY(DB,CODE,ERROR) if(DB->error_handler != 0)o_database_error_handler_notify(DB->error_handler, CODE, ERROR);
+
 __thread struct o_database * context_database = 0;
 
 struct o_database * o_database_context_database()
@@ -28,7 +30,7 @@ void o_database_context_database_init(struct o_database * to_set)
 
 struct o_database * o_database_new(char * connection_url)
 {
-	return o_database_new_error_handler(connection_url, 0);
+	return o_database_new_error_handler(connection_url, o_database_error_handler_new_default());
 }
 
 struct o_database * o_database_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
@@ -58,7 +60,7 @@ void o_database_open(struct o_database * db, char * username, char * password)
 	}
 	catch(struct o_exception , ex)
 	{
-		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
 	}
 	end_try;
@@ -104,7 +106,7 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 	}
 	catch( struct o_exception ,ex)
 	{
-		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
 	}
 	end_try;
@@ -123,7 +125,7 @@ int o_database_delete(struct o_database * db, struct o_record * record)
 	}
 	catch( struct o_exception ,ex)
 	{
-		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
 	}
 	end_try;
@@ -150,7 +152,7 @@ struct o_record * o_database_internal_load_record(struct o_database * db, struct
 	}
 	catch( struct o_exception ,ex)
 	{
-		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
 	}
 	end_try;
@@ -195,7 +197,7 @@ void o_database_close(struct o_database * db)
 	}
 	catch(struct o_exception , ex)
 	{
-		o_database_error_handler_notify(db->error_handler, o_exception_code(ex), o_exception_message(ex));
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
 	}
 	end_try;

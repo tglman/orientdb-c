@@ -246,10 +246,8 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 	{
 		struct o_record *rec = o_document_o_record(VALUE(o_value,struct o_document *));
 		struct o_record_id * id = o_record_get_id(rec);
-		o_string_printer_print(buff, "#");
-		o_string_printer_print_long(buff, o_record_id_cluster_id(id));
-		o_string_printer_print(buff, ":");
-		o_string_printer_print_long(buff, o_record_id_record_id(id));
+		o_string_printer_print_char(buff, '#');
+		o_string_printer_print(buff,o_record_id_string(id));
 	}
 		break;
 

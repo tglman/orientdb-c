@@ -22,6 +22,12 @@ typedef void (*o_database_error_handler_function)(int code, char * error, void *
  */
 struct o_database_error_handler * o_database_error_handler_new(o_database_error_handler_function function, void * custom_info);
 
+/*! \biref Create the default error handler.
+ *
+ * \return the new error handler instance.
+ */
+struct o_database_error_handler * o_database_error_handler_new_default();
+
 /** Notify an error to the handler.
  *
  * @param error_handler target of notification.

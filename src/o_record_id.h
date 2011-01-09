@@ -44,6 +44,13 @@ int o_record_id_is_new(struct o_record_id * o_id);
  */
 void o_record_id_refer(struct o_record_id * o_id);
 
+/*! \brief Retrieve the record id serialized sach a string.
+ *
+ * \param o_id to serialize.
+ * \return the string representation of o_id.
+ */
+char * o_record_id_string(struct o_record_id * o_id);
+
 /** Release an reference to record id.
  *
  * @param o_id the record id to release.

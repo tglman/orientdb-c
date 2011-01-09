@@ -14,7 +14,7 @@ struct o_database * o_database_document_to_database(struct o_database_document *
 
 struct o_database_document * o_database_document_new(char * connection_url)
 {
-	return o_database_document_new_error_handler(connection_url, 0);
+	return o_database_document_new_error_handler(connection_url, o_database_error_handler_new_default());
 }
 
 struct o_database_document * o_database_document_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
