@@ -15,6 +15,7 @@ struct o_record
 	void (*o_record_deserialize)(struct o_record * record, struct o_input_stream * stream);
 	void (*o_record_before_save)(struct o_record * record);
 	void (*o_record_after_save)(struct o_record * record);
+	char *(*o_record_cluster_name)(struct o_record * record);
 	void (*o_record_free)(struct o_record * record);
 };
 
@@ -71,6 +72,13 @@ struct o_database * o_record_owner(struct o_record * record);
  * \param record to check.
  */
 void o_record_check_load(struct o_record * record);
+
+/*! \brief Retrieve the cluster where the record must be saved.
+ *
+ * \param record to save.
+ * \return the name of cluster where save the record.
+ */
+char * o_record_cluster_name(struct o_record * record);
 
 /**
  * Use to actuate free operation on a record.

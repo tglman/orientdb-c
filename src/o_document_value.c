@@ -106,10 +106,10 @@ struct o_document_value * o_document_value_embedded(struct o_document * doc)
 	return doc_val;
 }
 
-struct o_document_value * o_document_value_link(struct o_document * doc)
+struct o_document_value * o_document_value_link(struct o_record * doc)
 {
-	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document *));
-	VALUE(doc_val,struct o_document *) = doc;
+	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_record *));
+	VALUE(doc_val,struct o_record *) = doc;
 	return doc_val;
 }
 
@@ -178,9 +178,9 @@ struct o_document * o_document_value_get_embedded(struct o_document_value * o_va
 	return VALUE_CHECK(o_value,struct o_document *,EMBEDDED);
 }
 
-struct o_document * o_document_value_get_link(struct o_document_value * o_value)
+struct o_record * o_document_value_get_link(struct o_document_value * o_value)
 {
-	return VALUE_CHECK(o_value,struct o_document *,LINK);
+	return VALUE_CHECK(o_value,struct o_record *,LINK);
 }
 
 struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value)
@@ -221,21 +221,31 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		break;
 	case BYTE:
 		o_string_printer_print_long(buff, VALUE(o_value,char));
+		o_string_printer_print_char(buff, 'b');
 		break;
 	case INT:
 		o_string_printer_print_long(buff, VALUE(o_value,int));
+		o_string_printer_print_char(buff, 'i');
 		break;
 	case LONG:
 		o_string_printer_print_long(buff, VALUE(o_value,long));
+		o_string_printer_print_char(buff, 'l');
 		break;
 	case SHORT:
 		o_string_printer_print_long(buff, VALUE(o_value,short));
+		o_string_printer_print_char(buff, 's');
 		break;
 	case FLOAT:
 		o_string_printer_print_double(buff, VALUE(o_value,float));
+		o_string_printer_print_char(buff, 'f');
 		break;
 	case DOUBLE:
 		o_string_printer_print_double(buff, VALUE(o_value,double));
+		o_string_printer_print_char(buff, 'd');
+		break;
+	case DATE:
+		o_string_printer_print_long(buff, VALUE(o_value,long));
+		o_string_printer_print_char(buff, 't');
 		break;
 	case EMBEDDED:
 		o_string_printer_print(buff, "(");
@@ -247,7 +257,7 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		struct o_record *rec = o_document_o_record(VALUE(o_value,struct o_document *));
 		struct o_record_id * id = o_record_get_id(rec);
 		o_string_printer_print_char(buff, '#');
-		o_string_printer_print(buff,o_record_id_string(id));
+		o_string_printer_print(buff, o_record_id_string(id));
 	}
 		break;
 
@@ -266,9 +276,6 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		o_string_printer_print(buff, "]");
 	}
 		break;
-	case DATE:
-		break;
-
 	}
 }
 
@@ -326,43 +333,83 @@ struct o_document_value * o_document_value_link_deserialize(struct o_input_strea
 	o_free(ca);
 	o_string_buffer_free(buff);
 	struct o_record_id * o_rid = o_record_id_new(cid, rid);
-	return o_document_value_link(o_document_new_id(o_rid));
+	return o_document_value_link(o_document_o_record(o_document_new_id(o_rid)));
+}
+
+struct o_document_value * o_document_value_number_facory(char * serialized_content, char type)
+{
+	double number = atof(serialized_content);
+	struct o_document_value *val;
+	switch (type)
+	{
+	case 'b':
+		val = o_document_value_byte(number);
+		break;
+	case 's':
+		val = o_document_value_short(number);
+		break;
+	case 'i':
+		val = o_document_value_int(number);
+		break;
+	case 'l':
+		val = o_document_value_long(number);
+		break;
+	case 'f':
+		val = o_document_value_float(number);
+		break;
+	case 'd':
+		val = o_document_value_double(number);
+		break;
+	case 't':
+		val = o_document_value_date(number);
+		break;
+	}
+	return val;
 }
 
 struct o_document_value * o_document_value_number_deserialize(struct o_input_stream * stream)
 {
 	int readed;
+	struct o_document_value *value = 0;
 	struct o_string_buffer * buff = o_string_buffer_new();
-	short doubleVal = 0;
 	do
 	{
-		o_string_buffer_append_char(buff, readed);
-		if (readed == '.')
-			doubleVal = 1;
-		else if ((readed < '0' || readed > '9'))
-		{
-			o_string_buffer_free(buff);
-			throw(o_exception_new("wrong number parsing", 0));
-		}
 		readed = o_input_stream_read(stream);
-	} while (readed != ',');
-	char * ca = o_string_buffer_str(buff);
-	struct o_document_value *value;
-	if (doubleVal)
+		switch (readed)
+		{
+		case 'b':
+		case 's':
+		case 'i':
+		case 'l':
+		case 'f':
+		case 'd':
+		case 't':
+		{
+			char * ca = o_string_buffer_str(buff);
+			value = o_document_value_number_facory(ca, readed);
+			o_free(ca);
+			o_string_buffer_free(buff);
+		}
+			break;
+		default:
+			if ((readed < '0' || readed > '9') && readed != '.')
+			{
+				o_string_buffer_free(buff);
+				throw(o_exception_new("wrong number parsing", 0));
+			}
+			o_string_buffer_append_char(buff, readed);
+			break;
+		}
+	} while (value == 0);
+	readed = o_input_stream_read(stream);
+	if (readed != ',')
 	{
-		double val = atof(ca);
-		value = o_document_value_long(val);
+		o_document_value_free(value);
+		throw(o_exception_new("wrong number parsing", 0));
 	}
-	else
-	{
-		long val = atol(ca);
-		value = o_document_value_long(val);
-	}
-	o_free(ca);
-	o_string_buffer_free(buff);
-
 	return value;
 }
+
 struct o_document_value_list
 {
 	struct o_document_value *val;

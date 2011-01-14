@@ -88,7 +88,7 @@ struct o_document_value * o_document_value_embedded(struct o_document * doc);
  * \param val value.
  * \return new document value.
  */
-struct o_document_value * o_document_value_link(struct o_document * doc);
+struct o_document_value * o_document_value_link(struct o_record * doc);
 
 /*! \brief Create a new array value.
  *
@@ -169,7 +169,7 @@ struct o_document * o_document_value_get_embedded(struct o_document_value * o_va
  *
  * \param o_value the document value where retrieve value.
  */
-struct o_document * o_document_value_get_link(struct o_document_value * o_value);
+struct o_record * o_document_value_get_link(struct o_document_value * o_value);
 
 /*! \brief Retrieve an array from a document value.
  *

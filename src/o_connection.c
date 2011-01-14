@@ -25,7 +25,7 @@ struct o_connection * o_connection_new(enum o_url_type type, char * path)
 	}
 	conn->path = path;
 	conn->type = type;
-	conn->storages = o_map_new();
+	conn->storages = o_map_string_new();
 	return conn;
 }
 
@@ -44,12 +44,12 @@ char * o_connection_build_storage_name(char * name, char * username)
 struct o_storage * o_connection_storage_open(struct o_connection * conn, char * name, char * username, char * password)
 {
 	char * store_name = o_connection_build_storage_name(name, username);
-	struct o_storage * str = o_map_get(conn->storages, store_name);
+	struct o_storage * str = o_map_string_get(conn->storages, store_name);
 	if (str == 0)
 	{
 		conn->last_user = username;
 		str = conn->storage_open(conn, name, username, password);
-		o_map_put(conn->storages, store_name, str);
+		o_map_string_put(conn->storages, store_name, str);
 	}
 	o_storage_reference(str);
 	o_free(store_name);
@@ -71,18 +71,18 @@ void o_connection_storage_release(struct o_connection * conn, struct o_storage *
 	char * name = o_storage_get_name(storage);
 	char * username = o_storage_get_user(storage);
 	char * store_name = o_connection_build_storage_name(name, username);
-	o_map_remove(conn->storages, store_name);
+	o_map_string_remove(conn->storages, store_name);
 	o_storage_close(storage);
 	o_storage_free(storage);
 	o_free(store_name);
-	if (o_map_size(conn->storages) == 0)
+	if (o_map_string_size(conn->storages) == 0)
 		o_engine_release_connection(conn);
 }
 
 void o_connection_free(struct o_connection * connection)
 {
 	if (connection->storages != 0)
-		o_map_free(connection->storages);
+		o_map_string_free(connection->storages);
 	o_free(connection->path);
 	connection->free(connection);
 }

@@ -87,6 +87,11 @@ void o_record_check_load(struct o_record * record)
 		o_database_load_record(record->owner, record);
 }
 
+char * o_record_cluster_name(struct o_record * record)
+{
+	return record->o_record_cluster_name(record);
+}
+
 struct o_database * o_record_owner(struct o_record * record)
 {
 	return record->owner;

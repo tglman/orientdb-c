@@ -83,8 +83,13 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 		struct o_raw_buffer * buff = o_raw_buffer_record(record);
 		if (is_new)
 		{
-			int cluster_id = cluster_name != 0 ? o_storage_get_cluster_id_by_name(db->storage, cluster_name) : o_storage_get_default_cluser_id(
-					db->storage);
+			if(cluster_name == 0)
+				cluster_name = o_record_cluster_name(record);
+			int cluster_id;
+			if (cluster_name != 0)
+				cluster_id = o_storage_get_cluster_id_by_name(db->storage, cluster_name);
+			else
+				cluster_id = o_storage_get_default_cluser_id(db->storage);
 
 			long long pos = o_storage_create_record(db->storage, cluster_id, buff);
 			struct o_record_id * new_rid = o_record_id_new(cluster_id, pos);

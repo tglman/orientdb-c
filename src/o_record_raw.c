@@ -73,16 +73,22 @@ void o_record_raw_after_save(struct o_record * record)
 {
 }
 
+char * o_record_raw_cluster_name(struct o_record * record)
+{
+	return 0;
+}
+
 struct o_record * o_record_raw_new_id(struct o_record_id * rid)
 {
 	struct o_record_raw * rr = o_malloc(sizeof(struct o_record_raw));
 	memset(rr, 0, sizeof(struct o_record_raw));
 	o_record_new_internal_id(&rr->record, RAW_RECORD_TYPE, rid);
 	rr->record.o_record_deserialize = o_record_raw_deserialize;
-	rr->record.o_record_free = o_record_raw_free;
 	rr->record.o_record_serialize = o_record_raw_serialize;
 	rr->record.o_record_before_save = o_record_raw_before_save;
 	rr->record.o_record_after_save = o_record_raw_after_save;
+	rr->record.o_record_cluster_name = o_record_raw_cluster_name;
+	rr->record.o_record_free = o_record_raw_free;
 	return &rr->record;
 }
 
