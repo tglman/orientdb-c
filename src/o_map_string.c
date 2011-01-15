@@ -23,10 +23,15 @@ void * o_string_dup(void * to_dup)
 	return o_memdup(to_dup, strlen((char *) to_dup) + 1);
 }
 
+void o_string_free(void * to_dup)
+{
+	o_free(to_dup);
+}
+
 struct o_map_string * o_map_string_new()
 {
 	struct o_map_string * string = o_malloc(sizeof(struct o_map_string));
-	string->map = o_map_new(o_map_hash_string, o_string_dup);
+	string->map = o_map_new(o_map_hash_string, o_string_dup, o_string_free);
 	return string;
 }
 

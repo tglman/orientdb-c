@@ -18,6 +18,7 @@ struct o_map
 {
 	unsigned int (*o_map_hash)(void * key, int size);
 	void * (*o_key_dup)(void * key);
+	void (*o_key_free)(void * key);
 	struct o_map_entry * first;
 	struct o_map_entry * last;
 	struct o_map_entry **entries;
@@ -37,7 +38,7 @@ void o_map_clear_caches(struct o_map *map)
 	map->cache_values = 0;
 }
 
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void * (*o_key_dup)(void *))
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void * (*o_key_dup)(void *), void (*o_key_free)(void * key))
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
 	memset(new_map, 0, sizeof(struct o_map));
@@ -49,9 +50,10 @@ struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void *
 	return new_map;
 }
 
-void o_map_free_entry(struct o_map_entry * entry)
+void o_map_free_entry(struct o_map * map, struct o_map_entry * entry)
 {
-	o_free(entry->key);
+	map->o_key_free(entry->key);
+	//o_free(entry->key);
 	o_free(entry);
 }
 
@@ -134,7 +136,7 @@ void * o_map_remove(struct o_map * map, void * key)
 		if (found->next != 0)
 			found->next->before = found->before;
 
-		o_map_free_entry(found);
+		o_map_free_entry(map, found);
 	}
 	map->size--;
 	o_map_clear_caches(map);
@@ -189,7 +191,7 @@ void o_map_free(struct o_map * map)
 		struct o_map_entry *iter = map->first->map_next;
 		while (iter != 0)
 		{
-			o_map_free_entry(iter->map_before);
+			o_map_free_entry(map, iter->map_before);
 			iter = iter->map_next;
 		}
 	}

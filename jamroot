@@ -1,0 +1,5 @@
+lib orientdb-c : [ glob src/*.c ] ;
+install install : orientdb-c : <location>/usr/lib ;
+
+
+

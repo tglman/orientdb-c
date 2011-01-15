@@ -41,7 +41,6 @@ void test_o_url_resolve_host_from_path()
 	char *host;
 	int port;
 	int ret = o_url_resolve_host_port_from_path("127.0.0.1", &host, &port);
-	printf("%i",ret);
 	assert_true(ret == 1, "wrong return value");
 	assert_true(strcmp(host, "127.0.0.1") == 0, "wrong host name");
 	o_free(host);

@@ -11,7 +11,7 @@ struct o_map;
  *
  *  @return a new map instance.
  */
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void * (*o_key_dup)(void *));
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void * (*o_key_dup)(void *), void (*o_key_free)(void * key));
 
 /**
  * put a value into map.
