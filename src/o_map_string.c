@@ -18,20 +18,20 @@ unsigned int o_map_hash_string(void * key, int size)
 	return h % size;
 }
 
-void * o_string_dup(void * to_dup)
+void o_entry_string_create(void ** key, void ** value)
 {
-	return o_memdup(to_dup, strlen((char *) to_dup) + 1);
+	*key = o_memdup(*key, strlen((char *) *key) + 1);
 }
 
-void o_string_free(void * to_dup)
+void o_entry_string_free(void ** key, void ** value)
 {
-	o_free(to_dup);
+	o_free(*key);
 }
 
 struct o_map_string * o_map_string_new()
 {
 	struct o_map_string * string = o_malloc(sizeof(struct o_map_string));
-	string->map = o_map_new(o_map_hash_string, o_string_dup, o_string_free);
+	string->map = o_map_new(o_map_hash_string, o_entry_string_create, o_entry_string_free);
 	return string;
 }
 
@@ -63,6 +63,11 @@ void ** o_map_string_values(struct o_map_string * map, int * values_num)
 int o_map_string_size(struct o_map_string * map)
 {
 	return o_map_size(map->map);
+}
+
+void o_map_string_clear(struct o_map_string * map)
+{
+	o_map_clear(map->map);
 }
 
 void o_map_string_free(struct o_map_string * map)

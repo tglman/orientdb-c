@@ -1,6 +1,7 @@
 #ifndef O_DOCUMENT_INTERNAL_H_
 #define O_DOCUMENT_INTERNAL_H_
 #include "o_string_printer.h"
+#include "o_document.h"
 
 /*! \brief Deserialize a document.
  *

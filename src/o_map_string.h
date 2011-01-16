@@ -62,11 +62,16 @@ void ** o_map_string_values(struct o_map_string * map, int * values_num);
  */
 int o_map_string_size(struct o_map_string * map);
 
+/*! \brief Remove all entry from string map.
+ *
+ * \param map to clear.
+ */
+void o_map_string_clear(struct o_map_string * map);
+
 /** Free the structures of map.
  *
  * @param map structures to free.
  */
 void o_map_string_free(struct o_map_string * map);
-
 
 #endif /* O_MAP_STRING_H_ */

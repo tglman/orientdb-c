@@ -17,8 +17,8 @@ struct o_map_entry
 struct o_map
 {
 	unsigned int (*o_map_hash)(void * key, int size);
-	void * (*o_key_dup)(void * key);
-	void (*o_key_free)(void * key);
+	void (*o_entry_create)(void ** key, void ** value);
+	void (*o_entry_free)(void ** key, void ** value);
 	struct o_map_entry * first;
 	struct o_map_entry * last;
 	struct o_map_entry **entries;
@@ -38,21 +38,22 @@ void o_map_clear_caches(struct o_map *map)
 	map->cache_values = 0;
 }
 
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void * (*o_key_dup)(void *), void (*o_key_free)(void * key))
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **))
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
 	memset(new_map, 0, sizeof(struct o_map));
 	new_map->entries_size = DEFAULT_ENTRIES_SIZE;
 	new_map->entries = o_malloc(sizeof(struct o_map_entry *) * new_map->entries_size);
 	new_map->o_map_hash = o_map_hash;
-	new_map->o_key_dup = o_key_dup;
+	new_map->o_entry_create = o_entry_create;
+	new_map->o_entry_free = o_entry_free;
 	memset(new_map->entries, 0, sizeof(struct o_map_entry *) * new_map->entries_size);
 	return new_map;
 }
 
 void o_map_free_entry(struct o_map * map, struct o_map_entry * entry)
 {
-	map->o_key_free(entry->key);
+	map->o_entry_free(&entry->key, &entry->value);
 	//o_free(entry->key);
 	o_free(entry);
 }
@@ -72,8 +73,11 @@ void * o_map_put(struct o_map * map, void * key, void * val)
 	struct o_map_entry * new_entry = o_map_get_entry(map, key, hash);
 	if (new_entry != 0)
 	{
+		map->o_entry_free(&new_entry->key, &new_entry->value);
+		new_entry->key = key;
 		void * old_val = new_entry->value;
 		new_entry->value = val;
+		map->o_entry_create(&new_entry->key, &new_entry->value);
 		return old_val;
 	}
 	new_entry = o_malloc(sizeof(struct o_map_entry));
@@ -87,8 +91,9 @@ void * o_map_put(struct o_map * map, void * key, void * val)
 	if (map->first == 0)
 		map->first = new_entry;
 
-	new_entry->key = map->o_key_dup(key);
+	new_entry->key = key;
 	new_entry->value = val;
+	map->o_entry_create(&new_entry->key, &new_entry->value);
 
 	if (new_entry == map->entries[hash])
 		*((int *) 0) = +1;
@@ -184,15 +189,47 @@ int o_map_size(struct o_map * map)
 	return map->size;
 }
 
+void o_map_clear(struct o_map * map)
+{
+	o_map_clear_caches(map);
+	if (map->first != 0)
+	{
+		struct o_map_entry *iter = map->first;
+		struct o_map_entry *next;
+		while (iter != 0)
+		{
+			next = iter->map_next;
+			o_map_free_entry(map, iter);
+			iter = next;
+		}
+	}
+	map->first = 0;
+	map->last = 0;
+	map->size = 0;
+	memset(map->entries, 0, sizeof(struct o_map_entry *) * map->entries_size);
+}
+
+void * o_map_first_key(struct o_map * map)
+{
+	return map->first->key;
+}
+
+void * o_map_last_key(struct o_map * map)
+{
+	return map->last->key;
+}
+
 void o_map_free(struct o_map * map)
 {
 	if (map->first != 0)
 	{
-		struct o_map_entry *iter = map->first->map_next;
+		struct o_map_entry *iter = map->first;
+		struct o_map_entry *next;
 		while (iter != 0)
 		{
-			o_map_free_entry(map, iter->map_before);
-			iter = iter->map_next;
+			next = iter->map_next;
+			o_map_free_entry(map, iter);
+			iter = next;
 		}
 	}
 	o_free(map->entries);

@@ -27,9 +27,23 @@ void test_o_map_keys_iteration()
 	o_map_string_free(mm);
 }
 
+void test_o_map_add_clear()
+{
+	struct o_map_string *mm = o_map_string_new();
+	o_map_string_put(mm, "cccc", 0);
+	o_map_string_put(mm, "sss", 0);
+	int size = o_map_string_size(mm);
+	assert_true(size == 2, "not correct size after insert");
+	o_map_string_clear(mm);
+	size = o_map_string_size(mm);
+	assert_true(size == 0, "not correct size after clear");
+
+}
+
 void o_map_suite()
 {
 	ADD_TEST(test_o_map, "creation and put test");
 	ADD_TEST(test_o_map_keys_iteration, "test key add and iterate");
+	ADD_TEST(test_o_map_add_clear, "test key add and iterate");
 }
 

@@ -56,6 +56,8 @@ void o_storage_release(struct o_storage * storage)
 }
 void o_storage_internal_free(struct o_storage *storage)
 {
+	if (storage->listener != 0)
+		o_push_listener_free(storage->listener);
 	o_free(storage->name);
 	o_free(storage->user);
 }
@@ -79,6 +81,16 @@ void o_storage_internal_new(struct o_storage *storage, char * name, char * user)
 	storage->user = o_malloc(usrlen);
 	memcpy(storage->user, user, usrlen);
 	storage->ref_count = 0;
+}
+
+void o_storage_set_push_listener(struct o_storage *storage, struct o_push_listener * listener)
+{
+	storage->listener = listener;
+}
+
+struct o_push_listener * o_storage_get_push_listener(struct o_storage *storage)
+{
+	return storage->listener;
 }
 
 void o_storage_reference(struct o_storage * storage)

@@ -1,5 +1,5 @@
 #include "o_document_value.h"
-#include "o_document.h"
+#include "o_database_internal.h"
 #include "o_document_internal.h"
 #include "o_record.h"
 #include "o_memory.h"
@@ -10,6 +10,13 @@
 
 #define VALUE(obb,type) *((type *)obb->value)
 #define VALUE_CHECK(OBB,TYPE,E_TYPE) E_TYPE==OBB->type?*((TYPE *)OBB->value):(TYPE)0
+
+struct o_document_value_link
+{
+	struct o_database * db;
+	struct o_record_id * rid;
+	struct o_record *record;
+};
 
 struct o_document_value * o_document_value_deserialize(struct o_input_stream * stream);
 
@@ -106,10 +113,24 @@ struct o_document_value * o_document_value_embedded(struct o_document * doc)
 	return doc_val;
 }
 
-struct o_document_value * o_document_value_link(struct o_record * doc)
+struct o_document_value * o_document_value_link_ref(struct o_record_id *id)
 {
-	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_record *));
-	VALUE(doc_val,struct o_record *) = doc;
+	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
+	link->rid = id;
+	link->db = o_database_context_database();
+	o_database_add_referrer(link->db, &link->db);
+	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document_value_link *));
+	VALUE(doc_val,struct o_document_value_link *) = link;
+	return doc_val;
+
+}
+
+struct o_document_value * o_document_value_link(struct o_record * rec)
+{
+	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
+	link->record = rec;
+	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document_value_link *));
+	VALUE(doc_val,struct o_document_value_link *) = link;
 	return doc_val;
 }
 
@@ -180,7 +201,17 @@ struct o_document * o_document_value_get_embedded(struct o_document_value * o_va
 
 struct o_record * o_document_value_get_link(struct o_document_value * o_value)
 {
-	return VALUE_CHECK(o_value,struct o_record *,LINK);
+	struct o_document_value_link * link = VALUE_CHECK(o_value,struct o_document_value_link *,LINK);
+	if (link == 0)
+		return 0;
+	if (link->record == 0)
+	{
+		if (link->db == 0 || link->rid == 0)
+			return 0;
+		link->record = o_database_load(link->db, link->rid);
+		o_database_remove_referrer(link->db, &link->db);
+	}
+	return link->record;
 }
 
 struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value)
@@ -333,7 +364,7 @@ struct o_document_value * o_document_value_link_deserialize(struct o_input_strea
 	o_free(ca);
 	o_string_buffer_free(buff);
 	struct o_record_id * o_rid = o_record_id_new(cid, rid);
-	return o_document_value_link(o_document_o_record(o_document_new_id(o_rid)));
+	return o_document_value_link_ref(o_rid);
 }
 
 struct o_document_value * o_document_value_number_facory(char * serialized_content, char type)
@@ -503,10 +534,16 @@ struct o_document_value * o_document_value_deserialize(struct o_input_stream * s
 }
 void o_document_value_free(struct o_document_value * to_free)
 {
-	/*if (to_free->type == LINK || to_free->type == EMBEDDED)
-	 o_document_free(VALUE(to_free,struct o_document *));
-
-	 else*/if (to_free->type == STRING)
+	if (to_free->type == LINK)
+	{
+		struct o_document_value_link * val = VALUE(to_free,struct o_document_value_link *);
+		if (val->db != 0)
+			o_database_remove_referrer(val->db, &val->db);
+		if (val->rid != 0)
+			o_record_id_release(val->rid);
+		o_free(val);
+	}
+	else if (to_free->type == STRING)
 		o_free(VALUE(to_free,char *));
 	o_free(to_free->value);
 	o_free(to_free);

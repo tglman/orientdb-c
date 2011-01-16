@@ -1,6 +1,6 @@
 #ifndef O_RAW_BUFFER_H_
 #define O_RAW_BUFFER_H_
-
+#include "o_input_stream.h"
 struct o_raw_buffer;
 
 /*! \brief Retrieve the content buffer size.

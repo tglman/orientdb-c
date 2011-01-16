@@ -4,6 +4,7 @@
 #include "o_database_error_handler.h"
 #include "o_record_id.h"
 #include "o_transaction.h"
+#include "o_push_listener.h"
 
 struct o_storage;
 
@@ -78,6 +79,20 @@ int o_storage_get_default_cluser_id(struct o_storage * storage);
  * @param transaction to commit.
  */
 void o_storage_commit_transaction(struct o_storage *storage, struct o_transaction * transaction);
+
+/*! \brief set the push listener to storage.
+ *
+ * \param storage where add the listener.
+ * \param listener to add.
+ */
+void o_storage_set_push_listener(struct o_storage *storage, struct o_push_listener * listener);
+
+/*! \brief Retrive the current push listener on storage.
+ *
+ * \param storage where retrieve the push listener.
+ * \return the push listener.
+ */
+struct o_push_listener * o_storage_get_push_listener(struct o_storage *storage);
 
 /*! \brief Release the current storage.
  * reference count decrement.

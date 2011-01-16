@@ -11,7 +11,7 @@ struct o_map;
  *
  *  @return a new map instance.
  */
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void * key, int size), void * (*o_key_dup)(void *), void (*o_key_free)(void * key));
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **));
 
 /**
  * put a value into map.
@@ -61,6 +61,26 @@ void ** o_map_values(struct o_map * map, int * values_num);
  * @return the size of map.
  */
 int o_map_size(struct o_map * map);
+
+/*! \brief remove all entries from the map.
+ *
+ * \param map to clear.
+ */
+void o_map_clear(struct o_map * map);
+
+/*! \brief Retrieve the first key of map.
+ *
+ * \param map where retrieve.
+ * \return the first key.
+ */
+void * o_map_first_key(struct o_map * map);
+
+/*! \brief Retrieve the last key of map.
+ *
+ * \param map where retrieve.
+ * \return the first key.
+ */
+void * o_map_last_key(struct o_map * map);
 
 /** Free the structures of map.
  *

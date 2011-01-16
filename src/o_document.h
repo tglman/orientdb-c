@@ -1,8 +1,6 @@
 #ifndef O_DOCUMENT_H_
 #define O_DOCUMENT_H_
 #include "o_record.h"
-#include "o_output_stream.h"
-#include "o_input_stream.h"
 
 #define DOCUMENT_RECORD_TYPE 'd'
 

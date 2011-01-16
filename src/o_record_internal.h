@@ -1,12 +1,12 @@
 #ifndef O_RECORD_INTERNAL_H_
 #define O_RECORD_INTERNAL_H_
 #include "o_record.h"
+#include "o_raw_buffer.h"
 #include "o_output_stream.h"
 
 struct o_record
 {
 	struct o_record_id * record_id;
-	struct o_database * owner;
 	char type;
 	int version;
 	int ref_count;
@@ -60,25 +60,19 @@ void o_record_reset_id(struct o_record * record, struct o_record_id *new_id);
  */
 void o_record_after_save(struct o_record * record);
 
-/*! \brief Retrieve the owner of this record.
- *
- * \param record to retrieve the owner.
- * \return the owner of record.
- */
-struct o_database * o_record_owner(struct o_record * record);
-
-/*! \brief Check if the record is loaded otherwise load it.
- *
- * \param record to check.
- */
-void o_record_check_load(struct o_record * record);
-
 /*! \brief Retrieve the cluster where the record must be saved.
  *
  * \param record to save.
  * \return the name of cluster where save the record.
  */
 char * o_record_cluster_name(struct o_record * record);
+
+/*! /brief retrieve the content of record.
+ *
+ * \param record from read content.
+ * \return the buffer content.
+ */
+struct o_raw_buffer * o_record_content(struct o_record * record);
 
 /**
  * Use to actuate free operation on a record.

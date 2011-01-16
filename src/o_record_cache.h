@@ -25,6 +25,13 @@ void o_record_cache_put(struct o_record_cache * cache, struct o_record * record)
  */
 struct o_record * o_record_cache_get(struct o_record_cache * cache, struct o_record_id *id);
 
+/*! \brief Remove a record from the cache .
+ *
+ * \param cache where remove.
+ * \param record to remove.
+ */
+void o_record_cache_remove(struct o_record_cache * cache, struct o_record * record);
+
 /*! \brief remove all record from cache.
  *
  * \param cache to clear.

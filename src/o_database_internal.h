@@ -3,12 +3,17 @@
 #include "o_record.h"
 #include "o_database.h"
 #include "o_string_buffer.h"
+#include "o_record_cache.h"
+#include "o_raw_buffer.h"
+#include "o_list.h"
 
 struct o_database
 {
 	struct o_database_error_handler * error_handler;
 	char * connection_url;
 	struct o_storage * storage;
+	struct o_record_cache * cache;
+	struct o_list * referrers;
 };
 
 /** Fill a new instance of a database and associate an error hendler
@@ -20,12 +25,35 @@ struct o_database
  */
 void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler);
 
-/*! \biref load an existent record instance from db.
+/*! \brief Retrieve the cache from database.
  *
- * \param db from load.
- * \param record to load.
+ * \param db where retrieve the cache.
+ * \param the record cache of db.
  */
-void o_database_load_record(struct o_database * db, struct o_record * record);
+struct o_record_cache * o_database_get_cache(struct o_database * db);
+
+/*! \brief Create a record form id and content, and cache it in the db cache.
+ *
+ * \param db where cache.
+ * \param id the id of record to create.
+ * \param content the content to fill the record.
+ * \return the new record instance.
+ */
+struct o_record * o_database_record_from_content(struct o_database * db, struct o_record_id * rid, struct o_raw_buffer * content);
+
+/*! \brief Add a referrer to the current db.
+ *
+ * \param db to refer.
+ * \param refferrer poiter who refer.
+ */
+void o_database_add_referrer(struct o_database * db, struct o_database ** referrer);
+
+/*! \brief Remove a referrer to current database.
+ *
+ * \param db to refer.
+ * \param referrer to remove.
+ */
+void o_database_remove_referrer(struct o_database * db, struct o_database ** referrer);
 
 /** Clear the database structure .
  *

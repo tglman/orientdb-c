@@ -83,7 +83,7 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 		struct o_raw_buffer * buff = o_raw_buffer_record(record);
 		if (is_new)
 		{
-			if(cluster_name == 0)
+			if (cluster_name == 0)
 				cluster_name = o_record_cluster_name(record);
 			int cluster_id;
 			if (cluster_name != 0)
@@ -107,6 +107,7 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 		}
 		o_raw_buffer_free(buff);
 		o_record_after_save(record);
+		o_record_cache_put(o_database_get_cache(db), record);
 		result = 1;
 	}
 	catch( struct o_exception ,ex)
@@ -125,6 +126,7 @@ int o_database_delete(struct o_database * db, struct o_record * record)
 	o_database_context_database_init(db);
 	try
 	{
+		o_record_cache_remove(o_database_get_cache(db), record);
 		o_storage_delete_record(db->storage, o_record_get_id(record), o_record_version(record));
 		result = 1;
 	}
@@ -138,22 +140,22 @@ int o_database_delete(struct o_database * db, struct o_record * record)
 	return result;
 }
 
-struct o_record * o_database_internal_load_record(struct o_database * db, struct o_record_id * rid, struct o_record * to_fill)
+struct o_record * o_database_record_from_content(struct o_database * db, struct o_record_id * rid, struct o_raw_buffer * content)
 {
+	struct o_record * record = 0;
 	o_database_context_database_init(db);
 	try
 	{
-		struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
 		o_record_id_refer(rid);
-		if (to_fill == 0)
-			to_fill = o_record_factory_id(o_raw_buffer_type(row), rid);
-		o_record_reset_version(to_fill, o_raw_buffer_version(row));
+		record = o_record_factory_id(o_raw_buffer_type(content), rid);
+		o_record_reset_version(record, o_raw_buffer_version(content));
 		int size;
-		unsigned char * bytes = o_raw_buffer_content(row, &size);
+		unsigned char * bytes = o_raw_buffer_content(content, &size);
 		struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
-		o_record_deserialize(to_fill, stream);
+		o_record_deserialize(record, stream);
 		o_input_stream_free(stream);
-		o_raw_buffer_free(row);
+		o_raw_buffer_free(content);
+		o_record_cache_put(o_database_get_cache(db), record);
 	}
 	catch( struct o_exception ,ex)
 	{
@@ -161,18 +163,27 @@ struct o_record * o_database_internal_load_record(struct o_database * db, struct
 		o_exception_free(ex);
 	}
 	end_try;
-	o_database_context_database_init(0);
-	return to_fill;
-}
-
-void o_database_load_record(struct o_database * db, struct o_record * record)
-{
-	o_database_internal_load_record(db, o_record_get_id(record), record);
+	return record;
 }
 
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid)
 {
-	return o_database_internal_load_record(db, rid, 0);
+	struct o_record * rec = o_record_cache_get(o_database_get_cache(db), rid);
+	if (rec == 0)
+	{
+		try
+		{
+			struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
+			rec = o_database_record_from_content(db, rid, row);
+		}
+		catch( struct o_exception ,ex)
+		{
+			DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+			o_exception_free(ex);
+		}
+		end_try;
+	}
+	return rec;
 }
 
 struct o_record * o_database_record_new_type(struct o_database *db, char type)
@@ -183,6 +194,13 @@ struct o_record * o_database_record_new_type(struct o_database *db, char type)
 	return new_rec;
 }
 
+struct o_record_cache * o_database_get_cache(struct o_database * db)
+{
+	if (db->cache == 0)
+		db->cache = o_record_cache_new();
+	return db->cache;
+}
+
 struct o_record * o_database_record_new(struct o_database *db)
 {
 	return o_database_record_new_type(db, RAW_RECORD_TYPE);
@@ -190,6 +208,13 @@ struct o_record * o_database_record_new(struct o_database *db)
 
 void o_database_free_internal(struct o_database * db)
 {
+	if (db->referrers != 0)
+	{
+		int count = o_list_size(db->referrers);
+		while (count > 0)
+			*((struct o_database **) o_list_get(db->referrers, --count)) = 0;
+		o_list_free(db->referrers);
+	}
 	o_database_close(db);
 }
 
@@ -206,7 +231,19 @@ void o_database_close(struct o_database * db)
 		o_exception_free(ex);
 	}
 	end_try;
+}
 
+void o_database_add_referrer(struct o_database * db, struct o_database ** referrer)
+{
+	if (db->referrers == 0)
+		db->referrers = o_list_new();
+	o_list_add(db->referrers, referrer);
+}
+
+void o_database_remove_referrer(struct o_database * db, struct o_database ** referrer)
+{
+	if (db->referrers != 0)
+		o_list_remove(db->referrers, referrer);
 }
 
 void o_database_free(struct o_database * db)
