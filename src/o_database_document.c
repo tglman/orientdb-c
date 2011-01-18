@@ -5,6 +5,7 @@
 struct o_database_document
 {
 	struct o_database database;
+	struct o_schema * schema;
 };
 
 struct o_database * o_database_document_to_database(struct o_database_document * db)

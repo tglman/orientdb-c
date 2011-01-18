@@ -1,0 +1,28 @@
+#include "o_property.h"
+#include "o_property_internal.h"
+#include "o_memory.h"
+#include <string.h>
+
+struct o_property
+{
+	char * name;
+	enum o_document_value_type type;
+};
+
+struct o_property * o_property_new(char * name, enum o_document_value_type type)
+{
+	struct o_property * prop = o_malloc(sizeof(struct o_property *));
+	prop->name = o_memdup(name, strlen(name));
+	prop->type = type;
+	return prop;
+}
+
+char * o_property_get_name(struct o_property * property)
+{
+	return property->name;
+}
+
+enum o_document_value_type o_property_get_type(struct o_property * property)
+{
+	return property->type;
+}
