@@ -17,4 +17,10 @@ struct o_schema * o_schema_load(struct o_database * db);
  */
 void o_schema_save(struct o_schema * schema, struct o_database * db);
 
+/*! \brief Free the momory of schema with all dependent structure.
+ *
+ * \param schema to free.
+ */
+void o_schema_free(struct o_schema * schema);
+
 #endif /* O_SCHEMA_INTERNAL_H_ */

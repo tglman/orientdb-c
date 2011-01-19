@@ -9,4 +9,10 @@
  */
 struct o_class * o_class_new(char * name);
 
+/*! \brief Free the memory and substructure of class.
+ *
+ * \param class to free.
+ */
+void o_class_free(struct o_class * class);
+
 #endif /* O_CLASS_INTERNAL_H_ */

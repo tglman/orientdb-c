@@ -28,4 +28,19 @@ struct o_class * o_schema_create_class(struct o_schema * schema, char * name);
  */
 struct o_class ** o_schema_get_classes(struct o_schema * schema, int * n_classes);
 
+/*! \brief Retrieve if a class with name exist.
+ *
+ * \param schema where check.
+ * \param name the name of class to find.
+ * \return 1 if class with name exist otherwise.
+ */
+int o_schema_exist_class(struct o_schema * schema, char * name);
+
+/*! \brief Remove the class from the schema.
+ *
+ * \param schema where remove class.
+ * \param name of class to remove.
+ */
+void o_schema_remove_class(struct o_schema * schema, char * name);
+
 #endif /* O_SCHEMA_H_ */
