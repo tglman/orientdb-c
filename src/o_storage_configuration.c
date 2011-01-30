@@ -15,9 +15,18 @@ char * o_storage_next_entry(unsigned char * content, int *cursor, int buff_size)
 
 struct o_storage_configuration
 {
+	int version;
+	char * name;
 	struct o_record_id *schema;
 	struct o_record_id *dictionary;
 };
+
+struct o_record_id * record_id_from_string(char * id)
+{
+	int pos = strchr(id, ':');
+	id[pos] = 0;
+	return o_record_id_new(atoi(id), atoi(id + pos));
+}
 
 struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffer * buff)
 {
@@ -25,7 +34,15 @@ struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffe
 	int buff_size;
 	unsigned char * content = o_raw_buffer_content(buff, &buff_size);
 	int cursor;
-	char * val = o_storage_next_entry(content,&cursor,buff_size);
+	char * val = o_storage_next_entry(content, &cursor, buff_size);
+	conf->version = atoi(val);
+	o_free(val);
+	conf->name = o_storage_next_entry(content, &cursor, buff_size);
+	val = o_storage_next_entry(content, &cursor, buff_size);
+	conf->schema = record_id_from_string(val);
+	o_free(val);
+	val = o_storage_next_entry(content, &cursor, buff_size);
+	conf->dictionary = record_id_from_string(val);
 	o_free(val);
 	//TODO:load configuration from storage.
 	return conf;

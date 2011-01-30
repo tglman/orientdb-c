@@ -72,6 +72,7 @@ struct o_metadata * o_database_document_metadata(struct o_database_document * db
 void o_database_document_free(struct o_database_document * db)
 {
 	o_database_free_internal(o_database_document_to_database(db));
-	o_metadata_free(db->metadata);
+	if (db->metadata != 0)
+		o_metadata_free(db->metadata);
 	o_free(db);
 }

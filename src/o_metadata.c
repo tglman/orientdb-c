@@ -17,8 +17,6 @@ struct o_metadata * o_metadata_from_document(struct o_document *doc)
 	struct o_metadata * meta = o_malloc(sizeof(struct o_metadata));
 	struct o_document_value * schema = o_document_field_get(doc, "schema");
 	meta->schema = o_schema_from_document((struct o_document *) o_document_value_get_link(schema));
-	//struct o_document_value * schema= o_document_field_get(doc,"schema");
-	//TODO FILL WITH DOCUMENT CONTENT.
 	return meta;
 }
 

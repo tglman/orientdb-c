@@ -17,6 +17,9 @@ struct o_schema * o_schema_new()
 struct o_schema * o_schema_from_document(struct o_document * doc)
 {
 	struct o_schema * sc = o_schema_new();
+	int schema_version = o_document_value_int(o_document_field_get(doc, "schemaVersion"));
+	//TODO: management schema version.
+
 	return sc;
 }
 
