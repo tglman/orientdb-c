@@ -26,3 +26,9 @@ enum o_document_value_type o_property_get_type(struct o_property * property)
 {
 	return property->type;
 }
+
+void o_property_free(struct o_property * property)
+{
+	o_free(property->name);
+	o_free(property);
+}

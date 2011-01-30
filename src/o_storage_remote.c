@@ -12,11 +12,6 @@
 #include <time.h>
 #include <stdio.h>
 
-#define CLUSTER_INTERNAL_NAME "internal"
-#define CLUSTER_INDEX_NAME "index"
-#define CLUSTER_DEFAULT_NAME "default"
-#define DATA_DEFAULT_NAME "default"
-
 #define CURRENT_VERSION 0;
 
 // COMMANDS
@@ -242,6 +237,17 @@ void o_storage_remote_internal_release(struct o_storage * storage)
 	o_connection_storage_release((struct o_connection *) storage_remote->connection, storage);
 }
 
+struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
+{
+	/*
+	 struct o_strign_buffer * buff = o_string_buffer_new();
+	 //o_string_buffer_append(buff,"schema:");
+	 o_string_buffer_append_int(buff,"schema:");
+	 o_string_buffer_append(buff,"");*/
+	//TODO: fill with configuration information
+	return 0;
+}
+
 void o_storage_remote_free(struct o_storage * storage)
 {
 	o_storage_internal_free(storage);
@@ -293,6 +299,7 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
 
 		storage->storage.o_storage_final_release = o_storage_remote_internal_release;
+		storage->storage.o_storage_get_metadata = o_storage_remote_get_metadata;
 		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;
 

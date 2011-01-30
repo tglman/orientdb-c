@@ -1,11 +1,12 @@
 #include "o_database_document.h"
 #include "o_memory.h"
 #include "o_database_internal.h"
+#include "o_metadata_internal.h"
 
 struct o_database_document
 {
 	struct o_database database;
-	struct o_schema * schema;
+	struct o_metadata * metadata;
 };
 
 struct o_database * o_database_document_to_database(struct o_database_document * db)
@@ -61,8 +62,16 @@ struct o_document * o_database_document_load(struct o_database_document * db, st
 	return (struct o_document *) record;
 }
 
+struct o_metadata * o_database_document_metadata(struct o_database_document * db)
+{
+	struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
+	db->metadata = o_metadata_from_document((struct o_document *) meta);
+	return db->metadata;
+}
+
 void o_database_document_free(struct o_database_document * db)
 {
 	o_database_free_internal(o_database_document_to_database(db));
+	o_metadata_free(db->metadata);
 	o_free(db);
 }

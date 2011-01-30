@@ -11,6 +11,9 @@ struct o_class
 	char * name;
 	struct o_class * superclass;
 	struct o_map_string * properties;
+	int defaultClusterId;
+	int *clusterIds;
+	int n_clusterIds;
 };
 
 struct o_class * o_class_new(char * name)
@@ -57,7 +60,23 @@ int o_class_exist_property(struct o_class * class, char * property_name)
 void o_class_remove_property(struct o_class * class, char * property_name)
 {
 	struct o_property * pro = (struct o_property *) o_map_string_remove(class->properties, property_name);
-	//TODO: free the property.
+	o_free(pro);
+}
+
+const int * o_class_get_clusters(struct o_class * class, int * n_cluster)
+{
+	*n_cluster = class->n_clusterIds;
+	return class->clusterIds;
+}
+
+void o_class_add_cluster(struct o_class * class, int clusterId)
+{
+	// TODO:
+}
+
+void o_class_remove_cluster(struct o_class * class, int clusterId)
+{
+	//TODO:
 }
 
 struct o_property ** o_class_properties(struct o_class * class, int * n_properties)
@@ -75,12 +94,22 @@ void o_class_set_id(struct o_class * class, int id)
 	class->id = id;
 }
 
+int o_class_get_default_cluster_id(struct o_class * class)
+{
+	return class->defaultClusterId;
+}
+
+void o_class_set_default_cluster_id(struct o_class * class, int cluster_id)
+{
+	class->defaultClusterId = cluster_id;
+}
+
 void o_class_free(struct o_class * class)
 {
 	int size;
 	struct o_property ** ps = o_class_properties(class, &size);
 	while (size > 0)
-		size--;
+		o_free(ps[--size]);
 	//TODO: free the porperties.
 	o_map_string_free(class->properties);
 	o_free(class->name);

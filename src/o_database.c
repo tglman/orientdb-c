@@ -246,6 +246,12 @@ void o_database_remove_referrer(struct o_database * db, struct o_database ** ref
 		o_list_remove(db->referrers, referrer);
 }
 
+struct o_record * o_database_metadata(struct o_database * db)
+{
+	struct o_raw_buffer * meta = o_storage_get_metadata(db->storage);
+	return o_database_record_from_content(db, o_record_id_new(0, 0), meta);
+}
+
 void o_database_free(struct o_database * db)
 {
 	o_database_free_internal(db);

@@ -64,6 +64,42 @@ struct o_property * o_class_create_property(struct o_class * class, char * prope
  */
 struct o_property ** o_class_properties(struct o_class * class, int * n_properties);
 
+/*! \brief Retrieve the id of default class cluster.
+ *
+ * \param class where retrieve id.
+ * \return the id of class.
+ */
+int o_class_get_default_cluster(struct o_class * class);
+
+/*! \brief Set the id of default class cluster.
+ *
+ * \param class where set  id.
+ * \param cluster_id the id to set.
+ */
+void o_class_set_default_cluster(struct o_class * class, int cluster_id);
+
+/*! \brief retrieve the array of cluster where was saved the class.
+ *
+ * \param class where retrieve.
+ * \param n_cluster filled with the size of returned array.
+ * \return the array that contain all id of cluster.
+ */
+const int * o_class_get_clusters(struct o_class * class, int * n_cluster);
+
+/*! \brief Add a cluster id to the class.
+ *
+ * \param class where add the cluster.
+ * \param clusterId to add.
+ */
+void o_class_add_cluster(struct o_class * class, int clusterId);
+
+/*! \brief Remove a cluster id to the class.
+ *
+ * \param class where remove the cluster.
+ * \param clusterId to remove.
+ */
+void o_class_remove_cluster(struct o_class * class, int clusterId);
+
 /*! \brief Retrieve if the property with property_name exist.
  *
  * \param class where check.

@@ -48,6 +48,24 @@ void o_storage_close(struct o_storage * storage)
 	return storage->o_storage_close(storage);
 }
 
+struct o_raw_buffer * o_storage_get_metadata(struct o_storage *storage)
+{
+	return storage->o_storage_get_metadata(storage);
+}
+
+struct o_storage_configuration * o_storage_get_configuration(struct o_storage *storage)
+{
+	if (storage->configuration == 0)
+	{
+		struct o_record_id *default_id = o_record_id_new(o_storage_get_cluster_id_by_name(storage, CLUSTER_INTERNAL_NAME), 0);
+		struct o_raw_buffer *buff = o_storage_read_record(storage, default_id);
+		o_storage_configuration_load(buff);
+		o_record_id_release(default_id);
+		o_raw_buffer_free(buff);
+	}
+	return storage->configuration;
+}
+
 void o_storage_release(struct o_storage * storage)
 {
 	storage->ref_count--;

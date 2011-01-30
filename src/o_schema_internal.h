@@ -2,20 +2,14 @@
 #define O_SCHEMA_INTERNAL_H_
 #include "o_schema.h"
 #include "o_database.h"
+#include "o_document.h"
 
-/*! \brief Load a schema from database.
+/*! \brief Retrieve the schema from a document.
  *
- * \param db where load schema.
- * \return the new loaded schema.
+ * \param document where read the schema.
+ * \return a new schema from document.
  */
-struct o_schema * o_schema_load(struct o_database * db);
-
-/*! \brief Save a schema to database.
- *
- * \param schema to save.
- * \param db to save.
- */
-void o_schema_save(struct o_schema * schema, struct o_database * db);
+struct o_schema * o_schema_from_document(struct o_document * doc);
 
 /*! \brief Free the momory of schema with all dependent structure.
  *

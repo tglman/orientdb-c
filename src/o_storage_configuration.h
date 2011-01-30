@@ -10,7 +10,7 @@ struct o_storage_configuration;
  * \param storage of load configuration.
  * \return the configuration of storage.
  */
-struct o_storage_configuration * o_storage_configuration_load(struct o_storage * storage);
+struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffer * buff);
 
 /*! \brief Retrieve the schema id from the configuration.
  *
@@ -25,5 +25,6 @@ struct o_record_id * o_storage_configuration_get_schema(struct o_storage_configu
  * \return the record id of dictionary for the storage.
  */
 struct o_record_id * o_storage_configuration_get_dictionary(struct o_storage_configuration * conf);
+
 
 #endif /* O_STORAGE_CONFIGURATION_H_ */

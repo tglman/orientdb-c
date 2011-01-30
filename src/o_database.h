@@ -99,6 +99,13 @@ struct o_database * o_database_context_database();
  */
 void o_database_close(struct o_database * db);
 
+/*! \brief retrieve the metadata of database.
+ *
+ * \param db to retrieve metadata.
+ * \param record that describe metadata.
+ */
+struct o_record * o_database_metadata(struct o_database * db);
+
 /** Free the database structure with all data.
  *
  * @param db to free.

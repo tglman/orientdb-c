@@ -14,8 +14,7 @@ struct o_schema * o_schema_new()
 	schema->classes = o_map_string_new();
 	return schema;
 }
-
-struct o_schema * o_schema_load(struct o_database * db)
+struct o_schema * o_schema_from_document(struct o_document * doc)
 {
 	struct o_schema * sc = o_schema_new();
 	return sc;

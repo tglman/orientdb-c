@@ -2,6 +2,7 @@
 #define O_DATABASE_DOCUMENT_H_
 #include "o_database_error_handler.h"
 #include "o_document.h"
+#include "o_metadata.h"
 
 /** Represent an document database structure.
  *
@@ -68,6 +69,13 @@ void o_database_document_delete(struct o_database_document * db, struct o_docume
  * @return loaded record
  */
 struct o_document * o_database_document_load(struct o_database_document * db, struct o_record_id * id);
+
+/*! \brief Retrieve the database metadata.
+ *
+ * \param db where retrieve metadata.
+ * \return the metadata of databse.
+ */
+struct o_metadata * o_database_document_metadata(struct o_database_document * db);
 
 /** Free the database structure with all data.
  *

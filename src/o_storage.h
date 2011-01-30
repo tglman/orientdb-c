@@ -6,6 +6,11 @@
 #include "o_transaction.h"
 #include "o_push_listener.h"
 
+#define CLUSTER_INTERNAL_NAME "internal"
+#define CLUSTER_INDEX_NAME "index"
+#define CLUSTER_DEFAULT_NAME "default"
+#define DATA_DEFAULT_NAME "default"
+
 struct o_storage;
 
 /**
@@ -93,6 +98,13 @@ void o_storage_set_push_listener(struct o_storage *storage, struct o_push_listen
  * \return the push listener.
  */
 struct o_push_listener * o_storage_get_push_listener(struct o_storage *storage);
+
+/*!\brief retrieve the metadata of the storage.
+ *
+ * \param storage to retrieve metedata.
+ * \return the raw buffer that represent the metadata.
+ */
+struct o_raw_buffer * o_storage_get_metadata(struct o_storage *storage);
 
 /*! \brief Release the current storage.
  * reference count decrement.
