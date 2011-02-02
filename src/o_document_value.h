@@ -174,8 +174,9 @@ struct o_record * o_document_value_get_link(struct o_document_value * o_value);
 /*! \brief Retrieve an array from a document value.
  *
  * \param o_value the document value where retrieve value.
+ * \param array_size filled with the size of array
  */
-struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value);
+struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value, int *array_size);
 
 /*! \Retrieve the size of array value.
  *

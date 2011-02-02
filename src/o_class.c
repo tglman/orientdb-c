@@ -79,6 +79,14 @@ void o_class_remove_cluster(struct o_class * class, int clusterId)
 	//TODO:
 }
 
+struct o_class * o_class_new_from_document(struct o_document * doc)
+{
+	char * name = o_document_value_get_string(o_document_field_get(doc, "name"));
+	struct o_class * cl = o_class_new(name);
+	cl->id = o_document_value_get_int(o_document_field_get(doc, "id"));
+	return cl;
+}
+
 struct o_property ** o_class_properties(struct o_class * class, int * n_properties)
 {
 	return (struct o_property **) o_map_string_values(class->properties, n_properties);
@@ -110,7 +118,6 @@ void o_class_free(struct o_class * class)
 	struct o_property ** ps = o_class_properties(class, &size);
 	while (size > 0)
 		o_free(ps[--size]);
-	//TODO: free the porperties.
 	o_map_string_free(class->properties);
 	o_free(class->name);
 	o_free(class);

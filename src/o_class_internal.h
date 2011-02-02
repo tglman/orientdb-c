@@ -9,6 +9,13 @@
  */
 struct o_class * o_class_new(char * name);
 
+/*! \brief Create a class from a document.
+ *
+ * \param doc to read from class.
+ * \return a new class with document values.
+ */
+struct o_class * o_class_new_from_document(struct o_document * doc);
+
 /*! \brief Free the memory and substructure of class.
  *
  * \param class to free.

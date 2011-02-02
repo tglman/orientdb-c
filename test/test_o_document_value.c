@@ -52,8 +52,8 @@ void test_o_document_value_create()
 	struct o_document_value * arr[3] =
 	{ 0, 0, 0 };
 	val = o_document_value_array(arr, 3);
-	struct o_document_value * *resarr = o_document_value_get_array(val);
-	int size = o_document_value_get_array_size(val);
+	int size;
+	struct o_document_value **resarr = o_document_value_get_array(val,&size);
 	assert_true(size == 3, "Array size of document value not is the expected");
 	int i;
 	for (i = 0; i < 3; i++)

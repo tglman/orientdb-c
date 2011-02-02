@@ -98,11 +98,8 @@ struct o_document_value * o_document_value_date(int val)
 struct o_document_value * o_document_value_string(char * val)
 {
 	struct o_document_value * doc_val = o_document_value_new(STRING, sizeof(char *));
-	//TODO: strdup
-	int size = strlen(val) + 1;
-	char * new_val = o_malloc(sizeof(char) * size);
-	memcpy(new_val, val, size);
-	VALUE(doc_val,char *) = new_val;
+	VALUE(doc_val,char *) = o_memdup(val, strlen(val) + 1);
+	;
 	return doc_val;
 }
 
@@ -214,12 +211,12 @@ struct o_record * o_document_value_get_link(struct o_document_value * o_value)
 	return link->record;
 }
 
-struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value)
+struct o_document_value ** o_document_value_get_array(struct o_document_value * o_value, int *array_size)
 {
 	if (o_value->type != ARRAY)
 		return 0;
-	else
-		return ((struct o_document_value_array *) o_value->value)->array;
+	*array_size = ((struct o_document_value_array *) o_value->value)->size;
+	return ((struct o_document_value_array *) o_value->value)->array;
 }
 int o_document_value_get_array_size(struct o_document_value * o_value)
 {
@@ -295,9 +292,9 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 	case ARRAY:
 	{
 		o_string_printer_print(buff, "[");
-		int s = o_document_value_get_array_size(o_value);
+		int s;
 		int i;
-		struct o_document_value ** array = o_document_value_get_array(o_value);
+		struct o_document_value ** array = o_document_value_get_array(o_value, &s);
 		for (i = 0; i < s; i++)
 		{
 			o_document_value_serialize(array[i], buff);

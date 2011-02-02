@@ -9,6 +9,7 @@
 #include "o_string_buffer.h"
 #include "o_native_lock.h"
 #include "o_raw_buffer_byte.h"
+#include "o_storage_configuration.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -239,13 +240,13 @@ void o_storage_remote_internal_release(struct o_storage * storage)
 
 struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
 {
-	struct o_storage_configuration conf = o_storage_get_configuration(storage);
-	struct o_strign_buffer * buff = o_string_buffer_new();
+	struct o_storage_configuration *conf = o_storage_get_configuration(storage);
+	struct o_string_buffer * buff = o_string_buffer_new();
 	o_string_buffer_append(buff, "schema:#");
 	o_string_buffer_append(buff, o_record_id_string(o_storage_configuration_get_schema(conf)));
 	char * content = o_string_buffer_str(buff);
 	o_string_buffer_free(buff);
-	return o_raw_buffer_byte('d', 0, content, strlen(content));
+	return o_raw_buffer_byte('d', 0, (unsigned char *) content, strlen(content));
 }
 
 void o_storage_remote_free(struct o_storage * storage)
