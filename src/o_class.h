@@ -93,13 +93,6 @@ const int * o_class_get_clusters(struct o_class * class, int * n_cluster);
  */
 void o_class_add_cluster(struct o_class * class, int clusterId);
 
-/*! \brief Remove a cluster id to the class.
- *
- * \param class where remove the cluster.
- * \param clusterId to remove.
- */
-void o_class_remove_cluster(struct o_class * class, int clusterId);
-
 /*! \brief Retrieve if the property with property_name exist.
  *
  * \param class where check.

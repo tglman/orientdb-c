@@ -1,5 +1,5 @@
 #include "test_o_input_stream.h"
-#include <TestFramework/test.h>
+#include <testframework/test.h>
 #include "../src/o_input_stream.h"
 
 void test_o_input_simple_read()

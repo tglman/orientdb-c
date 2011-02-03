@@ -1,5 +1,5 @@
 #include "test_o_document.h"
-#include <TestFramework/test.h>
+#include <testframework/test.h>
 #include "../src/o_document.h"
 #include "../src/o_document_value.h"
 #include <string.h>

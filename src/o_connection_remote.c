@@ -14,7 +14,6 @@
 
 struct o_connection_remote
 {
-	//Inerith
 	struct o_connection connection;
 	struct o_database_socket *socket;
 	struct o_input_stream * input;
@@ -202,7 +201,7 @@ int o_connection_remote_begin_read_session(struct o_connection_remote * connecti
 		o_native_cond_wait(connection->cond, connection->cond_lock);
 		o_native_lock_unlock(connection->cond_lock);
 	} while (1);
-	//never executed remove only warning.
+	/*never executed remove only warning.*/
 	return 0;
 }
 

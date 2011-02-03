@@ -10,6 +10,13 @@
  */
 struct o_property * o_property_new(char * name, enum o_document_value_type type);
 
+/*! \brief Create a new property from a document.
+ *
+ * \param document to deserialize for generate property.
+ * \return a new instance of property.
+ */
+struct o_property * o_property_new_from_document(struct o_document *document);
+
 /*! \brief Free property memory.
  *
  * \param property to free

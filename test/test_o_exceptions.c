@@ -1,5 +1,5 @@
 #include "test_o_exceptions.h"
-#include <TestFramework/test.h>
+#include <testframework/test.h>
 #include "../src/o_exceptions.h"
 #include "../src/o_exception.h"
 #include <string.h>

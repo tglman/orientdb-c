@@ -14,6 +14,7 @@
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -25,7 +26,7 @@
 				<configuration artifactExtension="so" artifactName="orient-database-client-c" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.debug.1640066307" name="Debug" parent="cdt.managedbuild.config.gnu.so.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.1640066307." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.808655908" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.886654728" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.so.debug.886654728" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
 							<builder buildPath="${workspace_loc:/orient-database-client-c/Debug}" id="cdt.managedbuild.target.gnu.builder.so.debug.845218411" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.so.debug">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Debug"/>
@@ -41,14 +42,14 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.740453278" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.so.debug.option.optimization.level.1159215805" name="Optimization Level" superClass="gnu.c.compiler.so.debug.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.so.debug.option.debugging.level.314818653" name="Debug Level" superClass="gnu.c.compiler.so.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.other.1361716283" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -fPIC" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.1361716283" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -pthread -fPIC" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.ansi.711797708" name="Support ANSI programs (-ansi)" superClass="gnu.c.compiler.option.misc.ansi" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.886740681" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.913917821" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug">
 								<option defaultValue="true" id="gnu.c.link.so.debug.option.shared.1470231194" name="Shared (-shared)" superClass="gnu.c.link.so.debug.option.shared" valueType="boolean"/>
-								<option id="gnu.c.link.option.libs.1218021184" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="pthread"/>
-								</option>
+								<option id="gnu.c.link.option.libs.1218021184" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs"/>
+								<option id="gnu.c.link.option.ldflags.306987390" superClass="gnu.c.link.option.ldflags" value="-pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1357227633" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -319,7 +320,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -402,7 +403,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -664,6 +665,7 @@
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -675,7 +677,7 @@
 				<configuration artifactExtension="so" artifactName="orient-database-client-c" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.release.1752453753" name="Release" parent="cdt.managedbuild.config.gnu.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1752453753." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1271710961" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.release.1106197760" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.so.release.1106197760" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>
 							<builder buildPath="${workspace_loc:/orient-database-client-c/Release}" id="cdt.managedbuild.target.gnu.builder.so.release.1029161557" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.so.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1012769733" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.release.941762359" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.release">
@@ -685,13 +687,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.release.1987851916" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.release">
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.so.release.option.optimization.level.1058778066" name="Optimization Level" superClass="gnu.c.compiler.so.release.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.so.release.option.debugging.level.508253936" name="Debug Level" superClass="gnu.c.compiler.so.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.1019765757" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -fPIC -pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.40938277" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.release.1945532916" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.release">
 								<option defaultValue="true" id="gnu.c.link.so.release.option.shared.662832935" name="Shared (-shared)" superClass="gnu.c.link.so.release.option.shared" valueType="boolean"/>
-								<option id="gnu.c.link.option.libs.1838055374" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="pthread"/>
-								</option>
+								<option id="gnu.c.link.option.libs.1838055374" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs"/>
+								<option id="gnu.c.link.option.ldflags.993052759" superClass="gnu.c.link.option.ldflags" value="-pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.387682827" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -962,7 +964,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -1045,7 +1047,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -1309,6 +1311,7 @@
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -1320,28 +1323,29 @@
 				<configuration artifactExtension="so" artifactName="orient-database-client-c" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.debug.1640066307.1787155235" name="Test" parent="cdt.managedbuild.config.gnu.so.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.1640066307.1787155235." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.119777450" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.29903832" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.so.debug.29903832" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
 							<builder buildPath="${workspace_loc:/orient-database-client-c/Test}" id="cdt.managedbuild.target.gnu.builder.base.650745187" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1298090009" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.548876889" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug">
 								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.987225273" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.so.debug.option.debugging.level.1080552515" name="Debug Level" superClass="gnu.cpp.compiler.so.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1874531213" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug">
+							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1874531213" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.so.debug.option.optimization.level.1090985704" name="Optimization Level" superClass="gnu.c.compiler.so.debug.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.so.debug.option.debugging.level.105584490" name="Debug Level" superClass="gnu.c.compiler.so.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.so.debug.option.debugging.level.105584490" name="Debug Level" superClass="gnu.c.compiler.so.debug.option.debugging.level" value="gnu.c.debugging.level.default" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.other.1141757839" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -fPIC" valueType="string"/>
-								<option id="gnu.c.compiler.option.debugging.gprof.846609622" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.debugging.prof.1101338969" name="Generate prof information (-p)" superClass="gnu.c.compiler.option.debugging.prof" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.debugging.gprof.846609622" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.debugging.prof.1101338969" name="Generate prof information (-p)" superClass="gnu.c.compiler.option.debugging.prof" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1905272105" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1293164326" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug">
 								<option id="gnu.c.link.so.debug.option.shared.1792844414" name="Shared (-shared)" superClass="gnu.c.link.so.debug.option.shared" value="true" valueType="boolean"/>
 								<option id="gnu.c.link.option.libs.129220696" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="TestFramework"/>
+									<listOptionValue builtIn="false" value="testframework"/>
 								</option>
-								<option id="gnu.c.link.option.debugging.prof.228448053" name="Generate prof information (-p)" superClass="gnu.c.link.option.debugging.prof" value="true" valueType="boolean"/>
-								<option id="gnu.c.link.option.debugging.gprof.1777139200" name="Generate gprof information (-pg)" superClass="gnu.c.link.option.debugging.gprof" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.debugging.prof.228448053" name="Generate prof information (-p)" superClass="gnu.c.link.option.debugging.prof" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.debugging.gprof.1777139200" name="Generate gprof information (-pg)" superClass="gnu.c.link.option.debugging.gprof" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.ldflags.615327344" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.100361836" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -1614,7 +1618,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -1697,7 +1701,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265.904294388;cdt.managedbuild.config.gnu.so.debug.1818489265.904294388.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.240679065;cdt.managedbuild.tool.gnu.c.compiler.input.154647848">
+				<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1818489265;cdt.managedbuild.config.gnu.so.debug.1818489265.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1685481896;cdt.managedbuild.tool.gnu.c.compiler.input.1635318132">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>

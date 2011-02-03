@@ -92,7 +92,7 @@ void * o_list_get(struct o_list * list, int pos)
 {
 	if (pos < 0 || pos >= list->size)
 		return 0;
-	int count;
+	int count = 0;
 	struct o_list_item *i = list->first;
 	while (count != pos)
 	{

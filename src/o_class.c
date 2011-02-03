@@ -19,6 +19,7 @@ struct o_class
 struct o_class * o_class_new(char * name)
 {
 	struct o_class * cl = o_malloc(sizeof(struct o_class));
+	memset(cl, 0, sizeof(struct o_class));
 	cl->name = o_memdup(name, strlen(name));
 	cl->properties = o_map_string_new();
 	return cl;
@@ -41,8 +42,13 @@ void o_class_set_superclass(struct o_class * class, struct o_class * superclass)
 
 struct o_property * o_class_get_property(struct o_class * class, char * property_name)
 {
-	//TODO: find in superclass.
-	return (struct o_property *) o_map_string_get(class->properties, property_name);
+	struct o_property * prop;
+	do
+	{
+		prop = (struct o_property *) o_map_string_get(class->properties, property_name);
+		class = class->superclass;
+	} while (prop == 0 && class != 0);
+	return prop;
 }
 
 struct o_property * o_class_create_property(struct o_class * class, char * property_name, enum o_document_value_type type)
@@ -71,12 +77,9 @@ const int * o_class_get_clusters(struct o_class * class, int * n_cluster)
 
 void o_class_add_cluster(struct o_class * class, int clusterId)
 {
-	// TODO:
-}
-
-void o_class_remove_cluster(struct o_class * class, int clusterId)
-{
-	//TODO:
+	class->n_clusterIds++;
+	class->clusterIds = o_realloc(class->clusterIds, (class->n_clusterIds) * sizeof(int));
+	class->clusterIds[class->n_clusterIds - 1] = clusterId;
 }
 
 struct o_class * o_class_new_from_document(struct o_document * doc)
@@ -84,6 +87,27 @@ struct o_class * o_class_new_from_document(struct o_document * doc)
 	char * name = o_document_value_get_string(o_document_field_get(doc, "name"));
 	struct o_class * cl = o_class_new(name);
 	cl->id = o_document_value_get_int(o_document_field_get(doc, "id"));
+	cl->defaultClusterId = o_document_value_get_int(o_document_field_get(doc, "defaultClusterId"));
+
+	struct o_document_value ** values = o_document_value_get_array(o_document_field_get(doc, "clusterIds"), &cl->n_clusterIds);
+	cl->clusterIds = o_malloc(sizeof(int) * (cl->n_clusterIds));
+	int i = cl->n_clusterIds;
+	while (i > 0)
+	{
+		--i;
+		cl ->clusterIds[i] = o_document_value_get_int(values[i]);
+	}
+
+	int n_properties;
+	struct o_document_value ** properties = o_document_value_get_array(o_document_field_get(doc, "properties"), &n_properties);
+	cl->clusterIds = o_malloc(sizeof(int) * (cl->n_clusterIds));
+	while (n_properties > 0)
+	{
+		--n_properties;
+		struct o_property * prop = o_property_new_from_document(o_document_value_get_embedded(properties[n_properties]));
+		o_map_string_put(cl->properties, o_property_get_name(prop), prop);
+	}
+
 	return cl;
 }
 

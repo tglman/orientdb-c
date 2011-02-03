@@ -5,7 +5,7 @@
 char * o_storage_next_entry(unsigned char * content, int *cursor, int buff_size)
 {
 	int start = *cursor;
-	while (content[*cursor++] != '|' && *cursor < buff_size)
+	while (content[(*cursor)++] != '|' && *cursor < buff_size)
 		;
 	char * retval = o_memdup(content + *cursor, *cursor - start);
 	memcpy(retval, content + *cursor, *cursor - start);
@@ -23,9 +23,10 @@ struct o_storage_configuration
 
 struct o_record_id * record_id_from_string(char * id)
 {
-	int pos = strchr(id, ':');
-	id[pos] = 0;
-	return o_record_id_new(atoi(id), atoi(id + pos));
+	char* pos = strchr(id, ':');
+	*pos = 0;
+	pos++;
+	return o_record_id_new(atoi(id), atoi(pos));
 }
 
 struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffer * buff)
@@ -33,7 +34,7 @@ struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffe
 	struct o_storage_configuration * conf = o_malloc(sizeof(struct o_storage_configuration));
 	int buff_size;
 	unsigned char * content = o_raw_buffer_content(buff, &buff_size);
-	int cursor;
+	int cursor=0;
 	char * val = o_storage_next_entry(content, &cursor, buff_size);
 	conf->version = atoi(val);
 	o_free(val);

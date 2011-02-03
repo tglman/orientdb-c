@@ -336,7 +336,7 @@ struct o_document_value * o_document_value_string_deserialize(struct o_input_str
 struct o_document_value * o_document_value_link_deserialize(struct o_input_stream * stream)
 {
 	int readed;
-	int cid;
+	int cid = 0;
 	long long rid;
 	struct o_string_buffer * buff = o_string_buffer_new();
 	while ((readed = o_input_stream_read(stream)) != ',')
@@ -367,7 +367,7 @@ struct o_document_value * o_document_value_link_deserialize(struct o_input_strea
 struct o_document_value * o_document_value_number_facory(char * serialized_content, char type)
 {
 	double number = atof(serialized_content);
-	struct o_document_value *val;
+	struct o_document_value *val = 0;
 	switch (type)
 	{
 	case 'b':

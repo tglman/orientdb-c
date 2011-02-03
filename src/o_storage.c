@@ -59,7 +59,7 @@ struct o_storage_configuration * o_storage_get_configuration(struct o_storage *s
 	{
 		struct o_record_id *default_id = o_record_id_new(o_storage_get_cluster_id_by_name(storage, CLUSTER_INTERNAL_NAME), 0);
 		struct o_raw_buffer *buff = o_storage_read_record(storage, default_id);
-		o_storage_configuration_load(buff);
+		storage->configuration = o_storage_configuration_load(buff);
 		o_record_id_release(default_id);
 		o_raw_buffer_free(buff);
 	}

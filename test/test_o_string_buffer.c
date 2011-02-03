@@ -1,5 +1,5 @@
 #include "test_o_string_buffer.h"
-#include <TestFramework/test.h>
+#include <testframework/test.h>
 #include "../src/o_string_buffer.h"
 #include "../src/o_memory.h"
 #include <string.h>

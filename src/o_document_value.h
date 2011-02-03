@@ -6,7 +6,7 @@
 
 enum o_document_value_type
 {
-	BYTE, SHORT, INT, LONG, BOOL, FLOAT, DOUBLE, DATE, STRING, EMBEDDED, LINK, ARRAY
+	BYTE = 17, SHORT = 2, INT = 1, LONG = 3, BOOL = 0, FLOAT = 4, DOUBLE = 5, DATE = 6, STRING = 7, EMBEDDED = 9, LINK = 13, ARRAY = 10
 };
 /*! \brief a document field value.
  *

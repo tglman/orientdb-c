@@ -14,7 +14,7 @@ struct o_native_thread
 struct o_native_thread * o_native_thread_new(char * name, void *(*function)(void *))
 {
 	struct o_native_thread * th = o_malloc(sizeof(struct o_native_thread));
-	memset(th, sizeof(struct o_native_thread), 0);
+	memset(th, 0, sizeof(struct o_native_thread));
 	th->name = name;
 	th->function = function;
 	return th;

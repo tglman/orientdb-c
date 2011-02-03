@@ -1,4 +1,4 @@
-#include <TestFramework/test.h>
+#include <testframework/test.h>
 #include "test_o_map.h"
 #include "test_o_connection_remote.h"
 #include "test_o_exceptions.h"
@@ -12,6 +12,7 @@
 #include "test_o_database.h"
 #include "test_o_database_document.h"
 #include "test_o_native_lock.h"
+#include "test_o_database_document_metadata.h"
 
 void initialize()
 {
@@ -28,4 +29,5 @@ void initialize()
 	ADD_SUITE(o_native_lock_suite, "basic native lock test suite");
 	ADD_SUITE(o_database_suite, "test on base database");
 	ADD_SUITE(o_database_document_suite, "test on base database");
+	ADD_SUITE(o_database_document_metadata_suite, "test database metadata load");
 }
