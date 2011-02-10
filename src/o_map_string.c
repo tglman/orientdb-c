@@ -28,10 +28,15 @@ void o_entry_string_free(void ** key, void ** value)
 	o_free(*key);
 }
 
+int o_key_string_compare(void * key1, void * key2)
+{
+	return strcmp((char *) key1, (char *) key2);
+}
+
 struct o_map_string * o_map_string_new()
 {
 	struct o_map_string * string = o_malloc(sizeof(struct o_map_string));
-	string->map = o_map_new(o_map_hash_string, o_entry_string_create, o_entry_string_free);
+	string->map = o_map_new(o_map_hash_string, o_entry_string_create, o_entry_string_free, o_key_string_compare);
 	return string;
 }
 

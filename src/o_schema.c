@@ -4,6 +4,7 @@
 #include "o_memory.h"
 #include "o_document_value.h"
 #include "o_document.h"
+#include <stdio.h>
 
 struct o_schema
 {
@@ -20,6 +21,14 @@ struct o_schema * o_schema_new()
 struct o_schema * o_schema_from_document(struct o_document * doc)
 {
 	struct o_schema * sc = o_schema_new();
+
+	/*
+	int n_attrs;
+	char ** names = o_document_field_names(doc, &n_attrs);
+	while (n_attrs > 0)
+		printf(" name:%s", names[--n_attrs]);
+	fflush(stdout);*/
+
 	sc->schema_version = o_document_value_get_int(o_document_field_get(doc, "schemaVersion"));
 	//TODO: management schema version.
 	int size;

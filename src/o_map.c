@@ -19,6 +19,7 @@ struct o_map
 	unsigned int (*o_map_hash)(void * key, int size);
 	void (*o_entry_create)(void ** key, void ** value);
 	void (*o_entry_free)(void ** key, void ** value);
+	int (*o_key_compare)(void * key1, void * key2);
 	struct o_map_entry * first;
 	struct o_map_entry * last;
 	struct o_map_entry **entries;
@@ -38,7 +39,8 @@ void o_map_clear_caches(struct o_map *map)
 	map->cache_values = 0;
 }
 
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **))
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **),
+		int(*o_key_compare)(void * key1, void * key2))
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
 	memset(new_map, 0, sizeof(struct o_map));
@@ -47,6 +49,7 @@ struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_c
 	new_map->o_map_hash = o_map_hash;
 	new_map->o_entry_create = o_entry_create;
 	new_map->o_entry_free = o_entry_free;
+	new_map->o_key_compare = o_key_compare;
 	memset(new_map->entries, 0, sizeof(struct o_map_entry *) * new_map->entries_size);
 	return new_map;
 }
@@ -61,7 +64,7 @@ void o_map_free_entry(struct o_map * map, struct o_map_entry * entry)
 struct o_map_entry * o_map_get_entry(struct o_map * map, void * key, unsigned int hash)
 {
 	struct o_map_entry * cur = map->entries[hash];
-	while (cur != 0 && strcmp(cur->key, key) != 0)
+	while (cur != 0 && map->o_key_compare(cur->key, key) != 0)
 		cur = cur->next;
 	return cur;
 }

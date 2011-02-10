@@ -13,15 +13,16 @@
 #include <time.h>
 #include <stdio.h>
 
-#define CURRENT_VERSION 0;
-
 // COMMANDS
-#define CONNECT 1
+#define SHUTDOWN 1
+#define CONNECT 2
 
-#define DB_OPEN	 5
-#define DB_CREATE 6
-#define DB_CLOSE 7
-#define DB_EXIST 8
+#define DB_OPEN	 4
+#define DB_CREATE 5
+#define DB_CLOSE 6
+#define DB_EXIST 7
+#define DB_DELETE 8
+#define DB_SIZE 9
 
 #define CLUSTER_ADD 10
 #define CLUSTER_REMOVE 11
@@ -246,6 +247,7 @@ struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
 	o_string_buffer_append(buff, o_record_id_string(o_storage_configuration_get_schema(conf)));
 	char * content = o_string_buffer_str(buff);
 	o_string_buffer_free(buff);
+	fflush(stdout);
 	return o_raw_buffer_byte('d', 0, (unsigned char *) content, strlen(content));
 }
 

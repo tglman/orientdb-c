@@ -7,6 +7,7 @@
 #include <string.h>
 #include "o_string_printer.h"
 #include "o_string_buffer.h"
+#include <stdio.h>
 
 #define VALUE(obb,type) *((type *)obb->value)
 #define VALUE_CHECK(OBB,TYPE,E_TYPE) E_TYPE==OBB->type?*((TYPE *)OBB->value):(TYPE)0
@@ -114,6 +115,7 @@ struct o_document_value * o_document_value_link_ref(struct o_record_id *id)
 {
 	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
 	link->rid = id;
+	link->record = 0;
 	link->db = o_database_context_database();
 	o_database_add_referrer(link->db, &link->db);
 	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document_value_link *));
@@ -282,10 +284,17 @@ void o_document_value_serialize(struct o_document_value * o_value, struct o_stri
 		break;
 	case LINK:
 	{
-		struct o_record *rec = o_document_o_record(VALUE(o_value,struct o_document *));
-		struct o_record_id * id = o_record_get_id(rec);
-		o_string_printer_print_char(buff, '#');
-		o_string_printer_print(buff, o_record_id_string(id));
+		struct o_document_value_link * link = VALUE_CHECK(o_value,struct o_document_value_link *,LINK);
+		if (link != 0)
+		{
+			struct o_record_id * id;
+			if (link->record != 0)
+				id = o_record_get_id(link->record);
+			else
+				id = link->rid;
+			o_string_printer_print_char(buff, '#');
+			o_string_printer_print(buff, o_record_id_string(id));
+		}
 	}
 		break;
 
@@ -339,7 +348,7 @@ struct o_document_value * o_document_value_link_deserialize(struct o_input_strea
 	int cid = 0;
 	long long rid;
 	struct o_string_buffer * buff = o_string_buffer_new();
-	while ((readed = o_input_stream_read(stream)) != ',')
+	while ((readed = o_input_stream_read(stream)) != ',' && readed != -1)
 	{
 		if (readed == ':')
 		{

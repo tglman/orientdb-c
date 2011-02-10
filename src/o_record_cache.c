@@ -10,7 +10,8 @@ struct o_record_cache
 
 unsigned int o_record_id_hash(void *par, int size)
 {
-	return 0;
+	struct o_record_id * rid = (struct o_record_id *) par;
+	return (o_record_id_cluster_id(rid) + o_record_id_record_id(rid)) % size;
 }
 
 void o_entry_record_create(void ** key, void ** value)
@@ -23,10 +24,20 @@ void o_entry_record_free(void ** key, void ** value)
 	o_record_release((struct o_record *) *value);
 }
 
+int o_key_record_compare(void * key1, void * key2)
+{
+	struct o_record_id * rec1 = (struct o_record_id *) key1;
+	struct o_record_id * rec2 = (struct o_record_id *) key2;
+	int dif = o_record_id_cluster_id(rec1) - o_record_id_cluster_id(rec2);
+	if (dif != 0)
+		return dif;
+	return o_record_id_record_id(rec1) - o_record_id_record_id(rec2);
+}
+
 struct o_record_cache * o_record_cache_new()
 {
 	struct o_record_cache * cache = o_malloc(sizeof(struct o_record_cache));
-	cache->map = o_map_new(o_record_id_hash, o_entry_record_create, o_entry_record_free);
+	cache->map = o_map_new(o_record_id_hash, o_entry_record_create, o_entry_record_free,o_key_record_compare);
 	return cache;
 }
 
