@@ -50,15 +50,13 @@ void o_database_document_close(struct o_database_document * db);
  *
  * \param db where save.
  * \param doc to save.
- *
  */
 int o_database_document_save(struct o_database_document *db, struct o_document * doc, struct o_record_id **id);
 
-/**
- * Delete an document from the database.
+/** \brief Delete an document from the database.
  *
- * @param db where delete.
- * @param doc to delete.
+ * \param db where delete.
+ * \param doc to delete.
  */
 void o_database_document_delete(struct o_database_document * db, struct o_document * doc);
 

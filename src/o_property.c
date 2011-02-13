@@ -1,6 +1,7 @@
 #include "o_property.h"
 #include "o_property_internal.h"
 #include "o_memory.h"
+#include "o_document.h"
 #include <string.h>
 
 struct o_property

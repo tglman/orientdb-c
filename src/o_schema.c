@@ -36,7 +36,7 @@ struct o_schema * o_schema_from_document(struct o_document * doc)
 	int i = size;
 	while (i > 0)
 	{
-		struct o_document_value * cur_class = classes[i--];
+		struct o_document_value * cur_class = classes[--i];
 		struct o_document * rec = o_document_value_get_embedded(cur_class);
 		struct o_class * cl = o_class_new_from_document(rec);
 		o_map_string_put(sc->classes, o_class_get_name(cl), cl);
@@ -44,7 +44,7 @@ struct o_schema * o_schema_from_document(struct o_document * doc)
 	i = size;
 	while (i > 0)
 	{
-		struct o_document_value * cur_class = classes[i--];
+		struct o_document_value * cur_class = classes[--i];
 		struct o_document * rec = o_document_value_get_embedded(cur_class);
 		struct o_document_value * val = o_document_field_get(rec, "superClass");
 		if (val != 0)

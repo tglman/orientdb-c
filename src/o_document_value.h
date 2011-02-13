@@ -1,8 +1,10 @@
 #ifndef O_DOCUMENT_VALUE_H_
 #define O_DOCUMENT_VALUE_H_
-#include "o_document.h"
+#include "o_record.h"
 #include "o_string_printer.h"
 #include "o_input_stream.h"
+
+struct o_document;
 
 enum o_document_value_type
 {
@@ -83,12 +85,19 @@ struct o_document_value * o_document_value_string(char * str);
  */
 struct o_document_value * o_document_value_embedded(struct o_document * doc);
 
-/*! \brief Create a new document link value.
+/*! \brief Create a new record link value.
  *
  * \param val value.
  * \return new document value.
  */
 struct o_document_value * o_document_value_link(struct o_record * doc);
+
+/*! \brief Create a new link ref value.
+ *
+ * \param id the to link id.
+ * \return a new document value
+ */
+struct o_document_value * o_document_value_link_ref(struct o_record_id *id);
 
 /*! \brief Create a new array value.
  *
@@ -171,6 +180,13 @@ struct o_document * o_document_value_get_embedded(struct o_document_value * o_va
  */
 struct o_record * o_document_value_get_link(struct o_document_value * o_value);
 
+/*! \brief Retrieve the id of referred record.
+ *
+ * \param value that contains the id.
+ * \return the id of referred record.
+ */
+struct o_record_id * o_document_value_get_link_ref(struct o_document_value * o_value);
+
 /*! \brief Retrieve an array from a document value.
  *
  * \param o_value the document value where retrieve value.
@@ -184,20 +200,6 @@ struct o_document_value ** o_document_value_get_array(struct o_document_value * 
  * \return the size of array.
  */
 int o_document_value_get_array_size(struct o_document_value * o_value);
-
-/*! \brief Serialize the value on string buffer.
- *
- * \param o_value to serialize.
- * \param buff where serialize.
- */
-void o_document_value_serialize(struct o_document_value * o_value, struct o_string_printer *buff);
-
-/*! \brief deserialize a document value from an stream.
- *
- * \param stream where read.
- * \return a new document value.
- */
-struct o_document_value * o_document_value_deserialize(struct o_input_stream * stream);
 
 /*! \brief free the used memory of document value.
  *

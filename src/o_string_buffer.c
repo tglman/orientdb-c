@@ -67,6 +67,11 @@ char * o_string_buffer_str(struct o_string_buffer * buff)
 	return new_str;
 }
 
+int o_string_buffer_size(struct o_string_buffer * buff)
+{
+	return buff->cursor;
+}
+
 void o_string_buffer_free(struct o_string_buffer * to_free)
 {
 	o_free(to_free->buffer);

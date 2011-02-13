@@ -12,7 +12,6 @@ struct o_string_buffer;
  */
 struct o_string_buffer * o_string_buffer_new();
 
-
 /*! \brief Append a string to buffer.
  *
  * \param buff where append string.
@@ -53,6 +52,13 @@ void o_string_buffer_clear(struct o_string_buffer * buff);
  * \return the global string in buffer in a new allocated memory.
  */
 char * o_string_buffer_str(struct o_string_buffer * buff);
+
+/*!\brief Retrieve the size of content in the buffer.
+ *
+ * \param buffer to check.
+ * \return the size of buffer.
+ */
+int o_string_buffer_size(struct o_string_buffer * buff);
 
 /*! \brief Free the buffer memory and delete it.
  *

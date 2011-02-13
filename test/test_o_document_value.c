@@ -1,6 +1,7 @@
 #include "test_o_document_value.h"
 #include <testframework/test.h>
 #include "../src/o_document_value.h"
+#include "../src/o_document.h"
 #include <string.h>
 
 void test_o_document_value_create()

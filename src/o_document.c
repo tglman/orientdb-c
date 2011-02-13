@@ -4,9 +4,9 @@
 #include "o_memory.h"
 #include "o_document_value.h"
 #include "o_string_buffer.h"
-#include "o_string_printer_stream.h"
 #include "o_database.h"
-#include "o_database_document.h"
+#include "o_database_document_internal.h"
+#include "o_document_formatter.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -14,6 +14,7 @@ struct o_document
 {
 	struct o_record record;
 	char * class_name;
+	struct o_class * class;
 	struct o_map_string *fields;
 	struct o_map_string *fields_old_values;
 };
@@ -134,68 +135,70 @@ struct o_document * o_document_copy(struct o_document * doc)
 	return new_doc;
 }
 
-void o_document_serialize_printer(struct o_document * doc, struct o_string_printer * printer)
-{
-	int names_count;
-	char ** names = o_document_field_names(doc, &names_count);
-	int i;
-	for (i = 0; i < names_count; i++)
-	{
-		o_string_printer_print(printer, names[i]);
-		o_string_printer_print(printer, ":");
-		o_document_value_serialize(o_document_field_get(doc, names[i]), printer);
-		if (i < names_count - 1)
-			o_string_printer_print(printer, ",");
-	}
-}
-
 void o_document_serialize(struct o_document * doc, struct o_output_stream * output)
 {
-	struct o_string_printer * printer = o_string_printer_stream_new(output);
-	o_document_serialize_printer(doc, printer);
-	o_string_printer_flush(printer);
-	o_string_printer_free(printer);
+	struct o_database_document * db = (struct o_database_document *) o_database_context_database();
+	struct o_document_formatter * fm = 0;
+	if (db != 0)
+		fm = o_database_document_get_formatter(db);
+	else
+		fm = o_document_formatter_factory_default();
+	o_document_formatter_serialize(fm, doc, output);
 }
 
 char * o_document_get_class_name(struct o_document * doc)
 {
+	if (doc->class_name == 0 && doc->class != 0)
+		return o_class_get_name(doc->class);
 	return doc->class_name;
 }
 
-void o_document_deserialize_internal(struct o_document * doc, struct o_input_stream * stream, int embeddd)
+void o_document_init_by_class_name(struct o_document * doc)
 {
-	struct o_string_buffer * buff = o_string_buffer_new();
-	int isfirst = 1;
-	int readed;
-	do
+	if (doc->class_name != 0)
 	{
-		readed = o_input_stream_read(stream);
-		if (isfirst && readed == '@')
+		struct o_database_document * db = (struct o_database_document *) o_database_context_database();
+		if (db != 0)
 		{
-			char * str = o_string_buffer_str(buff);
-			doc->class_name = str;
-			o_string_buffer_clear(buff);
+			struct o_metadata * meta = o_database_document_metadata(db);
+			if (meta != 0)
+			{
+				struct o_schema *schema = o_metadata_get_schema(meta);
+				if (schema != 0)
+					doc->class = o_schema_get_class(schema, doc->class_name);
+			}
 		}
-		else if (readed == ':')
-		{
-			isfirst = 0;
-			char * str = o_string_buffer_str(buff);
-			struct o_document_value * val = o_document_value_deserialize(stream);
-			o_document_field_set(doc, str, val);
-			o_free(str);
-			o_string_buffer_clear(buff);
-		}
-		else if (readed != -1)
-		{
-			o_string_buffer_append_char(buff, readed);
-		}
-	} while (readed != -1 && readed != ')');
-	o_string_buffer_free(buff);
+
+	}
+}
+
+struct o_class * o_document_get_class(struct o_document * doc)
+{
+	if (doc->class == 0)
+		o_document_init_by_class_name(doc);
+	return doc->class;
+}
+
+void o_document_set_class(struct o_document * doc, struct o_class * cl)
+{
+	doc->class = cl;
+}
+
+void o_document_set_class_by_name(struct o_document * doc, char * class_name)
+{
+	doc->class_name = o_memdup(class_name, strlen(class_name));
+	o_document_init_by_class_name(doc);
 }
 
 void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream)
 {
-	o_document_deserialize_internal(doc, stream, 0);
+	struct o_database_document * db = (struct o_database_document *) o_database_context_database();
+	struct o_document_formatter * fm = 0;
+	if (db != 0)
+		fm = o_database_document_get_formatter(db);
+	else
+		fm = o_document_formatter_factory_default();
+	o_document_formatter_deserialize(fm, doc, stream);
 }
 
 void o_document_free_maps_values(struct o_document * doc)

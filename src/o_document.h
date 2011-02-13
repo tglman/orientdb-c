@@ -1,6 +1,8 @@
 #ifndef O_DOCUMENT_H_
 #define O_DOCUMENT_H_
 #include "o_record.h"
+#include "o_class.h"
+#include "o_document_value.h"
 
 #define DOCUMENT_RECORD_TYPE 'd'
 
@@ -90,6 +92,27 @@ void o_document_remove_field(struct o_document *doc, char * field_name);
  */
 struct o_document * o_document_copy(struct o_document * doc);
 
+/*! \brief Retreive the document class name.
+ *
+ * \param doc where retrieve the name.
+ * \return the name of class of document.
+ */
+char * o_document_get_class_name(struct o_document * doc);
+
+/*! \brief Retrive the class of the document.
+ *
+ * \param doc where retrieve the class.
+ * \return class of document.
+ */
+struct o_class * o_document_get_class(struct o_document * doc);
+
+/*! \brief Set the class of document.
+ *
+ * \parma doc where set the class.
+ * \param cl class to set.
+ */
+void o_document_set_class(struct o_document * doc, struct o_class * cl);
+
 /*! \brief write the document to buffer.
  *
  * \param doc to write.
@@ -103,13 +126,6 @@ void o_document_serialize(struct o_document * doc, struct o_output_stream * outp
  * \param stream to read.
  */
 void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream);
-
-/*! \brief Retreive the document class name.
- *
- * \param doc where retrieve the name.
- * \return the name of class of document.
- */
-char * o_document_get_class_name(struct o_document * doc);
 
 /** release the reference to document.
  *

@@ -1,12 +1,15 @@
 #include "o_database_document.h"
+#include "o_database_document_internal.h"
 #include "o_memory.h"
 #include "o_database_internal.h"
 #include "o_metadata_internal.h"
+#include <string.h>
 
 struct o_database_document
 {
 	struct o_database database;
 	struct o_metadata * metadata;
+	struct o_document_formatter * formatter;
 };
 
 struct o_database * o_database_document_to_database(struct o_database_document * db)
@@ -22,6 +25,7 @@ struct o_database_document * o_database_document_new(char * connection_url)
 struct o_database_document * o_database_document_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
 {
 	struct o_database_document * new_db = o_malloc(sizeof(struct o_database_document));
+	memset(new_db, 0, sizeof(struct o_database_document));
 	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler);
 	return new_db;
 }
@@ -75,4 +79,13 @@ void o_database_document_free(struct o_database_document * db)
 	if (db->metadata != 0)
 		o_metadata_free(db->metadata);
 	o_free(db);
+}
+
+struct o_document_formatter * o_database_document_get_formatter(struct o_database_document * db)
+{
+	if (db->formatter == 0)
+	{
+		db->formatter = o_document_formatter_factory_default();
+	}
+	return db->formatter;
 }
