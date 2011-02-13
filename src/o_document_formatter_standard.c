@@ -116,7 +116,7 @@ void o_doc_for_std_serialize_printer(struct o_document_formatter * fm, struct o_
 	if (name != 0)
 	{
 		o_string_printer_print(printer, name);
-		o_string_printer_print(printer, '@');
+		o_string_printer_print_char(printer, '@');
 	}
 	for (i = 0; i < names_count; i++)
 	{
