@@ -114,9 +114,10 @@ void o_storage_remote_begin_response(struct o_storage_remote * storage, int req_
 			o_free(ex_msg);
 
 		}
+		o_connection_remote_end_read(storage->connection);
 		char * messg = o_string_buffer_str(buff);
-		throw(o_exception_new(messg,30));
 		o_string_buffer_free(buff);
+		throw(o_exception_new(messg,30));
 	}
 }
 
