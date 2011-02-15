@@ -17,12 +17,13 @@
 #define SHUTDOWN 1
 #define CONNECT 2
 
-#define DB_OPEN	 4
-#define DB_CREATE 5
-#define DB_CLOSE 6
-#define DB_EXIST 7
-#define DB_DELETE 8
-#define DB_SIZE 9
+#define DB_OPEN	 3
+#define DB_CREATE 4
+#define DB_CLOSE 5
+#define DB_EXIST 6
+#define DB_DELETE 7
+#define DB_SIZE 8
+#define DB_COUNTRECORDS 9
 
 #define CLUSTER_ADD 10
 #define CLUSTER_REMOVE 11

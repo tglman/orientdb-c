@@ -13,7 +13,16 @@ struct o_input_stream_bytes
 
 int o_input_stream_read(struct o_input_stream * stream)
 {
-	return stream->o_input_stream_read(stream);
+	if (stream->peek_buffer != -2)
+	{
+		int ret = stream->peek_buffer;
+		stream->peek_buffer = -2;
+		return ret;
+	}
+	unsigned char content;
+	if (o_input_stream_read_bytes(stream, &content, 1) == 0)
+		return -1;
+	return content;
 }
 
 int o_input_stream_read_bytes(struct o_input_stream * stream, void * bytes, int size)
@@ -28,15 +37,15 @@ void o_input_stream_free(struct o_input_stream * to_free)
 
 int o_input_stream_peek(struct o_input_stream * stream)
 {
-	return stream->o_input_stream_peek(stream);
-}
-
-int o_input_stream_bytes_read(struct o_input_stream * stream)
-{
-	struct o_input_stream_bytes * bytes_struct = (struct o_input_stream_bytes *) stream;
-	if (bytes_struct->cursor >= bytes_struct->lenght)
-		return -1;
-	return (int) bytes_struct->bytes[bytes_struct->cursor++];
+	if (stream->peek_buffer == -2)
+	{
+		unsigned char content;
+		if (o_input_stream_read_bytes(stream, &content, 1) == 0)
+			stream->peek_buffer = -1;
+		else
+			stream->peek_buffer = content;
+	}
+	return stream->peek_buffer;
 }
 
 int o_input_stream_bytes_read_bytes(struct o_input_stream * stream, void * bytes, int size)
@@ -51,27 +60,23 @@ int o_input_stream_bytes_read_bytes(struct o_input_stream * stream, void * bytes
 	return size;
 }
 
-int o_input_stream_bytes_peek(struct o_input_stream * stream)
-{
-	struct o_input_stream_bytes * bytes_struct = (struct o_input_stream_bytes *) stream;
-	if (bytes_struct->cursor >= bytes_struct->lenght)
-		return -1;
-	return (int) bytes_struct->bytes[bytes_struct->cursor];
-}
-
 void o_input_stream_bytes_free(struct o_input_stream * to_free)
 {
 	o_free(to_free);
 }
 
+void o_input_stream_internal_new(struct o_input_stream * input)
+{
+	input->peek_buffer = -2;
+}
+
 struct o_input_stream * o_input_stream_new_bytes(unsigned char * bytes, int lenght)
 {
 	struct o_input_stream_bytes * new_stre = o_malloc(sizeof(struct o_input_stream_bytes));
+	o_input_stream_internal_new(&new_stre->stream);
 	new_stre->bytes = bytes;
 	new_stre->lenght = lenght;
 	new_stre->cursor = 0;
-	new_stre->stream.o_input_stream_read = o_input_stream_bytes_read;
-	new_stre->stream.o_input_stream_peek = o_input_stream_bytes_peek;
 	new_stre->stream.o_input_stream_read_bytes = o_input_stream_bytes_read_bytes;
 	new_stre->stream.o_input_stream_free = o_input_stream_bytes_free;
 	return &new_stre->stream;
