@@ -186,6 +186,12 @@ struct o_record * o_database_load(struct o_database * db, struct o_record_id * r
 	return rec;
 }
 
+struct o_list_record * o_database_query(struct o_database * db, struct o_query * query)
+{
+	//TODO:Implement this.
+	return 0;
+}
+
 struct o_record * o_database_record_new_type(struct o_database *db, char type)
 {
 	o_database_context_database_init(db);

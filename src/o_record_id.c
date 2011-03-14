@@ -2,9 +2,6 @@
 #include "o_memory.h"
 #include "o_string_buffer.h"
 
-#define CLUSTER_ID_INVALID	-1
-#define CLUSTER_POS_INVALID	 -1
-
 struct o_record_id
 {
 	int cluster_id;

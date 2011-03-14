@@ -1,7 +1,6 @@
 #ifndef O_STORAGE_INTERNAL_H_
 #define O_STORAGE_INTERNAL_H_
 #include "o_storage.h"
-#include "o_push_listener.h"
 #include "o_storage_configuration.h"
 
 struct o_storage
@@ -9,9 +8,11 @@ struct o_storage
 	char * name;
 	char * user;
 	int ref_count;
-	struct o_push_listener * listener;
+	query_result_callback callback;
+	void * callback_addinfo;
 	struct o_storage_configuration * configuration;
 	long long (*o_storage_create_record)(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
+	struct o_query_engine * (*o_storage_get_query_engine)(struct o_storage * storage);
 	struct o_raw_buffer * (*o_storage_read_record)(struct o_storage * storage, struct o_record_id * id);
 	int (*o_storage_update_record)(struct o_storage * storage, struct o_record_id * id, struct o_raw_buffer * content);
 	int (*o_storage_delete_record)(struct o_storage * storage, struct o_record_id * id, int version);

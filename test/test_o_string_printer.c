@@ -15,7 +15,7 @@ void o_string_buffer_test_print()
 	o_string_printer_print(buffer, " app");
 	o_string_printer_flush(buffer);
 	int size;
-	char * content = o_output_stream_byte_content(o, &size);
+	unsigned char * content = o_output_stream_byte_content(o, &size);
 	char * mem = o_malloc(size + 1);
 	memcpy(mem, content, size);
 	mem[size] = 0;
@@ -33,7 +33,7 @@ void o_string_buffer_test_print_integer()
 	o_string_printer_print_long(buffer, 30);
 	o_string_printer_flush(buffer);
 	int size;
-	char * content = o_output_stream_byte_content(o, &size);
+	unsigned char * content = o_output_stream_byte_content(o, &size);
 	char * mem = o_malloc(size + 1);
 	memcpy(mem, content, size);
 	mem[size] = 0;
@@ -51,7 +51,7 @@ void o_string_buffer_test_print_double()
 	o_string_printer_print_double(buffer, 30.25);
 	o_string_printer_flush(buffer);
 	int size;
-	char * content = o_output_stream_byte_content(o, &size);
+	unsigned char * content = o_output_stream_byte_content(o, &size);
 	char * mem = o_malloc(size + 1);
 	memcpy(mem, content, size);
 	mem[size] = 0;
@@ -69,7 +69,7 @@ void o_string_buffer_test_print_char()
 	o_string_printer_print_char(buffer, 'A');
 	o_string_printer_flush(buffer);
 	int size;
-	char * content = o_output_stream_byte_content(o, &size);
+	unsigned char * content = o_output_stream_byte_content(o, &size);
 	char * mem = o_malloc(size + 1);
 	memcpy(mem, content, size);
 	mem[size] = 0;

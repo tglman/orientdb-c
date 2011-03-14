@@ -8,6 +8,11 @@ long long o_storage_create_record(struct o_storage * storage, int cluster, struc
 	return storage->o_storage_create_record(storage, cluster, content);
 }
 
+struct o_query_engine * o_storage_get_query_engine(struct o_storage * storage)
+{
+	return storage->o_storage_get_query_engine(storage);
+}
+
 struct o_raw_buffer * o_storage_read_record(struct o_storage * storage, struct o_record_id * id)
 {
 	return storage->o_storage_read_record(storage, id);
@@ -74,8 +79,6 @@ void o_storage_release(struct o_storage * storage)
 }
 void o_storage_internal_free(struct o_storage *storage)
 {
-	if (storage->listener != 0)
-		o_push_listener_free(storage->listener);
 	o_free(storage->name);
 	o_free(storage->user);
 }
@@ -101,14 +104,16 @@ void o_storage_internal_new(struct o_storage *storage, char * name, char * user)
 	storage->ref_count = 0;
 }
 
-void o_storage_set_push_listener(struct o_storage *storage, struct o_push_listener * listener)
+void o_storage_set_callback(struct o_storage *storage, void * add_info, query_result_callback callback)
 {
-	storage->listener = listener;
+	storage->callback = callback;
+	storage->callback_addinfo = add_info;
 }
 
-struct o_push_listener * o_storage_get_push_listener(struct o_storage *storage)
+query_result_callback o_storage_get_callback(struct o_storage *storage, void ** add_info)
 {
-	return storage->listener;
+	*add_info=storage->callback_addinfo ;
+	return storage->callback;
 }
 
 void o_storage_reference(struct o_storage * storage)

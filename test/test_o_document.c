@@ -44,7 +44,7 @@ void test_o_document_serialize()
 	struct o_output_stream * out = o_output_stream_byte_buffer();
 	o_document_serialize(doc, out);
 	int size;
-	char * content = o_output_stream_byte_content(out, &size);
+	unsigned char * content = o_output_stream_byte_content(out, &size);
 	char *mem = o_malloc(size + 1);
 	memcpy(mem, content, size);
 	mem[size] = 0;
@@ -62,7 +62,7 @@ void test_o_document_serialize_deserialize()
 	struct o_output_stream * out = o_output_stream_byte_buffer();
 	o_document_serialize(doc, out);
 	int size;
-	char * content = o_output_stream_byte_content(out, &size);
+	unsigned char * content = o_output_stream_byte_content(out, &size);
 	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, size);
 	o_document_release(doc);
 	doc = o_document_new();
@@ -85,7 +85,7 @@ void test_o_document_serialize_deserialize_complex()
 	struct o_output_stream * out = o_output_stream_byte_buffer();
 	o_document_serialize(doc, out);
 	int size;
-	char * content = o_output_stream_byte_content(out, &size);
+	unsigned char * content = o_output_stream_byte_content(out, &size);
 	struct o_input_stream * os = o_input_stream_new_bytes((unsigned char *) content, size);
 	o_document_release(doc_emb);
 	o_document_release(doc);

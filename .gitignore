@@ -1,2 +1,5 @@
 /Debug
 /bin
+/.settings
+/Release
+/Test

@@ -1,6 +1,9 @@
 #ifndef O_RECORD_ID_H_
 #define O_RECORD_ID_H_
 
+#define CLUSTER_ID_INVALID	-1
+#define CLUSTER_POS_INVALID	 -1
+
 struct o_record_id;
 
 /** Create a new record id with empty values.

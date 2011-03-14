@@ -1,6 +1,6 @@
 #include "o_connection_remote.h"
 #include "o_connection_internal.h"
-#include "o_database_socket.h"
+#include "o_native_socket.h"
 #include "o_storage_remote.h"
 #include "o_input_stream_socket.h"
 #include "o_output_stream_socket.h"
@@ -15,7 +15,7 @@
 struct o_connection_remote
 {
 	struct o_connection connection;
-	struct o_database_socket *socket;
+	struct o_native_socket *socket;
 	struct o_input_stream * input;
 	struct o_output_stream * output;
 	struct o_native_lock * input_lock;
@@ -30,11 +30,11 @@ struct o_connection_remote
 void o_connection_remote_free(struct o_connection *connection);
 struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name, char * username, char * password);
 
-struct o_connection * o_connection_remote_new_accept(struct o_database_socket * listen_sock)
+struct o_connection * o_connection_remote_new_accept(struct o_native_socket * listen_sock)
 {
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
-	conn->socket = o_database_socket_accept(listen_sock);
+	conn->socket = o_native_socket_accept(listen_sock);
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
@@ -50,7 +50,7 @@ struct o_connection * o_connection_remote_new(char * host, int port)
 {
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
-	conn->socket = o_database_socket_connect(host, port);
+	conn->socket = o_native_socket_connect(host, port);
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
 	conn->connection.free = o_connection_remote_free;
@@ -230,7 +230,7 @@ void o_connection_remote_end_write(struct o_connection_remote * connection)
 void o_connection_remote_free(struct o_connection *connection)
 {
 	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	o_database_socket_close(remote->socket);
+	o_native_socket_close(remote->socket);
 	o_input_stream_free(remote->input);
 	o_output_stream_free(remote->output);
 	o_native_lock_free(remote->output_lock);

@@ -1,4 +1,4 @@
-#include "o_storage_remote.h"
+#include "o_storage_remote_internal.h"
 #include "o_storage_internal.h"
 #include "o_exceptions.h"
 #include "o_exception_io.h"
@@ -10,75 +10,16 @@
 #include "o_native_lock.h"
 #include "o_raw_buffer_byte.h"
 #include "o_storage_configuration.h"
+#include "o_remote_protocol_specs.h"
+#include "o_query_engine_remote.h"
 #include <time.h>
 #include <stdio.h>
-
-// COMMANDS
-#define SHUTDOWN 1
-#define CONNECT 2
-
-#define DB_OPEN	 3
-#define DB_CREATE 4
-#define DB_CLOSE 5
-#define DB_EXIST 6
-#define DB_DELETE 7
-#define DB_SIZE 8
-#define DB_COUNTRECORDS 9
-
-#define CLUSTER_ADD 10
-#define CLUSTER_REMOVE 11
-#define CLUSTER_COUNT 12
-
-#define DATASEGMENT_ADD 20
-#define DATASEGMENT_REMOVE 21
-
-#define RECORD_LOAD 30
-#define RECORD_CREATE 31
-#define RECORD_UPDATE 32
-#define RECORD_DELETE 33
-
-#define COUNT 40
-#define COMMAND 41
-
-#define DICTIONARY_LOOKUP 50
-#define DICTIONARY_PUT 51
-#define DICTIONARY_REMOVE 52
-#define DICTIONARY_SIZE 53
-#define DICTIONARY_KEYS 54
-
-#define TX_COMMIT 100
-
-// STATUSES
-#define OK	 0
-#define ERROR 1
-
-// CONSTANTS
-#define RECORD_NULL -2
 
 int o_storage_remote_new_request_id()
 {
 	static int cur_id = 0;
 	return (cur_id++) + time(0);
 }
-
-struct o_storage_remote_cluster
-{
-	char * storage_name;
-	int id;
-	char * type;
-	struct o_storage_remote_cluster *next;
-};
-
-struct o_storage_remote
-{
-	struct o_storage storage;
-	struct o_connection_remote * connection;
-	struct o_native_lock * exclusive_lock;
-	int session_id;
-	int n_cluster;
-	struct o_storage_remote_cluster *clusters;
-	int default_cluster_id;
-};
 
 void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
 {
@@ -285,6 +226,11 @@ int o_storage_remote_get_default_cluster_id(struct o_storage * storage)
 	return rs->default_cluster_id;
 }
 
+struct o_query_engine * o_storage_remote_get_query_engine(struct o_storage * storage)
+{
+	return o_query_engine_remote_new((struct o_storage_remote *)storage);
+}
+
 struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char * name, char * username, char * password)
 {
 	struct o_storage_remote * storage = 0;
@@ -300,7 +246,7 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->storage.o_storage_get_cluster_names = o_storage_remote_get_cluster_names;
 		storage->storage.o_storage_get_cluster_id_by_name = o_storage_remote_get_cluster_id_by_name;
 		storage->storage.o_storage_get_default_cluster_id = o_storage_remote_get_default_cluster_id;
-
+		storage->storage.o_storage_get_query_engine = o_storage_remote_get_query_engine;
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
 
 		storage->storage.o_storage_final_release = o_storage_remote_internal_release;

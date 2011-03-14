@@ -1,4 +1,4 @@
-#include "o_database_socket.h"
+#include "o_native_socket.h"
 #include "o_exceptions.h"
 #include "o_exception_io.h"
 #include "o_memory.h"
@@ -11,20 +11,20 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-struct o_database_socket
+struct o_native_socket
 {
 	int socket;
 };
 
-struct o_database_socket * o_database_socket_connect(char * site, short port)
+struct o_native_socket * o_native_socket_connect(char * site, short port)
 {
-	struct o_database_socket *sock = 0;
+	struct o_native_socket *sock = 0;
 	try
 	{
 		struct sockaddr_in sock_info;
 		//TODO: Retrieve the socket information by the name of site.
 		struct hostent *he = gethostbyname(site);
-		sock = o_malloc(sizeof(struct o_database_socket));
+		sock = o_malloc(sizeof(struct o_native_socket));
 		sock->socket = socket(AF_INET, SOCK_STREAM, 0);
 		sock_info.sin_family = AF_INET;
 		sock_info.sin_port = htons(port);
@@ -46,13 +46,13 @@ struct o_database_socket * o_database_socket_connect(char * site, short port)
 	return sock;
 }
 
-struct o_database_socket * o_database_socket_listen(char * site, short port)
+struct o_native_socket * o_native_socket_listen(char * site, short port)
 {
-	struct o_database_socket *sock = 0;
+	struct o_native_socket *sock = 0;
 	try
 	{
-		sock = o_malloc(sizeof(struct o_database_socket));
-		memset(sock, 0, sizeof(struct o_database_socket));
+		sock = o_malloc(sizeof(struct o_native_socket));
+		memset(sock, 0, sizeof(struct o_native_socket));
 		int res;
 		sock->socket = socket(AF_INET, SOCK_STREAM, 0);
 		struct sockaddr_in listen_conf;
@@ -85,12 +85,12 @@ struct o_database_socket * o_database_socket_listen(char * site, short port)
 	return sock;
 }
 
-struct o_database_socket * o_database_socket_accept(struct o_database_socket * listen)
+struct o_native_socket * o_native_socket_accept(struct o_native_socket * listen)
 {
-	struct o_database_socket *sock = 0;
+	struct o_native_socket *sock = 0;
 	try
 	{
-		sock = o_malloc(sizeof(struct o_database_socket));
+		sock = o_malloc(sizeof(struct o_native_socket));
 		struct sockaddr_in accept_sock;
 		unsigned int len = sizeof(struct sockaddr_in);
 		sock->socket = accept(listen->socket, (struct sockaddr*) &accept_sock, &len);
@@ -107,7 +107,7 @@ struct o_database_socket * o_database_socket_accept(struct o_database_socket * l
 
 }
 
-void o_database_socket_send(struct o_database_socket * sock, void * buff, int buff_size)
+void o_native_socket_send(struct o_native_socket * sock, void * buff, int buff_size)
 {
 	int already_send = 0;
 	int cur_ret = 0;
@@ -119,7 +119,7 @@ void o_database_socket_send(struct o_database_socket * sock, void * buff, int bu
 	}
 }
 
-void o_database_socket_recv(struct o_database_socket * sock, void * buff, int *buff_size, int params)
+void o_native_socket_recv(struct o_native_socket * sock, void * buff, int *buff_size, int params)
 {
 	int sock_par = 0;
 	int already_receved = 0;
@@ -135,14 +135,14 @@ void o_database_socket_recv(struct o_database_socket * sock, void * buff, int *b
 	*buff_size = already_receved;
 }
 
-int o_database_socket_has_data(struct o_database_socket * sock)
+int o_native_socket_has_data(struct o_native_socket * sock)
 {
 	int size = 0;
 	ioctl(sock->socket, FIONREAD, &size);
 	return size;
 }
 
-void o_database_socket_close(struct o_database_socket * sock)
+void o_native_socket_close(struct o_native_socket * sock)
 {
 	shutdown(sock->socket, SHUT_RDWR);
 	o_free(sock);

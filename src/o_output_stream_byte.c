@@ -7,7 +7,7 @@
 struct o_output_stream_byte
 {
 	struct o_output_stream stream;
-	char * content;
+	unsigned char * content;
 	int size;
 	int cursor;
 };
@@ -36,7 +36,7 @@ void o_output_stream_byte_free(struct o_output_stream * stream)
 	o_free(stream_byte);
 }
 
-char * o_output_stream_byte_content(struct o_output_stream * stream, int * content_size)
+unsigned char * o_output_stream_byte_content(struct o_output_stream * stream, int * content_size)
 {
 	struct o_output_stream_byte *buff = (struct o_output_stream_byte *) stream;
 	*content_size = buff->cursor;

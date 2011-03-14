@@ -4,7 +4,8 @@
 #include "o_database_error_handler.h"
 #include "o_record_id.h"
 #include "o_transaction.h"
-#include "o_push_listener.h"
+#include "o_query_engine.h"
+#include "o_query_callback.h"
 
 #define CLUSTER_INTERNAL_NAME "internal"
 #define CLUSTER_INDEX_NAME "index"
@@ -22,6 +23,13 @@ struct o_storage;
  * @return the new identifier of created record.
  */
 long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
+
+/*! \brief Retrieve A query engine for current browser.
+ *
+ * \param storage where retrieve the query engine.
+ * \return the query engine instance.
+ */
+struct o_query_engine * o_storage_get_query_engine(struct o_storage * storage);
 
 /**
  * Read a record from the storage
@@ -85,19 +93,21 @@ int o_storage_get_default_cluser_id(struct o_storage * storage);
  */
 void o_storage_commit_transaction(struct o_storage *storage, struct o_transaction * transaction);
 
-/*! \brief set the push listener to storage.
+/*! \brief set the callback to the storage.
  *
- * \param storage where add the listener.
- * \param listener to add.
+ * \param storage where set the callback.
+ * \param add_info additional info for the callback call.
+ * \param callback to invoke.
  */
-void o_storage_set_push_listener(struct o_storage *storage, struct o_push_listener * listener);
+void o_storage_set_callback(struct o_storage *storage, void * add_info, query_result_callback callback);
 
-/*! \brief Retrive the current push listener on storage.
+/*! \brief get the callback from the storage.
  *
- * \param storage where retrieve the push listener.
- * \return the push listener.
+ * \param storage where get the callback.
+ * \param add_info additional info of the callback.
+ * \return callback of the storage.
  */
-struct o_push_listener * o_storage_get_push_listener(struct o_storage *storage);
+query_result_callback o_storage_get_callback(struct o_storage *storage, void ** add_info);
 
 /*!\brief retrieve the metadata of the storage.
  *

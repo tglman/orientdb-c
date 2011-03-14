@@ -1,8 +1,9 @@
 #ifndef O_DATABASE_H_
 #define O_DATABASE_H_
-
 #include "o_database_error_handler.h"
 #include "o_record.h"
+#include "o_record_list.h"
+#include "o_query.h"
 
 /**
  * Rapresent a database.
@@ -71,6 +72,14 @@ int o_database_delete(struct o_database * db, struct o_record * record);
  * \return the persistent record.
  */
 struct o_record * o_database_load(struct o_database * db, struct o_record_id * rid);
+
+/*! \brief make a query on the database.
+ *
+ * \param where execute the query.
+ * \param query to execute.
+ * \return the list of result.
+ */
+struct o_list_record * o_database_query(struct o_database * db, struct o_query * query);
 
 /*! \brief create a new raw record and associate it to this database.
  *

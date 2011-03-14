@@ -1,6 +1,6 @@
 #include "test_o_connection_remote.h"
 #include "../src/o_connection_remote.h"
-#include "../src/o_database_socket.h"
+#include "../src/o_native_socket.h"
 #include <testframework/test.h>
 #include "../src/o_native_thread.h"
 #include "../src/o_memory.h"
@@ -14,7 +14,7 @@ void *test_o_connection_private_listen_thread(void * par)
 {
 	try
 	{
-		struct o_database_socket * socket = o_database_socket_listen(HOST_TEST, PORT_TEST);
+		struct o_native_socket * socket = o_native_socket_listen(HOST_TEST, PORT_TEST);
 		struct o_connection * server_conn = o_connection_remote_new_accept(socket);
 
 		struct o_connection_remote * server = (struct o_connection_remote *) server_conn;
@@ -41,7 +41,7 @@ void *test_o_connection_private_listen_thread(void * par)
 		o_free(string);
 
 		o_connection_free(server_conn);
-		o_database_socket_close(socket);
+		o_native_socket_close(socket);
 		o_native_thread_current_exit();
 	}
 	catch (struct o_exception, e)
