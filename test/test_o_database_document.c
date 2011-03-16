@@ -1,7 +1,7 @@
 #include "test_o_database_document.h"
 #include "../src/o_database_document.h"
 #include "../src/o_document_value.h"
-#include <testframework/test.h>
+#include <test.h>
 #include <string.h>
 #include <stdio.h>
 

@@ -4,6 +4,12 @@
 
 struct o_list_record;
 
+/*! \brief Create a new list of record.
+ *
+ * \return the new record list.
+ */
+struct o_list_record * o_list_record_new();
+
 /*! \brief Retrieve the size of list of record.
  *
  * \param list to retrieve the size.
@@ -17,6 +23,13 @@ int o_list_record_size(struct o_list_record * list);
  * \param pos position fo record to retrieve.
  */
 struct o_record * o_list_record_get(struct o_list_record * list, int pos);
+
+/*! \brief Add an record to the back of list.
+ *
+ * \param list where add.
+ * \param record to add.
+ */
+void o_list_record_add(struct o_list_record * list, struct o_record * record);
 
 /*! \brief Release the reference to record list.
  *

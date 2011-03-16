@@ -1,7 +1,7 @@
 #include "test_o_connection_remote.h"
 #include "../src/o_connection_remote.h"
 #include "../src/o_native_socket.h"
-#include <testframework/test.h>
+#include <test.h>
 #include "../src/o_native_thread.h"
 #include "../src/o_memory.h"
 #include "../src/o_exceptions.h"

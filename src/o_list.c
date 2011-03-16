@@ -16,6 +16,12 @@ struct o_list
 	int size;
 };
 
+struct o_list_iterator
+{
+	struct o_list_item * current;
+	short direction;
+};
+
 struct o_list *o_list_new()
 {
 	struct o_list * new_l = o_malloc(sizeof(struct o_list));
@@ -102,6 +108,26 @@ void * o_list_get(struct o_list * list, int pos)
 	return i;
 }
 
+struct o_list_iterator *o_list_begin(struct o_list * list)
+{
+	if (list->size == 0)
+		return 0;
+	struct o_list_iterator *i = o_malloc(sizeof(struct o_list_iterator));
+	i->current = list->first;
+	i->direction = 1;
+	return i;
+}
+
+struct o_list_iterator *o_list_end(struct o_list * list)
+{
+	if (list->size == 0)
+		return 0;
+	struct o_list_iterator *i = o_malloc(sizeof(struct o_list_iterator));
+	i->current = list->last;
+	i->direction = 0;
+	return i;
+}
+
 void o_list_free(struct o_list * list)
 {
 	struct o_list_item *i = list->first;
@@ -113,3 +139,48 @@ void o_list_free(struct o_list * list)
 	}
 	o_free(list);
 }
+
+int o_list_iterator_move(struct o_list_iterator * iter, int direction)
+{
+	if (direction)
+	{
+		if (iter->current->next != 0)
+		{
+			iter->current = iter->current->next;
+			return 1;
+		}
+		else
+			return 0;
+	}
+	else
+	{
+		if (iter->current->previus != 0)
+		{
+			iter->current = iter->current->previus;
+			return 1;
+		}
+		else
+			return 0;
+	}
+}
+
+int o_list_iterator_next(struct o_list_iterator * iter)
+{
+	return o_list_iterator_move(iter, iter->direction);
+}
+
+int o_list_iterator_previus(struct o_list_iterator * iter)
+{
+	return o_list_iterator_move(iter, !iter->direction);
+}
+
+void * o_list_iterator_current(struct o_list_iterator * iter)
+{
+	return iter->current->value;
+}
+
+void o_list_iterator_free(struct o_list_iterator * iter)
+{
+	o_free(iter);
+}
+

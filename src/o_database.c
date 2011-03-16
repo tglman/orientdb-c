@@ -17,6 +17,11 @@
 #define DB_ERROR_NOTIFY(DB,CODE,ERROR) if(DB->error_handler != 0)o_database_error_handler_notify(DB->error_handler, CODE, ERROR);
 
 __thread struct o_database * context_database = 0;
+struct o_internal_result_handler
+{
+	struct o_list_record *list;
+	struct o_database * db;
+};
 
 struct o_database * o_database_context_database()
 {
@@ -186,10 +191,20 @@ struct o_record * o_database_load(struct o_database * db, struct o_record_id * r
 	return rec;
 }
 
+void o_query_engine_record_listener(void * add_info, struct o_record_id *id, struct o_raw_buffer * buffer)
+{
+	struct o_internal_result_handler *result_handler = (struct o_internal_result_handler *) add_info;
+	struct o_record * record = o_database_record_from_content(result_handler->db, id, buffer);
+	o_list_record_add(result_handler->list, record);
+}
+
 struct o_list_record * o_database_query(struct o_database * db, struct o_query * query)
 {
-	//TODO:Implement this.
-	return 0;
+	struct o_internal_result_handler result_handler;
+	result_handler.db = db;
+	struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
+	o_query_engine_query(query_engine, query, &result_handler, o_query_engine_record_listener);
+	return result_handler.list;
 }
 
 struct o_record * o_database_record_new_type(struct o_database *db, char type)

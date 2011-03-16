@@ -2,7 +2,7 @@
 #include "../src/o_record.h"
 #include "../src/o_record_id.h"
 #include "../src/o_record_factory.h"
-#include <testframework/test.h>
+#include <test.h>
 
 void test_o_record_id_new()
 {

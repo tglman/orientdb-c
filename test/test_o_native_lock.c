@@ -1,6 +1,6 @@
 #include "test_o_native_lock.h"
 #include "../src/o_native_lock.h"
-#include "testframework/test.h"
+#include <test.h>
 
 void test_o_native_lock()
 {

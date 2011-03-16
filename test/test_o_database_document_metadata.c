@@ -1,5 +1,5 @@
 #include "test_o_database_document_metadata.h"
-#include <testframework/test.h>
+#include <test.h>
 #include "../src/o_database_document.h"
 #include "../src/o_metadata.h"
 #include <string.h>

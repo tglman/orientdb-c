@@ -2,7 +2,7 @@
 #include "../src/o_string_printer.h"
 #include "../src/o_string_printer_stream.h"
 #include "../src/o_output_stream_byte.h"
-#include <testframework/test.h>
+#include <test.h>
 #include "../src/o_memory.h"
 #include <string.h>
 #include <stdio.h>
