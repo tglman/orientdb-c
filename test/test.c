@@ -14,6 +14,7 @@
 #include "test_o_native_lock.h"
 #include "test_o_database_document_metadata.h"
 #include "test_o_list.h"
+#include "test_o_list_record.h"
 
 void initialize()
 {
@@ -32,4 +33,5 @@ void initialize()
 	ADD_SUITE(o_database_document_suite, "test on base database");
 	ADD_SUITE(o_database_document_metadata_suite, "test database metadata load");
 	ADD_SUITE(o_list_suite, "test list management");
+	ADD_SUITE(o_list_record_suite, "test list management");
 }

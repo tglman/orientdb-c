@@ -1,4 +1,4 @@
-#include "o_record_list.h"
+#include "o_list_record.h"
 #include "o_list.h"
 #include "o_memory.h"
 
@@ -32,6 +32,15 @@ void o_list_record_add(struct o_list_record * list, struct o_record * record)
 		return;
 	o_record_refer(record);
 	o_list_add(list->list, record);
+}
+
+struct o_record * o_list_record_remove(struct o_list_record * list, struct o_record * record)
+{
+	if (record == 0)
+		return 0;
+	struct o_record * rec_ret = o_list_remove(list->list, record);
+	o_record_release(rec_ret);
+	return rec_ret;
 }
 
 void o_list_record_release(struct o_list_record * list)

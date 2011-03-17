@@ -23,9 +23,9 @@ int o_list_add(struct o_list * list, void * to_add);
  *
  * \param list where remove.
  * \param to_remove value to remove.
- * \return 1 if the value is removed otherwise 0.
+ * \return the value removed otherwise 0.
  */
-int o_list_remove(struct o_list * list, void *to_remove);
+void * o_list_remove(struct o_list * list, void *to_remove);
 
 /*! \brief Check if an value is contained in the list.
  *

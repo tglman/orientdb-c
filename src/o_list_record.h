@@ -31,6 +31,13 @@ struct o_record * o_list_record_get(struct o_list_record * list, int pos);
  */
 void o_list_record_add(struct o_list_record * list, struct o_record * record);
 
+/*! \brief Remove a record from the list.
+ *
+ * \param list where remove the record.
+ * \param record to remove;
+ */
+struct o_record * o_list_record_remove(struct o_list_record * list,struct o_record * record);
+
 /*! \brief Release the reference to record list.
  *
  * \param list to release the reference.

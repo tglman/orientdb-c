@@ -2,7 +2,7 @@
 #define O_DATABASE_H_
 #include "o_database_error_handler.h"
 #include "o_record.h"
-#include "o_record_list.h"
+#include "o_list_record.h"
 #include "o_query.h"
 
 /**

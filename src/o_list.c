@@ -61,7 +61,7 @@ struct o_list_item * o_list_find_item(struct o_list * list, void *to_find)
 	return 0;
 }
 
-int o_list_remove(struct o_list * list, void *to_remove)
+void * o_list_remove(struct o_list * list, void *to_remove)
 {
 	struct o_list_item * finded = o_list_find_item(list, to_remove);
 	if (finded != 0)
@@ -74,9 +74,10 @@ int o_list_remove(struct o_list * list, void *to_remove)
 			finded->next->previus = finded->previus;
 		if (finded->previus != 0)
 			finded->previus->next = finded->next;
+		void * value = finded->value;
 		o_free(finded);
 		list->size--;
-		return 1;
+		return value;
 	}
 	return 0;
 }
@@ -105,7 +106,7 @@ void * o_list_get(struct o_list * list, int pos)
 		i = i->next;
 		count++;
 	}
-	return i;
+	return i->value;
 }
 
 struct o_list_iterator *o_list_begin(struct o_list * list)
@@ -169,7 +170,7 @@ int o_list_iterator_next(struct o_list_iterator * iter)
 	return o_list_iterator_move(iter, iter->direction);
 }
 
-int o_list_iterator_previus(struct o_list_iterator * iter)
+int o_list_iterator_prev(struct o_list_iterator * iter)
 {
 	return o_list_iterator_move(iter, !iter->direction);
 }
