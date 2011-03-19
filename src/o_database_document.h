@@ -3,6 +3,7 @@
 #include "o_database_error_handler.h"
 #include "o_document.h"
 #include "o_metadata.h"
+#define DOCUMENT_DB_TYPE 'd'
 
 /** Represent an document database structure.
  *

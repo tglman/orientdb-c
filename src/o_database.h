@@ -4,6 +4,7 @@
 #include "o_record.h"
 #include "o_list_record.h"
 #include "o_query.h"
+#define RAW_DB_TYPE 'r'
 
 /**
  * Rapresent a database.
@@ -115,9 +116,16 @@ void o_database_close(struct o_database * db);
  */
 struct o_record * o_database_metadata(struct o_database * db);
 
-/** Free the database structure with all data.
+/*! \brief Retrieve the type of db.
  *
- * @param db to free.
+ * \param db the db where give type.
+ * \return the type of db.
+ */
+char o_database_get_type(struct o_database *db);
+
+/*! \brief Free the database structure with all data.
+ *
+ * \param db to free.
  */
 void o_database_free(struct o_database * db);
 

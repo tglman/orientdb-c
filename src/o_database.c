@@ -41,15 +41,16 @@ struct o_database * o_database_new(char * connection_url)
 struct o_database * o_database_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
 {
 	struct o_database * new_db = o_malloc(sizeof(struct o_database));
-	o_database_new_internal(new_db, connection_url, error_handler);
+	o_database_new_internal(new_db, connection_url, error_handler,RAW_DB_TYPE);
 	return new_db;
 }
 
-void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler)
+void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler,char db_type)
 {
 	memset(db, 0, sizeof(struct o_database));
 	db->error_handler = error_handler;
 	db->connection_url = connection_url;
+	db->db_type = db_type;
 }
 
 void o_database_reset_error_handler(struct o_database * db, struct o_database_error_handler *error_handler)
@@ -201,9 +202,19 @@ void o_query_engine_record_listener(void * add_info, struct o_record_id *id, str
 struct o_list_record * o_database_query(struct o_database * db, struct o_query * query)
 {
 	struct o_internal_result_handler result_handler;
-	result_handler.db = db;
-	struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
-	o_query_engine_query(query_engine, query, &result_handler, o_query_engine_record_listener);
+	try
+	{
+		result_handler.db = db;
+		result_handler.list = o_list_record_new();
+		struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
+		o_query_engine_query(query_engine, query, &result_handler, o_query_engine_record_listener);
+	}
+	catch( struct o_exception ,ex)
+	{
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
 	return result_handler.list;
 }
 
@@ -265,6 +276,11 @@ void o_database_remove_referrer(struct o_database * db, struct o_database ** ref
 {
 	if (db->referrers != 0)
 		o_list_remove(db->referrers, referrer);
+}
+
+char o_database_get_type(struct o_database *db)
+{
+	return db->db_type;
 }
 
 struct o_record * o_database_metadata(struct o_database * db)

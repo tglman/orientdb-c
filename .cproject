@@ -1506,7 +1506,7 @@
 								<option id="gnu.c.compiler.option.misc.other.1141757839" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -fPIC" valueType="string"/>
 								<option id="gnu.c.compiler.option.debugging.gprof.846609622" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
 								<option id="gnu.c.compiler.option.debugging.prof.1101338969" name="Generate prof information (-p)" superClass="gnu.c.compiler.option.debugging.prof" value="false" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.include.paths.1693495617" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.1693495617" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/ctesf-1.0"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1905272105" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -1520,7 +1520,7 @@
 								<option id="gnu.c.link.option.debugging.prof.228448053" name="Generate prof information (-p)" superClass="gnu.c.link.option.debugging.prof" value="false" valueType="boolean"/>
 								<option id="gnu.c.link.option.debugging.gprof.1777139200" name="Generate gprof information (-pg)" superClass="gnu.c.link.option.debugging.gprof" value="false" valueType="boolean"/>
 								<option id="gnu.c.link.option.ldflags.615327344" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="" valueType="string"/>
-								<option id="gnu.c.link.option.paths.258395034" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths"/>
+								<option id="gnu.c.link.option.paths.258395034" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.100361836" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

@@ -26,7 +26,7 @@ struct o_database_document * o_database_document_new_error_handler(char * connec
 {
 	struct o_database_document * new_db = o_malloc(sizeof(struct o_database_document));
 	memset(new_db, 0, sizeof(struct o_database_document));
-	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler);
+	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler,DOCUMENT_DB_TYPE);
 	return new_db;
 }
 

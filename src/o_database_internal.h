@@ -14,16 +14,18 @@ struct o_database
 	struct o_storage * storage;
 	struct o_record_cache * cache;
 	struct o_list * referrers;
+	char db_type;
 };
 
-/** Fill a new instance of a database and associate an error hendler
+/*! \brief Fill a new instance of a database and associate an error hendler
  *
- * @param db to fill.
- * @param connection_url the database connection url.
- * @param error_handler the handler of eventually errors.
- * @return the new database instance.
+ * \param db to fill.
+ * \param connection_url the database connection url.
+ * \param error_handler the handler of eventually errors.
+ * \param db_type the type of instantiate database.
+ * \return the new database instance.
  */
-void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler);
+void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler, char db_type);
 
 /*! \brief Retrieve the cache from database.
  *

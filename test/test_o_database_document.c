@@ -1,20 +1,15 @@
 #include "test_o_database_document.h"
 #include "../src/o_database_document.h"
 #include "../src/o_document_value.h"
+#include "test_commons.h"
 #include <test.h>
 #include <string.h>
 #include <stdio.h>
 
-void o_db_document_error_handler_function(int code, char * error, void * custom_info)
-{
-	char message[512];
-	sprintf(message, "code:%i message:%s", code, error);
-	fail(message);
-}
 
 void test_o_database_document_open_save_load_close()
 {
-	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_document_error_handler_function, 0);
+	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database_document * db = o_database_document_new_error_handler("remote:127.0.0.1/demo", errorHandler);
 	o_database_document_open(db, "admin", "admin");
 	struct o_document * doc = o_document_new();

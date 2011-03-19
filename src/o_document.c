@@ -157,10 +157,11 @@ void o_document_init_by_class_name(struct o_document * doc)
 {
 	if (doc->class_name != 0)
 	{
-		struct o_database_document * db = (struct o_database_document *) o_database_context_database();
-		if (db != 0)
+		struct o_database * db = o_database_context_database();
+		if (db != 0 && o_database_get_type(db) != DOCUMENT_DB_TYPE)
 		{
-			struct o_metadata * meta = o_database_document_metadata(db);
+			struct o_database_document * docDb = (struct o_database_document *) o_database_context_database();
+			struct o_metadata * meta = o_database_document_metadata(docDb);
 			if (meta != 0)
 			{
 				struct o_schema *schema = o_metadata_get_schema(meta);

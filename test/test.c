@@ -1,4 +1,4 @@
-#include <testframework/test.h>
+#include <test.h>
 #include "test_o_map.h"
 #include "test_o_connection_remote.h"
 #include "test_o_exceptions.h"
@@ -15,8 +15,9 @@
 #include "test_o_database_document_metadata.h"
 #include "test_o_list.h"
 #include "test_o_list_record.h"
+#include "test_o_database_query.h"
 
-void initialize()
+TEST_INITIALIZE
 {
 	ADD_SUITE(o_exceptions_suite, "exceptions management tests");
 	ADD_SUITE(o_map_suite, "o_map tests");
@@ -34,4 +35,5 @@ void initialize()
 	ADD_SUITE(o_database_document_metadata_suite, "test database metadata load");
 	ADD_SUITE(o_list_suite, "test list management");
 	ADD_SUITE(o_list_record_suite, "test list management");
+	ADD_SUITE(o_database_query_suite, "test list management");
 }

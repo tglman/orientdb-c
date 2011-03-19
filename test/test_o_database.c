@@ -2,15 +2,10 @@
 #include <test.h>
 #include "../src/o_database.h"
 #include "../src/o_record_raw.h"
+#include "test_commons.h"
 #include <stdio.h>
 #include <string.h>
 
-void o_db_error_handler_function(int code, char * error, void * custom_info)
-{
-	char message[512];
-	sprintf(message, "code:%i message:%s", code, error);
-	fail(message);
-}
 
 void test_o_database_new_open_close()
 {
