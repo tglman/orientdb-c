@@ -41,11 +41,11 @@ struct o_database * o_database_new(char * connection_url)
 struct o_database * o_database_new_error_handler(char * connection_url, struct o_database_error_handler * error_handler)
 {
 	struct o_database * new_db = o_malloc(sizeof(struct o_database));
-	o_database_new_internal(new_db, connection_url, error_handler,RAW_DB_TYPE);
+	o_database_new_internal(new_db, connection_url, error_handler, RAW_DB_TYPE);
 	return new_db;
 }
 
-void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler,char db_type)
+void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler, char db_type)
 {
 	memset(db, 0, sizeof(struct o_database));
 	db->error_handler = error_handler;
@@ -150,25 +150,16 @@ struct o_record * o_database_record_from_content(struct o_database * db, struct 
 {
 	struct o_record * record = 0;
 	o_database_context_database_init(db);
-	try
-	{
-		o_record_id_refer(rid);
-		record = o_record_factory_id(o_raw_buffer_type(content), rid);
-		o_record_reset_version(record, o_raw_buffer_version(content));
-		int size;
-		unsigned char * bytes = o_raw_buffer_content(content, &size);
-		struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
-		o_record_deserialize(record, stream);
-		o_input_stream_free(stream);
-		o_raw_buffer_free(content);
-		o_record_cache_put(o_database_get_cache(db), record);
-	}
-	catch( struct o_exception ,ex)
-	{
-		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
-		o_exception_free(ex);
-	}
-	end_try;
+	o_record_id_refer(rid);
+	record = o_record_factory_id(o_raw_buffer_type(content), rid);
+	o_record_reset_version(record, o_raw_buffer_version(content));
+	int size;
+	unsigned char * bytes = o_raw_buffer_content(content, &size);
+	struct o_input_stream * stream = o_input_stream_new_bytes(bytes, size);
+	o_record_deserialize(record, stream);
+	o_input_stream_free(stream);
+	o_raw_buffer_free(content);
+	o_record_cache_put(o_database_get_cache(db), record);
 	return record;
 }
 
@@ -199,15 +190,12 @@ void o_query_engine_record_listener(void * add_info, struct o_record_id *id, str
 	o_list_record_add(result_handler->list, record);
 }
 
-struct o_list_record * o_database_query(struct o_database * db, struct o_query * query)
+void o_database_query_internal(struct o_database * db, struct o_query * query, void *add_info, query_result_callback callback)
 {
-	struct o_internal_result_handler result_handler;
 	try
 	{
-		result_handler.db = db;
-		result_handler.list = o_list_record_new();
 		struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
-		o_query_engine_query(query_engine, query, &result_handler, o_query_engine_record_listener);
+		o_query_engine_query(query_engine, query, add_info, callback);
 	}
 	catch( struct o_exception ,ex)
 	{
@@ -215,6 +203,14 @@ struct o_list_record * o_database_query(struct o_database * db, struct o_query *
 		o_exception_free(ex);
 	}
 	end_try;
+}
+
+struct o_list_record * o_database_query(struct o_database * db, struct o_query * query)
+{
+	struct o_internal_result_handler result_handler;
+	result_handler.db = db;
+	result_handler.list = o_list_record_new();
+	o_database_query_internal(db, query, &result_handler, o_query_engine_record_listener);
 	return result_handler.list;
 }
 
@@ -285,8 +281,20 @@ char o_database_get_type(struct o_database *db)
 
 struct o_record * o_database_metadata(struct o_database * db)
 {
-	struct o_raw_buffer * meta = o_storage_get_metadata(db->storage);
-	return o_database_record_from_content(db, o_record_id_new(0, 0), meta);
+	struct o_record * metadata = 0;
+	try
+	{
+
+		struct o_raw_buffer * meta = o_storage_get_metadata(db->storage);
+		metadata = o_database_record_from_content(db, o_record_id_new(0, 0), meta);
+	}
+	catch( struct o_exception ,ex)
+	{
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	return metadata;
 }
 
 void o_database_free(struct o_database * db)

@@ -14,7 +14,7 @@ struct o_document_formatter;
  */
 void o_document_formatter_serialize(struct o_document_formatter * fm, struct o_document * doc, struct o_output_stream * output);
 
-/* Fill a document with content read from stream using the current formatter.
+/*! \brief Fill a document with content read from stream using the current formatter.
  *
  * \param fm formatter to use.
  * \param doc to fill.

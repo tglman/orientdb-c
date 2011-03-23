@@ -26,7 +26,7 @@ struct o_database_document * o_database_document_new_error_handler(char * connec
 {
 	struct o_database_document * new_db = o_malloc(sizeof(struct o_database_document));
 	memset(new_db, 0, sizeof(struct o_database_document));
-	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler,DOCUMENT_DB_TYPE);
+	o_database_new_internal(o_database_document_to_database(new_db), connection_url, error_handler, DOCUMENT_DB_TYPE);
 	return new_db;
 }
 
@@ -71,6 +71,29 @@ struct o_metadata * o_database_document_metadata(struct o_database_document * db
 	struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
 	db->metadata = o_metadata_from_document((struct o_document *) meta);
 	return db->metadata;
+}
+
+struct o_document_rh
+{
+	struct o_database_document * db;
+	struct o_list_document * list;
+};
+
+void o_query_engine_document_listener(void * add_info, struct o_record_id *id, struct o_raw_buffer * buffer)
+{
+	struct o_document_rh * docr = (struct o_document_rh *) add_info;
+	struct o_record * record = o_database_record_from_content(o_database_document_to_database(docr->db), id, buffer);
+	o_list_document_add(docr->list, (struct o_document *) record);
+
+}
+
+struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query)
+{
+	struct o_document_rh rh;
+	rh.db = db;
+	rh.list = o_list_document_new();
+	o_database_query_internal(o_database_document_to_database(db), query, &rh, o_query_engine_document_listener);
+	return rh.list;
 }
 
 void o_database_document_free(struct o_database_document * db)

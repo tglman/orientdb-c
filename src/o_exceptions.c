@@ -17,7 +17,8 @@ struct exception
 	char catched;
 };
 
-__thread struct exception cur_exception = { 0, 0, 1 };
+__thread struct exception cur_exception =
+{ 0, 0, 1 };
 __thread struct jmp_stack *stack_top = 0;
 
 int o_catch_type(char * name, void **val, jmp_buf cur_jmp)

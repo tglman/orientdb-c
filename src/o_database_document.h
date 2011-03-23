@@ -2,7 +2,9 @@
 #define O_DATABASE_DOCUMENT_H_
 #include "o_database_error_handler.h"
 #include "o_document.h"
+#include "o_list_document.h"
 #include "o_metadata.h"
+#include "o_query.h"
 #define DOCUMENT_DB_TYPE 'd'
 
 /** Represent an document database structure.
@@ -75,6 +77,14 @@ struct o_document * o_database_document_load(struct o_database_document * db, st
  * \return the metadata of databse.
  */
 struct o_metadata * o_database_document_metadata(struct o_database_document * db);
+
+/*! \brief Make a query to the document database.
+ *
+ * \param db where execute query.
+ * \param query to execute.
+ * \return the result of query.
+ */
+struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query);
 
 /** Free the database structure with all data.
  *

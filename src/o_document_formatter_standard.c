@@ -177,18 +177,20 @@ struct o_document_value * o_doc_for_std_value_link_deserialize(struct o_input_st
 			o_string_buffer_clear(buff);
 			o_input_stream_read(stream);
 		}
-		else if ((readed < '0' || readed > '9') && readed != ',' && readed != -1)
-		{
-			o_string_buffer_free(buff);
-			throw(o_exception_new("wrong link parsing", 0));
-		}
-		else
+		else if (readed >= '0' && readed <= '9')
 		{
 			o_string_buffer_append_char(buff, readed);
 			//Remove the peek from stream
 			o_input_stream_read(stream);
 		}
-	} while (readed != ',' && readed != -1);
+		else if (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '*')
+		{
+			o_string_buffer_free(buff);
+			char message[50];
+			sprintf(message, "wrong link parsing char:%c", readed);
+			throw(o_exception_new(message, 0));
+		}
+	} while (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '*');
 	char * ca = o_string_buffer_str(buff);
 	rid = atol(ca);
 	o_free(ca);
@@ -335,7 +337,6 @@ struct o_document_value * o_doc_for_std_value_plain_deserialize(struct o_input_s
 				o_string_buffer_free(buff);
 				char message[50];
 				sprintf(message, "wrong number parsing '%c'", readed);
-				((void(*)()) 0)();
 				throw(o_exception_new(message, 0));
 			}
 			o_string_buffer_append_char(buff, readed);
@@ -387,7 +388,7 @@ struct o_document_value * o_doc_for_std_value_deserialize(struct o_input_stream 
 		break;
 	case '{':
 		return o_document_value_map_deserialize(stream);
-
+		break;
 	case 't':
 	case 'f':
 		value = o_doc_for_std_value_bool_deserialize(stream);
@@ -425,13 +426,12 @@ void o_document_formatter_standard_deserialize(struct o_document_formatter * fm,
 			o_free(str);
 			o_string_buffer_clear(buff);
 		}
-		else if (readed != -1 && readed != ')' && readed != '*')
+		else if (readed != -1 && readed != ')' && readed != '*' && readed != ']' && readed != ',')
 		{
 			o_string_buffer_append_char(buff, readed);
 		}
 	} while (readed != -1 && readed != ')' && readed != '*');
 	o_string_buffer_free(buff);
-
 }
 
 struct o_document_formatter * o_document_formatter_standard_new()

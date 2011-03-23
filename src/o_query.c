@@ -66,7 +66,7 @@ struct o_query * o_query_sql(char * query)
 {
 	struct o_query_sql * qsql = o_malloc(sizeof(struct o_query_sql));
 	memset(qsql, 0, sizeof(struct o_query_sql));
-	qsql->sql = o_memdup(query, strlen(query));
+	qsql->sql = o_memdup(query, strlen(query) + 1);
 	qsql->query.o_query_free = o_query_sql_free;
 	qsql->query.o_query_seriealize = o_query_sql_serialize;
 	return &qsql->query;

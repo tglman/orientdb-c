@@ -6,6 +6,7 @@
 #include "o_record_cache.h"
 #include "o_raw_buffer.h"
 #include "o_list.h"
+#include "o_query_callback.h"
 
 struct o_database
 {
@@ -56,6 +57,15 @@ void o_database_add_referrer(struct o_database * db, struct o_database ** referr
  * \param referrer to remove.
  */
 void o_database_remove_referrer(struct o_database * db, struct o_database ** referrer);
+
+/*! \brief Exucute a query on database and put result in the call back.
+ *
+ * \param db where execute query.
+ * \param query to execute.
+ * \param add_info gived to callback.
+ * \param callback to invoke on result put.
+ */
+void o_database_query_internal(struct o_database * db, struct o_query * query, void *add_info, query_result_callback callback);
 
 /** Clear the database structure .
  *

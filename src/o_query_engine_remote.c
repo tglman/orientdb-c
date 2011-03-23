@@ -7,8 +7,9 @@
 #include "o_memory.h"
 #include "o_output_stream_byte.h"
 #include "o_raw_buffer_byte.h"
+#include "o_exceptions.h"
+#include "o_exception.h"
 #include <string.h>
-#include <stdio.h>
 
 struct o_query_engine_remote
 {
@@ -28,7 +29,6 @@ void o_query_engine_remote_record_result(struct o_connection_remote * connection
 	unsigned char * o_p = o_connection_remote_read_bytes(connection, &size);
 	struct o_raw_buffer * buff = o_raw_buffer_byte(type, version, o_p, size);
 	callback(add_info, o_record_id_new(rec_cl, rec_pos), buff);
-
 }
 void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struct o_query * query, struct o_document_value ** parameters, void * add_info,
 		query_result_callback callback)
@@ -47,51 +47,41 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 
 	o_storage_remote_begin_response(engine_remote->storage, req_id);
 	char response = o_connection_remote_read_byte(engine_remote->storage->connection);
-
-	switch (response)
+	try
 	{
-	case 'n':
-	{
-		int size;
-		o_connection_remote_read_bytes(engine_remote->storage->connection, &size);
-	}
-		break;
-	case 'r':
-	{
-		o_query_engine_remote_record_result(engine_remote->storage->connection, add_info, callback);
-	}
-		break;
-	case 'l':
-	{
-		int size = o_connection_remote_read_int(engine_remote->storage->connection);
-		while (size-- > 0)
+		switch (response)
+		{
+		case 'n':
+		{
+			int size;
+			unsigned char * readed = o_connection_remote_read_bytes(engine_remote->storage->connection, &size);
+			o_free(readed);
+		}
+			break;
+		case 'r':
 		{
 			o_query_engine_remote_record_result(engine_remote->storage->connection, add_info, callback);
 		}
+			break;
+		case 'l':
+		{
+			int size = o_connection_remote_read_int(engine_remote->storage->connection);
+			while (size-- > 0)
+			{
+				o_query_engine_remote_record_result(engine_remote->storage->connection, add_info, callback);
+			}
 
+		}
+			break;
+		}
+		o_connection_remote_end_read(engine_remote->storage->connection);
 	}
-		break;
+	catch( struct o_exception ,ex)
+	{
+		o_connection_remote_end_read(engine_remote->storage->connection);
+		throw(ex);
 	}
-	/*
-	 while ((status =) > 0)
-	 {
-	 int size;
-	 //CLASS!! RIQUERED FOR THE PROTOCOLL, I IGNORE
-	 o_connection_remote_read_int(engine_remote->storage->connection);
-	 printf("%s","One Read \n");
-	 fflush(stdout);
-
-	 char type = o_connection_remote_read_byte(engine_remote->storage->connection);
-	 short rec_cl = o_connection_remote_read_short(engine_remote->storage->connection);
-	 long long rec_pos = o_connection_remote_read_long64(engine_remote->storage->connection);
-	 int version = o_connection_remote_read_int(engine_remote->storage->connection);
-	 unsigned char * o_p = o_connection_remote_read_bytes(engine_remote->storage->connection, &size);
-	 struct o_raw_buffer * buff = o_raw_buffer_byte(type, version, o_p, size);
-	 if (status == 1)
-	 callback(add_info, o_record_id_new(rec_cl, rec_pos), buff);
-
-	 }
-	 */
+	end_try;
 
 }
 

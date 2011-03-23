@@ -158,7 +158,7 @@ void o_document_init_by_class_name(struct o_document * doc)
 	if (doc->class_name != 0)
 	{
 		struct o_database * db = o_database_context_database();
-		if (db != 0 && o_database_get_type(db) != DOCUMENT_DB_TYPE)
+		if (db != 0 && o_database_get_type(db) == DOCUMENT_DB_TYPE)
 		{
 			struct o_database_document * docDb = (struct o_database_document *) o_database_context_database();
 			struct o_metadata * meta = o_database_document_metadata(docDb);
@@ -193,10 +193,10 @@ void o_document_set_class_by_name(struct o_document * doc, char * class_name)
 
 void o_document_deserialize(struct o_document * doc, struct o_input_stream * stream)
 {
-	struct o_database_document * db = (struct o_database_document *) o_database_context_database();
+	struct o_database * db = o_database_context_database();
 	struct o_document_formatter * fm = 0;
-	if (db != 0)
-		fm = o_database_document_get_formatter(db);
+	if (db != 0 && o_database_get_type(db) == DOCUMENT_DB_TYPE)
+		fm = o_database_document_get_formatter((struct o_database_document *) db);
 	else
 		fm = o_document_formatter_factory_default();
 	o_document_formatter_deserialize(fm, doc, stream);

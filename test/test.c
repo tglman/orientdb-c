@@ -16,6 +16,7 @@
 #include "test_o_list.h"
 #include "test_o_list_record.h"
 #include "test_o_database_query.h"
+#include "test_o_database_document_query.h"
 
 TEST_INITIALIZE
 {
@@ -34,6 +35,8 @@ TEST_INITIALIZE
 	ADD_SUITE(o_database_document_suite, "test on base database");
 	ADD_SUITE(o_database_document_metadata_suite, "test database metadata load");
 	ADD_SUITE(o_list_suite, "test list management");
-	ADD_SUITE(o_list_record_suite, "test list management");
-	ADD_SUITE(o_database_query_suite, "test list management");
+	ADD_SUITE(o_list_record_suite, "test record list management");
+	ADD_SUITE(o_database_query_suite, "test execute query on database");
+	ADD_SUITE(o_database_document_query_suite, "test execute query on document database");
 }
+
