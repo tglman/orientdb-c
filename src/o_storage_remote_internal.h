@@ -30,10 +30,4 @@ struct o_storage_remote
  */
 void o_storage_remote_begin_response(struct o_storage_remote * storage, int req_id);
 
-/*! \brief Generate an request id.
- *
- * \return a request id.
- */
-int o_storage_remote_new_request_id();
-
 #endif /* O_STORAGE_REMOTE_INTERNAL_H_ */

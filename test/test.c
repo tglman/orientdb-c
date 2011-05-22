@@ -17,6 +17,7 @@
 #include "test_o_list_record.h"
 #include "test_o_database_query.h"
 #include "test_o_database_document_query.h"
+#include "test_o_pool.h"
 
 TEST_INITIALIZE
 {
@@ -38,5 +39,6 @@ TEST_INITIALIZE
 	ADD_SUITE(o_list_record_suite, "test record list management");
 	ADD_SUITE(o_database_query_suite, "test execute query on database");
 	ADD_SUITE(o_database_document_query_suite, "test execute query on document database");
+	ADD_SUITE(o_pool_suite, "a suite of test on pool");
 }
 

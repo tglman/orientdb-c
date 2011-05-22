@@ -124,6 +124,7 @@ struct o_document_value * o_document_value_link_ref(struct o_record_id *id)
 struct o_document_value * o_document_value_link(struct o_record * rec)
 {
 	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
+	memset(link, 0, sizeof(struct o_document_value_link));
 	link->record = rec;
 	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document_value_link *));
 	VALUE(doc_val,struct o_document_value_link *) = link;

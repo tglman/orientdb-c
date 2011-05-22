@@ -15,12 +15,6 @@
 #include <time.h>
 #include <stdio.h>
 
-int o_storage_remote_new_request_id()
-{
-	static int cur_id = 0;
-	return (cur_id++) + time(0);
-}
-
 void o_storage_acquire_exclusive_lock(struct o_storage_remote * storage)
 {
 	o_native_lock_lock(storage->exclusive_lock);
@@ -67,8 +61,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
 
-	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_CREATE);
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_CREATE);
 	o_connection_remote_write_short(rs->connection, cluster);
 	int size;
 	unsigned char * buff = o_raw_buffer_content(content, &size);
@@ -76,7 +69,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
 	o_connection_remote_end_write(rs->connection);
 
-	o_storage_remote_begin_response(rs, req_id);
+	o_storage_remote_begin_response(rs, rs->session_id);
 	long long val = o_connection_remote_read_long64(rs->connection);
 	o_connection_remote_end_read(rs->connection);
 	o_storage_release_exclusive_lock(rs);
@@ -88,14 +81,13 @@ struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, s
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
 
-	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_LOAD);
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_LOAD);
 	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
 	o_connection_remote_write_string(rs->connection, "");
 	o_connection_remote_end_write(rs->connection);
 
-	o_storage_remote_begin_response(rs, req_id);
+	o_storage_remote_begin_response(rs, rs->session_id);
 	char res = o_connection_remote_read_byte(rs->connection);
 	if (res == 0)
 		return 0;
@@ -115,8 +107,8 @@ int o_storage_remote_update_record(struct o_storage * storage, struct o_record_i
 {
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
-	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_UPDATE);
+
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_UPDATE);
 	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
 	int size;
@@ -126,7 +118,7 @@ int o_storage_remote_update_record(struct o_storage * storage, struct o_record_i
 	o_connection_remote_write_byte(rs->connection, o_raw_buffer_type(content));
 	o_connection_remote_end_write(rs->connection);
 
-	o_storage_remote_begin_response(rs, req_id);
+	o_storage_remote_begin_response(rs, rs->session_id);
 	int res = o_connection_remote_read_int(rs->connection);
 	o_connection_remote_end_read(rs->connection);
 
@@ -139,14 +131,13 @@ int o_storage_remote_delete_record(struct o_storage * storage, struct o_record_i
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	o_storage_acquire_exclusive_lock(rs);
 
-	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, RECORD_DELETE);
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, RECORD_DELETE);
 	o_connection_remote_write_short(rs->connection, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(rs->connection, o_record_id_record_id(id));
 	o_connection_remote_write_int(rs->connection, version);
 	o_connection_remote_end_write(rs->connection);
 
-	o_storage_remote_begin_response(rs, req_id);
+	o_storage_remote_begin_response(rs, rs->session_id);
 	char res = o_connection_remote_read_byte(rs->connection);
 	o_connection_remote_end_read(rs->connection);
 	o_storage_release_exclusive_lock(rs);
@@ -215,8 +206,7 @@ void o_storage_remote_free(struct o_storage * storage)
 void o_storage_remote_close(struct o_storage * storage)
 {
 	struct o_storage_remote * rs = (struct o_storage_remote *) storage;
-	int req_id = o_storage_remote_new_request_id();
-	o_connection_remote_begin_write_session(rs->connection, req_id, DB_CLOSE);
+	o_connection_remote_begin_write_session(rs->connection, rs->session_id, DB_CLOSE);
 	o_connection_remote_end_write(rs->connection);
 }
 
@@ -228,7 +218,7 @@ int o_storage_remote_get_default_cluster_id(struct o_storage * storage)
 
 struct o_query_engine * o_storage_remote_get_query_engine(struct o_storage * storage)
 {
-	return o_query_engine_remote_new((struct o_storage_remote *)storage);
+	return o_query_engine_remote_new((struct o_storage_remote *) storage);
 }
 
 struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char * name, char * username, char * password)
@@ -255,17 +245,16 @@ struct o_storage * o_storage_remote_new(struct o_connection_remote * conn, char 
 		storage->storage.o_storage_free = o_storage_remote_free;
 
 		storage->connection = conn;
-		storage->session_id = 0;
+		storage->session_id = -1;
 		storage->exclusive_lock = o_native_lock_new();
 
-		int req_id = o_storage_remote_new_request_id();
-		o_connection_remote_begin_write_session(storage->connection, req_id, DB_OPEN);
+		o_connection_remote_begin_write_session(storage->connection, storage->session_id, DB_OPEN);
 		o_connection_remote_write_string(storage->connection, name);
 		o_connection_remote_write_string(storage->connection, username);
 		o_connection_remote_write_string(storage->connection, password);
 		o_connection_remote_end_write(storage->connection);
 
-		o_storage_remote_begin_response(storage, req_id);
+		o_storage_remote_begin_response(storage, storage->session_id);
 		storage->session_id = o_connection_remote_read_int(storage->connection);
 		storage->n_cluster = o_connection_remote_read_int(storage->connection);
 		int i;
