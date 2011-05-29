@@ -1,7 +1,7 @@
 #ifndef O_ENGINE_H_
 #define O_ENGINE_H_
 #include "o_storage.h"
-#include "o_connection.h"
+#include "o_storage_factory.h"
 
 /*! \brief Instanziate a new storage on a connection.
  *
@@ -16,6 +16,6 @@ struct o_storage * o_engine_get_storage(char * connection_url, char * username, 
  *
  * \param connection to release.
  */
-void o_engine_release_connection(struct o_connection * connection);
+void o_engine_release_factory(struct o_storage_factory * factory);
 
 #endif /* O_ENGINE_H_ */

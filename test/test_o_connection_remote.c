@@ -15,7 +15,7 @@ void *test_o_connection_private_listen_thread(void * par)
 	try
 	{
 		struct o_native_socket * socket = o_native_socket_listen(HOST_TEST, PORT_TEST);
-		struct o_connection * server_conn = o_connection_remote_new_accept(socket);
+		struct o_connection_remote * server_conn = o_connection_remote_new_accept(socket);
 
 		struct o_connection_remote * server = (struct o_connection_remote *) server_conn;
 
@@ -40,7 +40,7 @@ void *test_o_connection_private_listen_thread(void * par)
 		o_connection_remote_write_string(server, string);
 		o_free(string);
 
-		o_connection_free(server_conn);
+		o_connection_remote_free(server_conn);
 		o_native_socket_close(socket);
 		o_native_thread_current_exit();
 	}
@@ -65,7 +65,7 @@ void test_o_connection_local_data_transfer()
 
 		o_native_thread_current_sleep(400);
 
-		struct o_connection * client_con = o_connection_remote_new(HOST_TEST, PORT_TEST);
+		struct o_connection_remote * client_con = o_connection_remote_new(HOST_TEST, PORT_TEST);
 		struct o_connection_remote * client = (struct o_connection_remote *) client_con;
 
 		o_connection_remote_write_int(client, 10);
@@ -102,7 +102,7 @@ void test_o_connection_local_data_transfer()
 		assert_true(strcmp(string, string_ret) == 0, "error transfer string");
 		o_free(string_ret);
 
-		o_connection_free(client_con);
+		o_connection_remote_free(client_con);
 	}
 	catch (struct o_exception, e)
 	{
@@ -118,7 +118,7 @@ void test_o_connection_remote_data_transfer()
 	try
 	{
 
-		struct o_connection * client_con = o_connection_remote_new(HOST_TEST, 3333);
+		struct o_connection_remote * client_con = o_connection_remote_new(HOST_TEST, 3333);
 		struct o_connection_remote * client = (struct o_connection_remote *) client_con;
 
 		o_connection_remote_write_int(client, 10);
@@ -155,7 +155,7 @@ void test_o_connection_remote_data_transfer()
 		assert_true(strcmp(string, string_ret) == 0, "error transfer string");
 		o_free(string_ret);
 
-		o_connection_free(client_con);
+		o_connection_remote_free(client_con);
 	}
 	catch (struct o_exception, e)
 	{

@@ -1,5 +1,4 @@
 #include "o_connection_remote.h"
-#include "o_connection_internal.h"
 #include "o_native_socket.h"
 #include "o_storage_remote.h"
 #include "o_input_stream_socket.h"
@@ -14,12 +13,10 @@
 
 struct o_connection_remote
 {
-	struct o_connection connection;
 	struct o_native_socket *socket;
 	struct o_input_stream * input;
 	struct o_output_stream * output;
 	struct o_native_lock * input_lock;
-	struct o_native_lock * output_lock;
 	struct o_native_lock * cond_lock;
 	struct o_native_cond * cond;
 	int session_id;
@@ -27,49 +24,34 @@ struct o_connection_remote
 	char readed;
 };
 
-void o_connection_remote_free(struct o_connection *connection);
-struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name, char * username, char * password);
 
-struct o_connection * o_connection_remote_new_accept(struct o_native_socket * listen_sock)
+struct o_connection_remote * o_connection_remote_new_accept(struct o_native_socket * listen_sock)
 {
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
 	conn->socket = o_native_socket_accept(listen_sock);
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
-	conn->connection.free = o_connection_remote_free;
-	conn->connection.storage_open = o_connection_remote_storage_open;
 	conn->input_lock = o_native_lock_new();
-	conn->output_lock = o_native_lock_new();
 	conn->cond_lock = o_native_lock_new();
 	conn->cond = o_native_cond_new();
-	return &conn->connection;
+	return conn;
 }
 
-struct o_connection * o_connection_remote_new(char * host, int port)
+struct o_connection_remote * o_connection_remote_new(char * host, int port)
 {
 	struct o_connection_remote * conn = o_malloc(sizeof(struct o_connection_remote));
 	memset(conn, 0, sizeof(struct o_connection_remote));
 	conn->socket = o_native_socket_connect(host, port);
 	conn->input = o_input_stream_socket_new(conn->socket);
 	conn->output = o_output_stream_socket_new(conn->socket);
-	conn->connection.free = o_connection_remote_free;
-	conn->connection.storage_open = o_connection_remote_storage_open;
 	conn->input_lock = o_native_lock_new();
-	conn->output_lock = o_native_lock_new();
 	conn->cond_lock = o_native_lock_new();
 	conn->cond = o_native_cond_new();
 
 	if (o_connection_remote_read_short(conn) != CURRENT_PROTOCOL)
 		throw(o_exception_new("Wrong protocol version", 1));
-	return &conn->connection;
-}
-
-struct o_storage * o_connection_remote_storage_open(struct o_connection *connection, char * name, char * username, char * password)
-{
-	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	struct o_storage * new_storage = o_storage_remote_new(remote, name, username, password);
-	return new_storage;
+	return conn;
 }
 
 int o_connection_remote_read_int(struct o_connection_remote * connection)
@@ -214,29 +196,14 @@ void o_connection_remote_end_read(struct o_connection_remote * connection)
 	o_native_lock_unlock(connection->cond_lock);
 }
 
-void o_connection_remote_begin_write_session(struct o_connection_remote * connection, int session_id, char command)
+void o_connection_remote_free(struct o_connection_remote *connection)
 {
-	o_native_lock_lock(connection->output_lock);
-	o_connection_remote_write_byte(connection, command);
-	o_connection_remote_write_int(connection, session_id);
-}
-
-void o_connection_remote_end_write(struct o_connection_remote * connection)
-{
-	o_connection_remote_flush(connection);
-	o_native_lock_unlock(connection->output_lock);
-}
-
-void o_connection_remote_free(struct o_connection *connection)
-{
-	struct o_connection_remote * remote = (struct o_connection_remote *) connection;
-	o_native_socket_close(remote->socket);
-	o_input_stream_free(remote->input);
-	o_output_stream_free(remote->output);
-	o_native_lock_free(remote->output_lock);
-	o_native_lock_free(remote->input_lock);
-	o_native_lock_free(remote->cond_lock);
-	o_native_cond_free(remote->cond);
-	o_free(remote);
+	o_native_socket_close(connection->socket);
+	o_input_stream_free(connection->input);
+	o_output_stream_free(connection->output);
+	o_native_lock_free(connection->input_lock);
+	o_native_lock_free(connection->cond_lock);
+	o_native_cond_free(connection->cond);
+	o_free(connection);
 }
 

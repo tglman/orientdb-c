@@ -1,6 +1,6 @@
 #ifndef O_STORAGE_REMOTE_H_
 #define O_STORAGE_REMOTE_H_
-#include "o_connection_remote.h"
+#include "o_storage_factory_remote.h"
 
 struct o_storage_remote;
 
@@ -11,6 +11,7 @@ struct o_storage_remote;
  * @return the new storage instace.
  *
  */
-struct o_storage * o_storage_remote_new(struct o_connection_remote * conn,char * name,char * username, char * password);
+struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storage_factory, char * name, char * username, char * password);
+
 
 #endif /* O_STORAGE_REMOTE_H_ */

@@ -34,16 +34,17 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 		query_result_callback callback)
 {
 	struct o_query_engine_remote *engine_remote = (struct o_query_engine_remote *) engine;
-	o_connection_remote_begin_write_session(engine_remote->storage->connection, engine_remote->storage->session_id, COMMAND);
-	o_connection_remote_write_byte(engine_remote->storage->connection, 's');
+	struct o_connection_remote * conn = o_storage_remote_begin_write(engine_remote->storage, COMMAND);
+	o_connection_remote_write_byte(conn, 's');
 	struct o_output_stream *str = o_output_stream_byte_buffer();
 	o_query_seriealize(query, str);
 	int cont_size = 0;
 	unsigned char *content = o_output_stream_byte_content(str, &cont_size);
-	o_connection_remote_write_bytes(engine_remote->storage->connection, content, cont_size);
-	o_connection_remote_end_write(engine_remote->storage->connection);
+	o_connection_remote_write_bytes(conn, content, cont_size);
+	o_storage_remote_end_write(engine_remote->storage, conn);
 	o_output_stream_free(str);
 
+	/*
 	o_storage_remote_begin_response(engine_remote->storage, engine_remote->storage->session_id);
 	char response = o_connection_remote_read_byte(engine_remote->storage->connection);
 	try
@@ -81,6 +82,7 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 		throw(ex);
 	}
 	end_try;
+	*/
 
 }
 

@@ -1,6 +1,5 @@
 #ifndef O_CONNECTION_REMOTE_H_
 #define O_CONNECTION_REMOTE_H_
-#include "o_connection_internal.h"
 #include "o_native_socket.h"
 struct o_connection_remote;
 
@@ -9,7 +8,15 @@ struct o_connection_remote;
  * \param listen_socket the listen socket.
  * \return the new connection.
  */
-struct o_connection * o_connection_remote_new_accept(struct o_native_socket * listen_sock);
+struct o_connection_remote * o_connection_remote_new_accept(struct o_native_socket * listen_sock);
+
+/** Create a new connection to an host.
+ *
+ * \param host where connect.
+ * \param port where connect.
+ * \return a new connection.
+ */
+struct o_connection_remote * o_connection_remote_new(char * host, int port);
 
 /**
  * Read an int from connection.
@@ -119,39 +126,17 @@ void o_connection_remote_write_string(struct o_connection_remote * connection, c
  */
 void o_connection_remote_write_array_strings(struct o_connection_remote * connection, char * *strings_array, int length);
 
-/*! \brief Start a read of an session from connection.
- *
- * \param connection where read.
- * \param session_id session to read from socket.
- * \return the response status.
- */
-int o_connection_remote_begin_read_session(struct o_connection_remote * connection, int session_id);
-
-/*! \biref End a read of socket.
- *
- * \param connectio where read.
- */
-void o_connection_remote_end_read(struct o_connection_remote * connection);
-
-/*! \brief Start a write command to remote connection for session.
- *
- * \param cennection where communicate.
- * \param session_id identifier of session in writing.
- * \parma command the command sent to remote.
- */
-void o_connection_remote_begin_write_session(struct o_connection_remote * connection, int session_id, char command);
-
-/*! \brief End a write action on connection.
- *
- * \param connection where writed.
- */
-void o_connection_remote_end_write(struct o_connection_remote * connection);
-
 /**
  * Flush buffered data on connection.
  *
  * @param connection to flush.
  */
 void o_connection_remote_flush(struct o_connection_remote * connection);
+
+/*! \brief free the connection.
+ *
+ * \param connection to free.
+ */
+void o_connection_remote_free(struct o_connection_remote *connection);
 
 #endif /* O_CONNECTION_REMOTE_H_ */
