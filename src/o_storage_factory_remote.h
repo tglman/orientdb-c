@@ -10,7 +10,7 @@ struct o_storage_factory_remote;
  * \param host where connect
  * \return a new storage factory remote.
  */
-struct o_storage_factory * o_storage_factory_remote(char * host);
+struct o_storage_factory * o_storage_factory_remote_new(char * host);
 
 /*!\brief Retrieve a connection remote for write.
  *
@@ -38,7 +38,7 @@ struct o_connection_remote * o_storage_factory_remote_begin_read(struct o_storag
 /*! \brief Release an on read connection.
  *
  * \param factory to release the connection.
- * @param conn to release.
+ * \param conn to release.
  */
 void o_storage_factory_remote_end_read(struct o_storage_factory_remote * factory, struct o_connection_remote * conn);
 

@@ -2,7 +2,7 @@
 #include "../src/o_database_document.h"
 #include "../src/o_database.h"
 #include "../src/o_document.h"
-#include <test.h>
+#include <ctesf.h>
 #include "test_commons.h"
 
 void test_o_database_query()

@@ -1,6 +1,7 @@
 #ifndef O_CONNECTION_REMOTE_H_
 #define O_CONNECTION_REMOTE_H_
 #include "o_native_socket.h"
+#include "o_native_socket_selector.h"
 struct o_connection_remote;
 
 /*! \brief Retrieve a new remote connection from an listen socket.
@@ -17,6 +18,20 @@ struct o_connection_remote * o_connection_remote_new_accept(struct o_native_sock
  * \return a new connection.
  */
 struct o_connection_remote * o_connection_remote_new(char * host, int port);
+
+/*! \brief Add a connection to an selector.
+ *
+ * \param connection to add to selector.
+ * \param selector the selector where add.
+ */
+void o_connection_remote_add_to_selector(struct o_connection_remote * connection, struct o_native_socket_selector * selector);
+
+/*! \brief Remove a connection to an selector.
+ *
+ * \param connection to remove from selector.
+ * \param selector where remove
+ */
+void o_connection_remote_remove_from_selector(struct o_connection_remote * connection, struct o_native_socket_selector * selector);
 
 /**
  * Read an int from connection.

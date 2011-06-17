@@ -65,6 +65,7 @@ char *o_document_cluster_name(struct o_record * record)
 struct o_document * o_document_new_id(struct o_record_id * rid)
 {
 	struct o_document * new_doc = o_malloc(sizeof(struct o_document));
+	memset(new_doc, 0, sizeof(struct o_document));
 	o_record_new_internal_id(o_document_o_record(new_doc), DOCUMENT_RECORD_TYPE, rid);
 	new_doc->record.o_record_serialize = o_document_record_serialize;
 	new_doc->record.o_record_deserialize = o_document_record_deserialize;

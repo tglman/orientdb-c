@@ -257,6 +257,7 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		storage->storage.o_storage_get_metadata = o_storage_remote_get_metadata;
 		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;
+		storage->storage_factory=storage_factory;
 
 		storage->session_id = -1;
 		storage->exclusive_lock = o_native_lock_new();

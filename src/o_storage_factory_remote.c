@@ -4,17 +4,22 @@
 #include "o_pool.h"
 #include "o_storage_remote.h"
 #include "o_native_socket_selector.h"
+#include "o_native_lock.h"
 
 struct o_storage_factory_remote
 {
 	struct o_storage_factory base_factory;
 	struct o_native_socket_selector * selector;
 	struct o_pool * connection_pool;
+	struct o_native_lock * input_lock;
+	struct o_native_lock * cond_lock;
+	struct o_native_cond * cond;
 	char * host;
 	int port;
 	int readed;
 	int session_id;
-	int response_status;
+	char response_status;
+	struct o_connection_remote *conn;
 };
 
 void o_storage_factory_remote_free(struct o_storage_factory * to_free)
@@ -58,7 +63,7 @@ void o_storage_factory_pool_free_connection(void * factory, void * to_free)
 	o_connection_remote_free(conn);
 }
 
-struct o_storage_factory * o_storage_factory_remote(char * path)
+struct o_storage_factory * o_storage_factory_remote_new(char * path)
 {
 	struct o_storage_factory_remote * fact = o_malloc(sizeof(struct o_storage_factory_remote));
 	fact->base_factory.clazz = o_storage_factory_remote_get_class();
@@ -69,45 +74,56 @@ struct o_storage_factory * o_storage_factory_remote(char * path)
 	return (struct o_storage_factory*) fact;
 }
 
-struct o_connection_remote * o_storage_factory_begin_write(struct o_storage_factory_remote * factory)
+struct o_connection_remote * o_storage_factory_remote_begin_write(struct o_storage_factory_remote * factory)
 {
 	return (struct o_connection_remote *) o_pool_get(factory->connection_pool);
 }
 
-void o_storage_factory_remote_end_read(struct o_storage_factory_remote * factory, struct o_connection_remote * conn)
-{
-
-}
-
-void o_storage_factory_end_write(struct o_storage_factory_remote * factory, struct o_connection_remote * conn)
+void o_storage_factory_remote_end_write(struct o_storage_factory_remote * factory, struct o_connection_remote * conn)
 {
 	o_pool_release(factory->connection_pool, conn);
 }
 
-struct o_conenction_remote * o_storage_factory_begin_read(struct o_storage_factory_remote * factory, int session_id, char * command)
+struct o_connection_remote * o_storage_factory_remote_begin_read(struct o_storage_factory_remote * factory, int session_id, int *returnCode)
 {
 	do
 	{
+		int to_notify = 0;
 		o_native_lock_lock(factory->input_lock);
 		if (!factory->readed)
 		{
-			struct o_connection_remote * conn = o_native_socket_selector_select(factory->selector, 0);
+			factory->conn = (struct o_connection_remote *) o_native_socket_selector_select(factory->selector, 0);
 			factory->readed = 1;
-			factory->response_status = o_connection_remote_read_byte(conn);
-			factory->session_id = o_connection_remote_read_int(conn);
+			factory->response_status = o_connection_remote_read_byte(factory->conn);
+			factory->session_id = o_connection_remote_read_int(factory->conn);
+			to_notify = 1;
 		}
 		if (factory->session_id == session_id)
 		{
 			factory->readed = 0;
-			return factory->response_id;
+			*returnCode = factory->response_status;
+			struct o_connection_remote * rem = factory->conn;
+			o_native_lock_lock(factory->input_lock);
+			return rem;
 		}
 
 		o_native_lock_unlock(factory->input_lock);
 		o_native_lock_lock(factory->cond_lock);
+		if (to_notify)
+			o_native_cond_broadcast(factory->cond);
 		o_native_cond_wait(factory->cond, factory->cond_lock);
 		o_native_lock_unlock(factory->cond_lock);
 	} while (1);
 	/*never executed remove only warning.*/
 	return 0;
+}
+
+void o_storage_factory_remote_end_read(struct o_storage_factory_remote * factory, struct o_connection_remote * conn)
+{
+	//TODO : verify directory use.
+	o_native_socket_selector_end_select(factory->selector, (struct o_native_socket *) conn);
+	o_native_lock_lock(factory->cond_lock);
+	o_native_cond_broadcast(factory->cond);
+	o_native_lock_unlock(factory->cond_lock);
 }
 

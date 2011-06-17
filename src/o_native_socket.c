@@ -1,4 +1,5 @@
 #include "o_native_socket.h"
+#include "o_native_socket_internal.h"
 #include "o_exceptions.h"
 #include "o_exception_io.h"
 #include "o_memory.h"
@@ -11,31 +12,30 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 
-struct o_native_socket
+void o_native_socket_connect_internal(struct o_native_socket * sock, char * site, short port)
 {
-	int socket;
-};
-
+	struct sockaddr_in sock_info;
+	//TODO: Retrieve the socket information by the name of site.
+	struct hostent *he = gethostbyname(site);
+	sock->socket = socket(AF_INET, SOCK_STREAM, 0);
+	sock_info.sin_family = AF_INET;
+	sock_info.sin_port = htons(port);
+	memcpy(&sock_info.sin_addr, he->h_addr, he->h_length);
+	int res = connect(sock->socket, (struct sockaddr*) &sock_info, sizeof(sock_info));
+	if (res == -1)
+	{
+		char err_message[512];
+		sprintf(err_message, "Error on connection:%s ", strerror(errno));
+		throw(o_exception_io_new(err_message,3));
+	}
+}
 struct o_native_socket * o_native_socket_connect(char * site, short port)
 {
 	struct o_native_socket *sock = 0;
 	try
 	{
-		struct sockaddr_in sock_info;
-		//TODO: Retrieve the socket information by the name of site.
-		struct hostent *he = gethostbyname(site);
 		sock = o_malloc(sizeof(struct o_native_socket));
-		sock->socket = socket(AF_INET, SOCK_STREAM, 0);
-		sock_info.sin_family = AF_INET;
-		sock_info.sin_port = htons(port);
-		memcpy(&sock_info.sin_addr, he->h_addr, he->h_length);
-		int res = connect(sock->socket, (struct sockaddr*) &sock_info, sizeof(sock_info));
-		if (res == -1)
-		{
-			char err_message[512];
-			sprintf(err_message, "Error on connection:%s ", strerror(errno));
-			throw(o_exception_io_new(err_message,3));
-		}
+		o_native_socket_connect_internal(sock, site, port);
 	}
 	catch(struct o_exception, ex)
 	{
@@ -85,17 +85,22 @@ struct o_native_socket * o_native_socket_listen(char * site, short port)
 	return sock;
 }
 
-struct o_native_socket * o_native_socket_accept(struct o_native_socket * listen)
+void o_native_socket_accept_internal(struct o_native_socket * listen, struct o_native_socket * to_fill)
+{
+	struct sockaddr_in accept_sock;
+	unsigned int len = sizeof(struct sockaddr_in);
+	to_fill->socket = accept(listen->socket, (struct sockaddr*) &accept_sock, &len);
+	if (to_fill->socket == -1)
+		throw(o_exception_io_new("error on accept socket",3));
+}
+
+struct o_native_socket * o_native_socket_accept(struct o_native_socket * listen_sock)
 {
 	struct o_native_socket *sock = 0;
 	try
 	{
 		sock = o_malloc(sizeof(struct o_native_socket));
-		struct sockaddr_in accept_sock;
-		unsigned int len = sizeof(struct sockaddr_in);
-		sock->socket = accept(listen->socket, (struct sockaddr*) &accept_sock, &len);
-		if (sock->socket == -1)
-			throw(o_exception_io_new("error on accept socket",3));
+		o_native_socket_accept_internal(listen_sock, sock);
 	}
 	catch(struct o_exception, ex)
 	{
@@ -142,8 +147,18 @@ int o_native_socket_has_data(struct o_native_socket * sock)
 	return size;
 }
 
-void o_native_socket_close(struct o_native_socket * sock)
+void o_native_socket_close_internal(struct o_native_socket * sock)
 {
 	shutdown(sock->socket, SHUT_RDWR);
+}
+
+int o_native_socket_internal_descriptor(struct o_native_socket * sock)
+{
+	return sock->socket;
+}
+
+void o_native_socket_close(struct o_native_socket * sock)
+{
+	o_native_socket_close_internal(sock);
 	o_free(sock);
 }

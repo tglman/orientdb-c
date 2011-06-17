@@ -1,7 +1,7 @@
 #include "test_o_database_document_query.h"
 #include "test_commons.h"
 #include "../src/o_database_document.h"
-#include <test.h>
+#include <ctesf.h>
 
 void test_o_database_document_query()
 {

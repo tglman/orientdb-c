@@ -1,10 +1,11 @@
 #include "test_o_connection_remote.h"
 #include "../src/o_connection_remote.h"
 #include "../src/o_native_socket.h"
-#include <test.h>
+#include <ctesf.h>
 #include "../src/o_native_thread.h"
 #include "../src/o_memory.h"
 #include "../src/o_exceptions.h"
+#include "test_o_native_socket_selector.h"
 #include <stdio.h>
 #include <string.h>
 #define HOST_TEST "127.0.0.1"
@@ -33,7 +34,7 @@ void *test_o_connection_private_listen_thread(void * par)
 
 		int number;
 		unsigned char *bytes = o_connection_remote_read_bytes(server, &number);
-		o_connection_remote_write_bytes(server, (unsigned char *)bytes, number);
+		o_connection_remote_write_bytes(server, (unsigned char *) bytes, number);
 		o_free(bytes);
 
 		char * string = o_connection_remote_read_string(server);
@@ -166,9 +167,14 @@ void test_o_connection_remote_data_transfer()
 	end_try;
 }
 
-void o_connection_remote_suite()
+void o_connection_remote_data_suite()
 {
 	//ADD_TEST(test_o_connection_local_data_transfer, " test a connection client server data transfer");
 	//Remote test commented for unaviable server.
 	//ADD_TEST(test_o_connection_remote_data_transfer, " test a connection to java server with data transfer");
+}
+void o_connection_remote_suite()
+{
+	ADD_SUITE(o_connection_remote_data_suite, "test data transfere on connection");
+	ADD_SUITE(o_native_socket_selector_suite, "test the selector on data receive.");
 }

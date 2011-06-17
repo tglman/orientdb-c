@@ -5,10 +5,10 @@
 
 struct o_native_socket;
 
-/** connect a new socket.
+/*! \brief connect a new socket.
  *
- * @param site the name of destination site.
- * @param port the destination connection port.
+ * \param site the name of destination site.
+ * \param port the destination connection port.
  */
 struct o_native_socket * o_native_socket_connect(char * site, short port);
 

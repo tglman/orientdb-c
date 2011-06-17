@@ -39,6 +39,13 @@ void o_native_socket_selector_remove_socket(struct o_native_socket_selector * se
  */
 struct o_native_socket* o_native_socket_selector_select(struct o_native_socket_selector * selector, int timeout);
 
+/*! \brief Reput the socket in the selector when the operation on socket was ended.
+ *
+ * \param selector where add
+ * \param socket to add
+ */
+void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* socket);
+
 /*!\brief free the selector.
  *
  * \param selector to free.

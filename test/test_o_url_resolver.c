@@ -2,7 +2,7 @@
 #include "../src/o_url_resolver.h"
 #include "../src/o_memory.h"
 #include <string.h>
-#include <test.h>
+#include <ctesf.h>
 #include <stdio.h>
 #define TEST_URL "remote:127.0.0.1:2424/dbname"
 

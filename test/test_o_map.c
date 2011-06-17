@@ -1,5 +1,5 @@
 #include "../src/o_map_string.h"
-#include <test.h>
+#include <ctesf.h>
 #include "test_o_map.h"
 #include <string.h>
 #include <stdio.h>

@@ -2,6 +2,7 @@
 #include "o_memory.h"
 #include "o_list.h"
 #include "o_native_lock.h"
+#include "o_exceptions.h"
 #include <string.h>
 
 struct o_pool
@@ -44,6 +45,8 @@ int o_pool_expand(struct o_pool * pool)
 	if (pool_size < pool->max_size)
 	{
 		int used_size = o_list_size(pool->used_instances);
+		if (used_size == 0)
+			used_size = 1;
 		if (used_size * 2 > pool->max_size)
 			used_size = pool->max_size - used_size;
 		while (used_size > 0)
@@ -86,11 +89,22 @@ void * o_pool_get(struct o_pool * pool)
 	void * inst = 0;
 	o_native_lock_lock(pool->lock);
 	if (o_list_size(pool->free_instances) == 0)
-		if (!o_pool_expand(pool))
+	{
+		try
+		{
+			if (!o_pool_expand(pool))
+			{
+				o_native_lock_unlock(pool->lock);
+				return 0;
+			}
+		}
+		catch( struct o_exception ,ex)
 		{
 			o_native_lock_unlock(pool->lock);
-			return 0;
+			throw(ex);
 		}
+		end_try;
+	}
 
 	inst = o_list_get(pool->free_instances, 0);
 	o_list_remove(pool->free_instances, inst);
