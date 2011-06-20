@@ -68,7 +68,7 @@ struct o_storage_factory * o_storage_factory_remote_new(char * path)
 	struct o_storage_factory_remote * fact = o_malloc(sizeof(struct o_storage_factory_remote));
 	fact->base_factory.clazz = o_storage_factory_remote_get_class();
 	fact->connection_pool = o_pool_new(fact, o_storage_factory_pool_new_connection, o_storage_factory_pool_free_connection);
-	fact->selector = o_native_socket_selector_new(READ);
+	fact->selector = o_native_socket_selector_new();
 	if (o_url_resolve_host_port_from_path(path, &fact->host, &fact->port))
 		fact->port = 2424;
 	return (struct o_storage_factory*) fact;

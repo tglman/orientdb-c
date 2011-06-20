@@ -3,11 +3,6 @@
 #include "o_native_socket.h"
 
 
-enum selector_mode
-{
-	READ,WRITE,ERROR
-};
-
 struct o_native_socket_selector;
 
 /*! \brief Create a new socket selector.
@@ -15,7 +10,7 @@ struct o_native_socket_selector;
  * \param mode the mode of select
  * \return the new selector.
  */
-struct o_native_socket_selector * o_native_socket_selector_new(enum selector_mode mode);
+struct o_native_socket_selector * o_native_socket_selector_new();
 
 /*! \brief add a socket to the selector.
  *

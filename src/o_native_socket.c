@@ -150,6 +150,7 @@ int o_native_socket_has_data(struct o_native_socket * sock)
 void o_native_socket_close_internal(struct o_native_socket * sock)
 {
 	shutdown(sock->socket, SHUT_RDWR);
+	close(sock->socket);
 }
 
 int o_native_socket_internal_descriptor(struct o_native_socket * sock)

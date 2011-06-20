@@ -8,148 +8,96 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/select.h>
+#include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <stropts.h>
 #include <signal.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #define max(x,y) ((x) > (y) ? (x) : (y))
 
 struct o_native_socket_selector
 {
-	enum selector_mode mode;
-	struct o_list * socks;
-	struct o_native_lock * select_lock;
 	struct o_native_lock * socks_lock;
-	struct o_list * active_sock;
 	int epoll;
 };
 
-int o_native_socket_selector_fill_set(struct o_native_socket_selector * selector, fd_set * set)
-{
-	o_native_lock_lock(selector->socks_lock);
-	struct o_list_iterator *i = o_list_begin(selector->socks);
-	int ret = 0;
-	if (i != 0)
-	{
-		do
-		{
-			struct o_native_socket * sock = (struct o_native_socket *) o_list_iterator_current(i);
-			int sock_dec = o_native_socket_internal_descriptor(sock);
-			/*int flags;
-			 if ((flags = fcntl(sock_dec, F_GETFL, 0)) == -1)
-			 flags = 0;
-			 fcntl(sock_dec, F_SETFL, flags | O_NONBLOCK);
-			 */
-			ret = max(ret, sock_dec);
-			FD_SET(sock_dec,set);
-		} while (o_list_iterator_next(i));
-		ret += 1;
-	}
-	o_native_lock_unlock(selector->socks_lock);
-	return ret;
-}
-
-void o_native_socket_selector_fill_active(struct o_native_socket_selector * selector, fd_set * set)
-{
-	o_native_lock_lock(selector->socks_lock);
-	struct o_list_iterator *i = o_list_begin(selector->socks);
-	if (i != 0)
-	{
-		do
-		{
-			struct o_native_socket * sock = (struct o_native_socket *) o_list_iterator_current(i);
-			if (FD_ISSET(o_native_socket_internal_descriptor(sock),set))
-				o_list_add(selector->active_sock, sock);
-		} while (o_list_iterator_next(i));
-	}
-	o_native_lock_unlock(selector->socks_lock);
-}
-
-struct o_native_socket_selector * o_native_socket_selector_new(enum selector_mode mode)
+struct o_native_socket_selector * o_native_socket_selector_new()
 {
 	struct o_native_socket_selector * selector = o_malloc(sizeof(struct o_native_socket_selector));
-	selector->mode = mode;
-	selector->socks = o_list_new();
 	selector->socks_lock = o_native_lock_new();
-	selector->select_lock = o_native_lock_new();
-	selector->active_sock = o_list_new();
+	selector->epoll = epoll_create(10);
 	return selector;
 }
 
 void o_native_socket_selector_add_socket(struct o_native_socket_selector * selector, struct o_native_socket* sock)
 {
 	o_native_lock_lock(selector->socks_lock);
-	o_list_add(selector->socks, sock);
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+	int sock_dec = o_native_socket_internal_descriptor(sock);
+	ev.events = EPOLLIN | EPOLLONESHOT;
+	ev.data.ptr = sock;
+	epoll_ctl(selector->epoll, EPOLL_CTL_ADD, sock_dec, &ev);
 	o_native_lock_unlock(selector->socks_lock);
 }
 
 void o_native_socket_selector_remove_socket(struct o_native_socket_selector * selector, struct o_native_socket* sock)
 {
 	o_native_lock_lock(selector->socks_lock);
-	o_list_remove(selector->socks, sock);
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+	int sock_dec = o_native_socket_internal_descriptor(sock);
+	epoll_ctl(selector->epoll, EPOLL_CTL_DEL, sock_dec, &ev);
 	o_native_lock_unlock(selector->socks_lock);
 }
 
 struct o_native_socket* o_native_socket_selector_select(struct o_native_socket_selector * selector, int timeout)
 {
-	fd_set set;
-	struct o_native_socket * return_sock = 0;
-	o_native_lock_lock(selector->select_lock);
-	if (o_list_size(selector->active_sock) == 0)
+	struct epoll_event events[1];
+	o_native_lock_lock(selector->socks_lock);
+	while (1)
 	{
-		FD_ZERO(&set);
-		int size = o_native_socket_selector_fill_set(selector, &set);
-		int select_ret;
-		switch (selector->mode)
+		int select_ret = epoll_wait(selector->epoll, events, 1, timeout);
+		if (select_ret == 1)
 		{
-		case READ:
-			select_ret = select(size, &set, 0, 0, 0);
-			break;
-		case WRITE:
-			select_ret = select(size, 0, &set, 0, 0);
-			break;
-		case ERROR:
-			select_ret = select(size, 0, 0, &set, 0);
-			break;
+			o_native_lock_unlock(selector->socks_lock);
+			return (struct o_native_socket*) events[0].data.ptr;
 		}
-		if (select_ret > 0)
-			o_native_socket_selector_fill_active(selector, &set);
+		else if (select_ret == 0)
+		{
+			o_native_lock_unlock(selector->socks_lock);
+			return 0;
+		}
 		else if (select_ret == -1)
 		{
 			if (errno == EBADF)
 				printf("Returned EBADF");
 			if (errno == EINTR)
-				printf("Returned EINTR");
+			{
+				printf("Returned EINTR:");
+				fflush(stdout);
+				continue;
+			}
 			if (errno == EINVAL)
 				printf("Returned EINVAL");
-			if (errno == ENOMEM)
-				printf("Returned ENOMEM");
+			if (errno == EFAULT)
+				printf("Returned EFAULT");
 			fflush(stdout);
 		}
 	}
-	if (o_list_size(selector->active_sock) > 0)
-	{
-		return_sock = (struct o_native_socket *) o_list_get(selector->active_sock, 0);
-		o_list_remove(selector->active_sock, return_sock);
-	}
-	ioctl(o_native_socket_internal_descriptor(return_sock), I_SETSIG, 0);
-	o_native_lock_unlock(selector->select_lock);
-	return return_sock;
+	o_native_lock_unlock(selector->socks_lock);
+	return 0;
 }
 
 void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* socket)
 {
-	ioctl(o_native_socket_internal_descriptor(socket), I_SETSIG, S_MSG);
 }
 
 void o_native_socket_selector_free(struct o_native_socket_selector * selector)
 {
-	o_list_free(selector->socks);
 	o_native_lock_free(selector->socks_lock);
-	o_native_lock_free(selector->select_lock);
-	o_list_free(selector->active_sock);
 	o_free(selector);
 }
