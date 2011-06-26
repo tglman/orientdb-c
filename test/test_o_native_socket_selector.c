@@ -58,6 +58,8 @@ void o_native_socket_selector_simple_select()
 	o_native_socket_send(sock, &val, sizeof(int));
 	struct o_native_socket * ret_sock = o_native_socket_selector_select(sel, -1);
 	struct o_native_socket * ret_sock1 = o_native_socket_selector_select(sel, 10);
+	o_native_socket_selector_end_select(sel, ret_sock);
+	ret_sock = o_native_socket_selector_select(sel, -1);
 	o_native_thread_current_sleep(10);
 	int size = sizeof(int);
 	val = 0;

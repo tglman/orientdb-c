@@ -116,19 +116,6 @@ query_result_callback o_storage_get_callback(struct o_storage *storage, void ** 
  */
 struct o_raw_buffer * o_storage_get_metadata(struct o_storage *storage);
 
-/*! \brief Release the current storage.
- * reference count decrement.
- *
- * \param storage to release.
- */
-void o_storage_release(struct o_storage * storage);
-
-/*! \brief increase an reference to the storage.
- *
- * \param storage to refer.
- */
-void o_storage_reference(struct o_storage * storage);
-
 /*! \brief Close the current storage.
  *
  * \param storage to close.

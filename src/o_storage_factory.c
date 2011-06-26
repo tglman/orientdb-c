@@ -23,11 +23,6 @@ struct o_storage_factory * o_storage_factory_new(enum o_url_type type, char * pa
 	return fact;
 }
 
-struct o_storage * o_storage_open(struct o_storage_factory * factory, char * db_name, char * user, char * passwd)
-{
-	return factory->clazz->storage_open(factory, db_name, user, passwd);
-}
-
 enum o_url_type o_storage_factory_get_type(struct o_storage_factory * factory)
 {
 	return factory->clazz->get_type(factory);
@@ -35,7 +30,7 @@ enum o_url_type o_storage_factory_get_type(struct o_storage_factory * factory)
 
 struct o_storage * o_storage_factory_storage_open(struct o_storage_factory * factory, char * db_name, char * user, char * passwd)
 {
-	return factory->clazz->storage_open(factory,db_name,user,passwd);
+	return factory->clazz->storage_open(factory, db_name, user, passwd);
 }
 
 char * o_storage_factory_get_path(struct o_storage_factory * factory)
@@ -45,9 +40,7 @@ char * o_storage_factory_get_path(struct o_storage_factory * factory)
 
 void o_storage_factory_release_storage(struct o_storage_factory *factory, struct o_storage * storage)
 {
-	factory->opened_storage_count--;
-	if(factory->opened_storage_count == 0)
-		o_engine_release_factory(factory);
+	factory->clazz->storage_release(factory, storage);
 }
 
 void o_storage_factory_free(struct o_storage_factory *factory)

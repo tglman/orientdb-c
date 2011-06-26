@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <unistd.h>
 
 void o_native_socket_connect_internal(struct o_native_socket * sock, char * site, short port)
 {

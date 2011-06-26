@@ -3,6 +3,7 @@
 #include "o_list.h"
 #include "o_native_socket_internal.h"
 #include "o_native_lock.h"
+#include "o_exceptions.h"
 #include <sys/socket.h>
 #include <sys/fcntl.h>
 #include <unistd.h>
@@ -73,27 +74,25 @@ struct o_native_socket* o_native_socket_selector_select(struct o_native_socket_s
 		}
 		else if (select_ret == -1)
 		{
-			if (errno == EBADF)
-				printf("Returned EBADF");
 			if (errno == EINTR)
-			{
-				printf("Returned EINTR:");
-				fflush(stdout);
 				continue;
-			}
-			if (errno == EINVAL)
-				printf("Returned EINVAL");
-			if (errno == EFAULT)
-				printf("Returned EFAULT");
-			fflush(stdout);
+			else
+				throw(o_exception_new("Error on socket selector", errno));
 		}
 	}
 	o_native_lock_unlock(selector->socks_lock);
 	return 0;
 }
 
-void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* socket)
+void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* sock)
 {
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+	int sock_dec = o_native_socket_internal_descriptor(sock);
+	ev.events = EPOLLIN | EPOLLONESHOT;
+	ev.data.ptr = sock;
+	epoll_ctl(selector->epoll, EPOLL_CTL_MOD, sock_dec, &ev);
+
 }
 
 void o_native_socket_selector_free(struct o_native_socket_selector * selector)

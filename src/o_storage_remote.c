@@ -181,12 +181,6 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 
 }
 
-void o_storage_remote_internal_release(struct o_storage * storage)
-{
-	struct o_storage_remote * storage_remote = (struct o_storage_remote *) storage;
-	o_storage_factory_release_storage((struct o_storage_factory *) storage_remote->storage_factory, storage);
-}
-
 struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
 {
 	struct o_storage_configuration *conf = o_storage_get_configuration(storage);
@@ -222,6 +216,10 @@ void o_storage_remote_close(struct o_storage * storage)
 	struct o_storage_remote * rs = (struct o_storage_remote *) storage;
 	struct o_connection_remote * conn = o_storage_remote_begin_write(rs, DB_CLOSE);
 	o_storage_remote_end_write(rs, conn);
+
+	struct o_storage_remote * storage_remote = (struct o_storage_remote *) storage;
+	o_storage_factory_release_storage((struct o_storage_factory *) storage_remote->storage_factory, storage);
+
 }
 
 int o_storage_remote_get_default_cluster_id(struct o_storage * storage)
@@ -253,7 +251,6 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		storage->storage.o_storage_get_query_engine = o_storage_remote_get_query_engine;
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
 
-		storage->storage.o_storage_final_release = o_storage_remote_internal_release;
 		storage->storage.o_storage_get_metadata = o_storage_remote_get_metadata;
 		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;

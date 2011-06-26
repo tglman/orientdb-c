@@ -48,10 +48,10 @@ struct o_storage * o_engine_get_storage(char * connection_url, char * username, 
 
 void o_engine_release_factory(struct o_storage_factory * factory)
 {
-	 char * path = o_storage_factory_get_path(factory);
-	 o_map_string_remove(o_engine_get_instance()->factories, path);
-	 if (o_map_string_size(o_engine_get_instance()->factories) == 0)
-	 o_engine_release();
+	char * path = o_storage_factory_get_path(factory);
+	o_map_string_remove(o_engine_get_instance()->factories, path);
+	if (o_map_string_size(o_engine_get_instance()->factories) == 0)
+		o_engine_release();
 
 }
 

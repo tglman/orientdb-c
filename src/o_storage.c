@@ -71,12 +71,6 @@ struct o_storage_configuration * o_storage_get_configuration(struct o_storage *s
 	return storage->configuration;
 }
 
-void o_storage_release(struct o_storage * storage)
-{
-	storage->ref_count--;
-	if (storage->ref_count == 0)
-		storage->o_storage_final_release(storage);
-}
 void o_storage_internal_free(struct o_storage *storage)
 {
 	o_free(storage->name);
@@ -101,7 +95,6 @@ void o_storage_internal_new(struct o_storage *storage, char * name, char * user)
 	int usrlen = strlen(user) + 1;
 	storage->user = o_malloc(usrlen);
 	memcpy(storage->user, user, usrlen);
-	storage->ref_count = 0;
 }
 
 void o_storage_set_callback(struct o_storage *storage, void * add_info, query_result_callback callback)
@@ -112,13 +105,8 @@ void o_storage_set_callback(struct o_storage *storage, void * add_info, query_re
 
 query_result_callback o_storage_get_callback(struct o_storage *storage, void ** add_info)
 {
-	*add_info=storage->callback_addinfo ;
+	*add_info = storage->callback_addinfo;
 	return storage->callback;
-}
-
-void o_storage_reference(struct o_storage * storage)
-{
-	storage->ref_count++;
 }
 
 void o_storage_free(struct o_storage * storage)

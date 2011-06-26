@@ -15,16 +15,16 @@ struct o_native_socket_selector * o_native_socket_selector_new();
 /*! \brief add a socket to the selector.
  *
  * \param selector where add a socket.
- * \param socket to add.
+ * \param sock to add.
  */
-void o_native_socket_selector_add_socket(struct o_native_socket_selector * selector, struct o_native_socket* socket);
+void o_native_socket_selector_add_socket(struct o_native_socket_selector * selector, struct o_native_socket* sock);
 
 /*! \brief Remove a socket from the selector.
  *
  * \param selector where remove.
- * \param socket to remove.
+ * \param sock to remove.
  */
-void o_native_socket_selector_remove_socket(struct o_native_socket_selector * selector, struct o_native_socket* socket);
+void o_native_socket_selector_remove_socket(struct o_native_socket_selector * selector, struct o_native_socket* sock);
 
 /*! \brief Start the select of socket.
  *
@@ -34,12 +34,12 @@ void o_native_socket_selector_remove_socket(struct o_native_socket_selector * se
  */
 struct o_native_socket* o_native_socket_selector_select(struct o_native_socket_selector * selector, int timeout);
 
-/*! \brief Reput the socket in the selector when the operation on socket was ended.
+/*! \brief Readd the socket in the selector when the operation on socket was ended.
  *
  * \param selector where add
- * \param socket to add
+ * \param sock to add
  */
-void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* socket);
+void o_native_socket_selector_end_select(struct o_native_socket_selector * selector, struct o_native_socket* sock);
 
 /*!\brief free the selector.
  *

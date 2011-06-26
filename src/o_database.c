@@ -64,7 +64,7 @@ void o_database_open(struct o_database * db, char * username, char * password)
 	{
 		db->storage = o_engine_get_storage(db->connection_url, username, password);
 	}
-	catch(struct o_exception , ex)
+	catch(struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
@@ -116,7 +116,7 @@ int o_database_save_cluster(struct o_database * db, struct o_record * record, ch
 		o_record_cache_put(o_database_get_cache(db), record);
 		result = 1;
 	}
-	catch( struct o_exception ,ex)
+	catch( struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
@@ -136,7 +136,7 @@ int o_database_delete(struct o_database * db, struct o_record * record)
 		o_storage_delete_record(db->storage, o_record_get_id(record), o_record_version(record));
 		result = 1;
 	}
-	catch( struct o_exception ,ex)
+	catch( struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
@@ -173,7 +173,7 @@ struct o_record * o_database_load(struct o_database * db, struct o_record_id * r
 			struct o_raw_buffer * row = o_storage_read_record(db->storage, rid);
 			rec = o_database_record_from_content(db, rid, row);
 		}
-		catch( struct o_exception ,ex)
+		catch( struct o_exception, ex)
 		{
 			DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 			o_exception_free(ex);
@@ -197,7 +197,7 @@ void o_database_query_internal(struct o_database * db, struct o_query * query, v
 		struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
 		o_query_engine_query(query_engine, query, add_info, callback);
 	}
-	catch( struct o_exception ,ex)
+	catch( struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
@@ -236,24 +236,23 @@ struct o_record * o_database_record_new(struct o_database *db)
 
 void o_database_free_internal(struct o_database * db)
 {
-	if (db->referrers != 0)
-	{
-		int count = o_list_size(db->referrers);
-		while (count > 0)
-			*((struct o_database **) o_list_get(db->referrers, --count)) = 0;
-		o_list_free(db->referrers);
-	}
-	o_database_close(db);
 }
 
 void o_database_close(struct o_database * db)
 {
 	try
 	{
+		if (db->referrers != 0)
+		{
+			int count = o_list_size(db->referrers);
+			while (count > 0)
+				*((struct o_database **) o_list_get(db->referrers, --count)) = 0;
+			o_list_free(db->referrers);
+		}
 		if (db->storage != 0)
-			o_storage_release(db->storage);
+			o_storage_close(db->storage);
 	}
-	catch(struct o_exception , ex)
+	catch(struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);
@@ -288,7 +287,7 @@ struct o_record * o_database_metadata(struct o_database * db)
 		struct o_raw_buffer * meta = o_storage_get_metadata(db->storage);
 		metadata = o_database_record_from_content(db, o_record_id_new(0, 0), meta);
 	}
-	catch( struct o_exception ,ex)
+	catch( struct o_exception, ex)
 	{
 		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
 		o_exception_free(ex);

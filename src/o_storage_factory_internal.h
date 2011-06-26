@@ -6,6 +6,7 @@ struct o_storage_factory_class
 {
 	enum o_url_type (*get_type)(struct o_storage_factory *factory);
 	struct o_storage * (*storage_open)(struct o_storage_factory *factory, char * storage_name, char * username, char * password);
+	void (*storage_release)(struct o_storage_factory *factory, struct o_storage * storage);
 	void (*free)(struct o_storage_factory *factory);
 };
 
@@ -13,7 +14,6 @@ struct o_storage_factory
 {
 	struct o_storage_factory_class *clazz;
 	char * path;
-	int opened_storage_count;
 };
 
 /*! \brief Release the storage to the current factory.

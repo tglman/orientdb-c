@@ -9,7 +9,7 @@
 #include <netinet/in.h>
 #include "o_exceptions.h"
 
-#define CURRENT_PROTOCOL 3
+#define CURRENT_PROTOCOL 5
 
 struct o_connection_remote
 {

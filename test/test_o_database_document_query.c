@@ -11,7 +11,7 @@ void test_o_database_document_query()
 
 	o_database_document_metadata(dd);
 
-	struct o_query * q = o_query_sql("select * from OUser where name = \'admin\' ");
+	struct o_query * q = o_query_sql("select * from OUser where name = 'admin' ");
 	struct o_list_document * ld = o_database_document_query(dd, q);
 
 	assert_true(o_list_document_size(ld) == 1, "The query not return the expected number of record");

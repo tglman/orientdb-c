@@ -13,10 +13,9 @@ void test_o_database_query()
 	struct o_query * q = o_query_sql("select * from OUser where name = \'admin\' ");
 	struct o_list_record * lr = o_database_query(db, q);
 
-	assert_true(o_list_record_size(lr) == 1, "The query not return the expected number of record");
-
 	o_database_close(db);
 	o_database_free(db);
+	assert_true(o_list_record_size(lr) == 1, "The query not return the expected number of record");
 
 }
 
