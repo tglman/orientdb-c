@@ -59,6 +59,7 @@ void o_query_sql_serialize(struct o_query * query, struct o_output_stream * stre
 	o_output_stream_data_write_string(data, qsql->query.fetchPlan != 0 ? qsql->query.fetchPlan : "");
 	//Write an empty byte array of params.
 	o_output_stream_data_write_string(data, "");
+	o_output_stream_data_write_byte(data, 0);
 	o_output_stream_data_free(data);
 }
 
@@ -69,6 +70,7 @@ struct o_query * o_query_sql(char * query)
 	qsql->sql = o_memdup(query, strlen(query) + 1);
 	qsql->query.o_query_free = o_query_sql_free;
 	qsql->query.o_query_seriealize = o_query_sql_serialize;
+	qsql->query.limit = -1;
 	return &qsql->query;
 }
 

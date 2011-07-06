@@ -25,9 +25,12 @@ struct o_string_buffer * o_string_buffer_new()
 void o_string_buffer_append(struct o_string_buffer * buff, char * to_append)
 {
 	int size = strlen(to_append);
-	if (buff->cursor + size >= buff->size)
+	int expected_cursor = buff->cursor + size;
+	if (expected_cursor >= buff->size)
 	{
-		buff->size = buff->size * 2;
+		buff->size *= 2;
+		if (expected_cursor >= buff->size)
+			buff->size = expected_cursor;
 		buff->buffer = o_realloc(buff->buffer, buff->size);
 	}
 	memcpy(buff->buffer + buff->cursor, to_append, size);
@@ -50,7 +53,8 @@ void o_string_buffer_append_double(struct o_string_buffer * buff, double double_
 
 void o_string_buffer_append_char(struct o_string_buffer * buff, char ch)
 {
-	char val[2] = { ch, 0 };
+	char val[2] =
+	{ ch, 0 };
 	o_string_buffer_append(buff, val);
 }
 

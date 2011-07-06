@@ -185,8 +185,12 @@ struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
 {
 	struct o_storage_configuration *conf = o_storage_get_configuration(storage);
 	struct o_string_buffer * buff = o_string_buffer_new();
-	o_string_buffer_append(buff, "schema:#");
-	o_string_buffer_append(buff, o_record_id_string(o_storage_configuration_get_schema(conf)));
+	struct o_record_id *sid = o_storage_configuration_get_schema(conf);
+	if (sid != 0)
+	{
+		o_string_buffer_append(buff, "schema:#");
+		o_string_buffer_append(buff, o_record_id_string(sid));
+	}
 	char * content = o_string_buffer_str(buff);
 	o_string_buffer_free(buff);
 	fflush(stdout);
@@ -254,7 +258,8 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		storage->storage.o_storage_get_metadata = o_storage_remote_get_metadata;
 		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;
-		storage->storage_factory=storage_factory;
+		storage->storage.configuration = 0;
+		storage->storage_factory = storage_factory;
 
 		storage->session_id = -1;
 		storage->exclusive_lock = o_native_lock_new();

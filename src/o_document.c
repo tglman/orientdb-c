@@ -188,7 +188,7 @@ void o_document_set_class(struct o_document * doc, struct o_class * cl)
 
 void o_document_set_class_by_name(struct o_document * doc, char * class_name)
 {
-	doc->class_name = o_memdup(class_name, strlen(class_name));
+	doc->class_name = o_memdup(class_name, strlen(class_name)+1);
 	o_document_init_by_class_name(doc);
 }
 

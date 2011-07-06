@@ -4,6 +4,7 @@
 #include "../src/o_document.h"
 #include <ctesf.h>
 #include "test_commons.h"
+#include <stdio.h>
 
 void test_o_database_query()
 {

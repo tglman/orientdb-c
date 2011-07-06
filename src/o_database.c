@@ -3,6 +3,7 @@
 #include "o_database_error_handler.h"
 #include "o_memory.h"
 #include <string.h>
+#include <stdio.h>
 #include "o_engine.h"
 #include "o_storage.h"
 #include "o_url_resolver.h"

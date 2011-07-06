@@ -20,7 +20,7 @@ struct o_query_engine_remote
 void o_query_engine_remote_record_result(struct o_connection_remote * connection, void * add_info, query_result_callback callback)
 {
 	//CLASS!! RIQUERED FOR THE PROTOCOLL, I IGNORE
-	o_connection_remote_read_int(connection);
+	o_connection_remote_read_short(connection);
 	int size;
 	char type = o_connection_remote_read_byte(connection);
 	short rec_cl = o_connection_remote_read_short(connection);
@@ -44,9 +44,9 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 	o_storage_remote_end_write(engine_remote->storage, conn);
 	o_output_stream_free(str);
 
-	/*
-	o_storage_remote_begin_response(engine_remote->storage, engine_remote->storage->session_id);
-	char response = o_connection_remote_read_byte(engine_remote->storage->connection);
+
+	conn =o_storage_remote_begin_response(engine_remote->storage);
+	char response = o_connection_remote_read_byte(conn);
 	try
 	{
 		switch (response)
@@ -54,35 +54,35 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 		case 'n':
 		{
 			int size;
-			unsigned char * readed = o_connection_remote_read_bytes(engine_remote->storage->connection, &size);
+			unsigned char * readed = o_connection_remote_read_bytes(conn, &size);
 			o_free(readed);
 		}
 			break;
 		case 'r':
 		{
-			o_query_engine_remote_record_result(engine_remote->storage->connection, add_info, callback);
+			o_query_engine_remote_record_result(conn, add_info, callback);
 		}
 			break;
 		case 'l':
 		{
-			int size = o_connection_remote_read_int(engine_remote->storage->connection);
+			int size = o_connection_remote_read_int(conn);
 			while (size-- > 0)
 			{
-				o_query_engine_remote_record_result(engine_remote->storage->connection, add_info, callback);
+				o_query_engine_remote_record_result(conn, add_info, callback);
 			}
 
 		}
 			break;
 		}
-		o_connection_remote_end_read(engine_remote->storage->connection);
+		o_storage_remote_end_read(engine_remote->storage, conn);
 	}
 	catch( struct o_exception ,ex)
 	{
-		o_connection_remote_end_read(engine_remote->storage->connection);
+		o_storage_remote_end_read(engine_remote->storage, conn);
 		throw(ex);
 	}
 	end_try;
-	*/
+
 
 }
 

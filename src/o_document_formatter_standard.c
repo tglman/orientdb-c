@@ -215,12 +215,15 @@ struct o_document_value * o_doc_for_std_value_array_deserialize(struct o_input_s
 	do
 	{
 		struct o_document_value *cur = o_doc_for_std_value_deserialize(stream);
-		if (value_list == 0)
-			root = value_list = o_malloc(sizeof(struct o_document_value_list));
-		else
-			value_list = value_list->next = o_malloc(sizeof(struct o_document_value_list));
-		value_list->val = cur;
-		size++;
+		if(cur != 0)
+		{
+			if (value_list == 0)
+				root = value_list = o_malloc(sizeof(struct o_document_value_list));
+			else
+				value_list = value_list->next = o_malloc(sizeof(struct o_document_value_list));
+			value_list->val = cur;
+			size++;
+		}
 		readed = o_input_stream_peek(stream);
 		if (readed == ',' || readed == ']')
 			o_input_stream_read(stream);

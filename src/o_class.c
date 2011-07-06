@@ -21,7 +21,7 @@ struct o_class * o_class_new(char * name)
 {
 	struct o_class * cl = o_malloc(sizeof(struct o_class));
 	memset(cl, 0, sizeof(struct o_class));
-	cl->name = o_memdup(name, strlen(name));
+	cl->name = o_memdup(name, strlen(name)+1);
 	cl->properties = o_map_string_new();
 	return cl;
 }

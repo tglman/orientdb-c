@@ -13,7 +13,7 @@ struct o_property
 struct o_property * o_property_new(char * name, enum o_document_value_type type)
 {
 	struct o_property * prop = o_malloc(sizeof(struct o_property *));
-	prop->name = o_memdup(name, strlen(name));
+	prop->name = o_memdup(name, strlen(name)+1);
 	prop->type = type;
 	return prop;
 }

@@ -19,7 +19,7 @@ struct o_storage_factory * o_storage_factory_new(enum o_url_type type, char * pa
 	default:
 		break;
 	}
-	fact->path = o_memdup(path, strlen(path));
+	fact->path = o_memdup(path, strlen(path)+1);
 	return fact;
 }
 
