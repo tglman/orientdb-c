@@ -54,6 +54,14 @@ void o_record_id_refer(struct o_record_id * o_id);
  */
 char * o_record_id_string(struct o_record_id * o_id);
 
+/*! \brief retrieve the hash for current record id.
+ *
+ * \param rid the record id to retrieve hash.
+ * \param size the limit of hash size.
+ * \return the hash.
+ */
+unsigned int o_record_id_hash(struct o_record_id * rid, unsigned int size);
+
 /** Release an reference to record id.
  *
  * @param o_id the record id to release.

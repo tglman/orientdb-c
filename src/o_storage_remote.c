@@ -94,10 +94,33 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	return val;
 }
 
+struct o_raw_buffer * o_storage_remote_build_matadata_record(struct o_storage_remote * storage)
+{
+	struct o_storage_configuration *conf = o_storage_get_configuration((struct o_storage *) storage);
+	struct o_string_buffer * buff = o_string_buffer_new();
+	struct o_record_id *sid = o_storage_configuration_get_schema(conf);
+	if (sid != 0)
+	{
+		o_string_buffer_append(buff, "schema:#");
+		o_string_buffer_append(buff, o_record_id_string(sid));
+	}
+	char * content = o_string_buffer_str(buff);
+	o_string_buffer_free(buff);
+	fflush(stdout);
+	return o_raw_buffer_byte('d', 0, (unsigned char *) content, strlen(content));
+
+}
+__thread int in_get_metadata = 1;
 struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, struct o_record_id * id)
 {
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
-
+	if (o_record_id_cluster_id(id) == 0 && o_record_id_record_id(id) == 0 && in_get_metadata)
+	{
+		in_get_metadata = 0;
+		struct o_raw_buffer * res = o_storage_remote_build_matadata_record(rs);
+		in_get_metadata = 1;
+		return res;
+	}
 	struct o_connection_remote * conn = o_storage_remote_begin_write(rs, RECORD_LOAD);
 	o_connection_remote_write_short(conn, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(conn, o_record_id_record_id(id));
@@ -181,20 +204,9 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 
 }
 
-struct o_raw_buffer * o_storage_remote_get_metadata(struct o_storage * storage)
+struct o_record_id * o_storage_remote_get_metadata_rid(struct o_storage * storage)
 {
-	struct o_storage_configuration *conf = o_storage_get_configuration(storage);
-	struct o_string_buffer * buff = o_string_buffer_new();
-	struct o_record_id *sid = o_storage_configuration_get_schema(conf);
-	if (sid != 0)
-	{
-		o_string_buffer_append(buff, "schema:#");
-		o_string_buffer_append(buff, o_record_id_string(sid));
-	}
-	char * content = o_string_buffer_str(buff);
-	o_string_buffer_free(buff);
-	fflush(stdout);
-	return o_raw_buffer_byte('d', 0, (unsigned char *) content, strlen(content));
+	return o_record_id_new(0, 0);
 }
 
 void o_storage_remote_free(struct o_storage * storage)
@@ -255,7 +267,7 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		storage->storage.o_storage_get_query_engine = o_storage_remote_get_query_engine;
 		storage->storage.o_storage_commit_transaction = o_storage_remote_commit_transaction;
 
-		storage->storage.o_storage_get_metadata = o_storage_remote_get_metadata;
+		storage->storage.o_storage_get_metadata_rid = o_storage_remote_get_metadata_rid;
 		storage->storage.o_storage_close = o_storage_remote_close;
 		storage->storage.o_storage_free = o_storage_remote_free;
 		storage->storage.configuration = 0;

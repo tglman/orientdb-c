@@ -7,13 +7,14 @@
 #include "o_raw_buffer.h"
 #include "o_list.h"
 #include "o_query_callback.h"
+#include "o_operation_context.h"
 
 struct o_database
 {
 	struct o_database_error_handler * error_handler;
 	char * connection_url;
 	struct o_storage * storage;
-	struct o_record_cache * cache;
+	struct o_operation_context * context;
 	struct o_list * referrers;
 	char db_type;
 };
@@ -27,13 +28,6 @@ struct o_database
  * \return the new database instance.
  */
 void o_database_new_internal(struct o_database * db, char * connection_url, struct o_database_error_handler * error_handler, char db_type);
-
-/*! \brief Retrieve the cache from database.
- *
- * \param db where retrieve the cache.
- * \param the record cache of db.
- */
-struct o_record_cache * o_database_get_cache(struct o_database * db);
 
 /*! \brief Create a record form id and content, and cache it in the db cache.
  *
@@ -62,10 +56,17 @@ void o_database_remove_referrer(struct o_database * db, struct o_database ** ref
  *
  * \param db where execute query.
  * \param query to execute.
- * \param add_info gived to callback.
+ * \param paremeters the parameters of the query.
  * \param callback to invoke on result put.
+ * \param add_info gived to callback.
  */
-void o_database_query_internal(struct o_database * db, struct o_query * query, void *add_info, query_result_callback callback);
+int o_database_query_internal(struct o_database * db, struct o_query * query, void ** parameters, QueryHandler callback, void *add_info);
+
+/*! \brief init the context with the database.
+ *
+ * \param to_set the database to set in the context.
+ */
+void o_database_context_database_init(struct o_database * to_set);
 
 /** Clear the database structure .
  *

@@ -68,8 +68,11 @@ struct o_document * o_database_document_load(struct o_database_document * db, st
 
 struct o_metadata * o_database_document_metadata(struct o_database_document * db)
 {
-	struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
-	db->metadata = o_metadata_from_document((struct o_document *) meta);
+	if (db->metadata == 0)
+	{
+		struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
+		db->metadata = o_metadata_from_document((struct o_document *) meta);
+	}
 	return db->metadata;
 }
 
@@ -79,20 +82,21 @@ struct o_document_rh
 	struct o_list_document * list;
 };
 
-void o_query_engine_document_listener(void * add_info, struct o_record_id *id, struct o_raw_buffer * buffer)
+void o_query_engine_document_listener(void * add_info, struct o_record *record)
 {
 	struct o_document_rh * docr = (struct o_document_rh *) add_info;
-	struct o_record * record = o_database_record_from_content(o_database_document_to_database(docr->db), id, buffer);
 	o_list_document_add(docr->list, (struct o_document *) record);
 
 }
 
 struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query)
 {
+	o_database_context_database_init(db);
 	struct o_document_rh rh;
 	rh.db = db;
 	rh.list = o_list_document_new();
-	o_database_query_internal(o_database_document_to_database(db), query, &rh, o_query_engine_document_listener);
+	o_database_query_internal(o_database_document_to_database(db), query, 0, o_query_engine_document_listener, &rh);
+	o_database_context_database_init(0);
 	return rh.list;
 }
 

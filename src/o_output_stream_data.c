@@ -23,7 +23,7 @@ void o_output_stream_data_flush(struct o_output_stream * stream)
 
 void o_output_stream_data_free(struct o_output_stream_data * stream)
 {
-	o_output_stream_data_flush(stream);
+	o_output_stream_data_flush((struct o_output_stream *)stream);
 	o_free(stream);
 }
 

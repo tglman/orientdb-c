@@ -114,7 +114,7 @@ query_result_callback o_storage_get_callback(struct o_storage *storage, void ** 
  * \param storage to retrieve metedata.
  * \return the raw buffer that represent the metadata.
  */
-struct o_raw_buffer * o_storage_get_metadata(struct o_storage *storage);
+struct o_record_id * o_storage_get_metadata_rid(struct o_storage *storage);
 
 /*! \brief Close the current storage.
  *

@@ -53,9 +53,9 @@ void o_storage_close(struct o_storage * storage)
 	return storage->o_storage_close(storage);
 }
 
-struct o_raw_buffer * o_storage_get_metadata(struct o_storage *storage)
+struct o_record_id * o_storage_get_metadata_rid(struct o_storage *storage)
 {
-	return storage->o_storage_get_metadata(storage);
+	return storage->o_storage_get_metadata_rid(storage);
 }
 
 struct o_storage_configuration * o_storage_get_configuration(struct o_storage *storage)

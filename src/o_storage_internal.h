@@ -19,7 +19,7 @@ struct o_storage
 	int (*o_storage_get_cluster_id_by_name)(struct o_storage * storage, char * name);
 	int (*o_storage_get_default_cluster_id)(struct o_storage * storage);
 	void (*o_storage_commit_transaction)(struct o_storage *storage, struct o_transaction * transaction);
-	struct o_raw_buffer * (*o_storage_get_metadata)(struct o_storage * storage);
+	struct o_record_id * (*o_storage_get_metadata_rid)(struct o_storage * storage);
 	void (*o_storage_close)(struct o_storage * storage);
 	void (*o_storage_free)(struct o_storage * storage);
 };

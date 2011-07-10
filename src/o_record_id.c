@@ -2,6 +2,8 @@
 #include "o_memory.h"
 #include "o_string_buffer.h"
 
+#define HASH_PRIME 31
+
 struct o_record_id
 {
 	int cluster_id;
@@ -48,6 +50,11 @@ void o_record_id_free(struct o_record_id * o_id)
 void o_record_id_refer(struct o_record_id * o_id)
 {
 	o_id->ref_count++;
+}
+
+unsigned int o_record_id_hash(struct o_record_id * rid, unsigned int size)
+{
+	return (o_record_id_cluster_id(rid) * HASH_PRIME + (o_record_id_record_id(rid) >> 32) * HASH_PRIME) % size;
 }
 
 char * o_record_id_string(struct o_record_id * o_id)
