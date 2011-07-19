@@ -16,7 +16,7 @@ struct o_map_entry
 
 struct o_map
 {
-	unsigned int (*o_map_hash)(void * key, int size);
+	unsigned int (*o_map_hash)(void * key);
 	void (*o_entry_create)(void ** key, void ** value);
 	void (*o_entry_free)(void ** key, void ** value);
 	int (*o_key_compare)(void * key1, void * key2);
@@ -39,7 +39,11 @@ void o_map_clear_caches(struct o_map *map)
 	map->cache_values = 0;
 }
 
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **),
+unsigned int o_map_hash(struct o_map *map, void * key)
+{
+	return map->o_map_hash(key) % map->entries_size;
+}
+struct o_map * o_map_new(unsigned int(*o_map_hash)(void *), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **),
 		int(*o_key_compare)(void * key1, void * key2))
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
@@ -57,7 +61,6 @@ struct o_map * o_map_new(unsigned int(*o_map_hash)(void *, int), void(*o_entry_c
 void o_map_free_entry(struct o_map * map, struct o_map_entry * entry)
 {
 	map->o_entry_free(&entry->key, &entry->value);
-	//o_free(entry->key);
 	o_free(entry);
 }
 
@@ -71,7 +74,7 @@ struct o_map_entry * o_map_get_entry(struct o_map * map, void * key, unsigned in
 
 void * o_map_put(struct o_map * map, void * key, void * val)
 {
-	unsigned int hash = map->o_map_hash(key, map->entries_size);
+	unsigned int hash = o_map_hash(map, key);
 	o_map_clear_caches(map);
 	struct o_map_entry * new_entry = o_map_get_entry(map, key, hash);
 	if (new_entry != 0)
@@ -111,7 +114,7 @@ void * o_map_put(struct o_map * map, void * key, void * val)
 
 void * o_map_get(struct o_map * map, void * key)
 {
-	unsigned int hash = map->o_map_hash(key, map->entries_size);
+	unsigned int hash = o_map_hash(map, key);
 	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	if (found != 0)
 		return found->value;
@@ -120,7 +123,7 @@ void * o_map_get(struct o_map * map, void * key)
 
 void * o_map_remove(struct o_map * map, void * key)
 {
-	unsigned int hash = map->o_map_hash(key, map->entries_size);
+	unsigned int hash = o_map_hash(map, key);
 	struct o_map_entry * found = o_map_get_entry(map, key, hash);
 	void *value = 0;
 	if (found != 0)

@@ -91,7 +91,7 @@ void o_query_engine_document_listener(void * add_info, struct o_record *record)
 
 struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query)
 {
-	o_database_context_database_init(db);
+	o_database_context_database_init((struct o_database *)db);
 	struct o_document_rh rh;
 	rh.db = db;
 	rh.list = o_list_document_new();

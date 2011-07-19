@@ -13,6 +13,7 @@
 #include "o_exceptions.h"
 #include "o_exception.h"
 #include "o_database_operation_context.h"
+#include "o_transaction.h"
 
 #define DB_ERROR_NOTIFY(DB,CODE,ERROR) if(DB->error_handler != 0)o_database_error_handler_notify(DB->error_handler, CODE, ERROR);
 

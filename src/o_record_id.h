@@ -57,10 +57,17 @@ char * o_record_id_string(struct o_record_id * o_id);
 /*! \brief retrieve the hash for current record id.
  *
  * \param rid the record id to retrieve hash.
- * \param size the limit of hash size.
  * \return the hash.
  */
-unsigned int o_record_id_hash(struct o_record_id * rid, unsigned int size);
+unsigned int o_record_id_hash(struct o_record_id * rid);
+
+/*! \brief compare two record id.
+ *
+ * \param rid1 first record id.
+ * \param rid2 second record id.
+ * \return ==0 if record ids are equals >0 if rid1 > rid2 otherwise < 0
+ */
+int o_record_id_compare(struct o_record_id * rid1, struct o_record_id * rid2);
 
 /** Release an reference to record id.
  *

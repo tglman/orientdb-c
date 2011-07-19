@@ -1,10 +1,11 @@
 #ifndef O_OPERATION_CONTEXT_H_
 #define O_OPERATION_CONTEXT_H_
-#include "o_transaction.h"
 #include "o_record.h"
 #include "o_query.h"
 
 struct o_operation_context;
+
+#include "o_transaction.h"
 
 /*! \brief Handler of found record by query.
  *

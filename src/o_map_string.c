@@ -8,14 +8,14 @@ struct o_map_string
 	struct o_map *map;
 };
 
-unsigned int o_map_hash_string(void * key, int size)
+unsigned int o_map_hash_string(void * key)
 {
 	char * string_key = key;
 	unsigned int h, i;
 	unsigned int len = strlen(string_key);
 	for (h = 0, i = 0; i < len; i++)
 		h = 31 * h + string_key[i++];
-	return h % size;
+	return h ;
 }
 
 void o_entry_string_create(void ** key, void ** value)

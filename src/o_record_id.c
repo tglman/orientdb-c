@@ -52,9 +52,17 @@ void o_record_id_refer(struct o_record_id * o_id)
 	o_id->ref_count++;
 }
 
-unsigned int o_record_id_hash(struct o_record_id * rid, unsigned int size)
+unsigned int o_record_id_hash(struct o_record_id * rid)
 {
-	return (o_record_id_cluster_id(rid) * HASH_PRIME + (o_record_id_record_id(rid) >> 32) * HASH_PRIME) % size;
+	return (o_record_id_cluster_id(rid) * HASH_PRIME + (o_record_id_record_id(rid) >> 32) * HASH_PRIME);
+}
+
+int o_record_id_compare(struct o_record_id * rid1, struct o_record_id * rid2)
+{
+	int dif = o_record_id_cluster_id(rid1) - o_record_id_cluster_id(rid2);
+	if (dif != 0)
+		return dif;
+	return o_record_id_record_id(rid1) - o_record_id_record_id(rid2);
 }
 
 char * o_record_id_string(struct o_record_id * o_id)
