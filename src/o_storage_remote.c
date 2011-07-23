@@ -238,7 +238,7 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 			else
 				o_connection_remote_write_byte(conn, 1);
 		}
-		else
+		else if (!o_record_id_is_new(rid))
 			o_connection_remote_write_byte(conn, 2);
 
 		o_connection_remote_write_short(conn, o_record_id_cluster_id(rid));
@@ -251,15 +251,20 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 				o_connection_remote_write_string(conn, o_storage_remote_get_cluster_name_by_id(storage, o_record_id_cluster_id(rid)));
 			else
 				o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
-			unsigned char* bytes = o_raw_buffer_content(buff, &size);
+			int buff_size = 0;
+			unsigned char* bytes = o_raw_buffer_content(buff, &buff_size);
 
-			o_connection_remote_write_bytes(conn, bytes, size);
+			o_connection_remote_write_bytes(conn, bytes, buff_size);
 		}
 		else
 			o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
 		o_raw_buffer_free(buff);
 
 	}
+	o_connection_remote_write_byte(conn, 0);
+	//NOW SEND NO INDEX UPDATE.
+	o_connection_remote_write_int(conn, 0);
+
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);

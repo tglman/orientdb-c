@@ -30,7 +30,6 @@ struct o_transaction_query_handler
 void o_entry_transaction_create(void ** key, void ** value)
 {
 	//TODO Verify what inc
-	o_record_refer(((struct o_transaction_entry *) *value)->record);
 	o_record_id_refer((struct o_record_id *) *key);
 }
 
@@ -38,7 +37,7 @@ void o_entry_transaction_free(void ** key, void ** value)
 {
 	//TODO Verify what dec
 	o_record_id_release((struct o_record_id *) *key);
-	o_record_release((struct o_record *) *value);
+	o_record_release(((struct o_transaction_entry *) *value)->record);
 }
 
 struct o_transaction_entry * o_transaction_resolve_entry(struct o_transaction * trans, struct o_record_id *id)
@@ -59,6 +58,7 @@ void o_transaction_query_handler(void * add_info, struct o_record * record)
 	struct o_record_id *id = o_record_get_id(record);
 	struct o_transaction_entry * entry = o_transaction_resolve_entry(handler->transaction, id);
 	entry->type = LOADED;
+	o_record_refer(record);
 	entry->record = record;
 	handler->wrappend_endler_function(handler->wrappend_endler, record);
 }
@@ -82,6 +82,7 @@ int o_transaction_save(struct o_operation_context * context, struct o_record * r
 		entry = o_malloc(sizeof(struct o_transaction_entry));
 		o_map_put(trans->records, id, entry);
 	}
+	o_record_refer(record);
 	entry->record = record;
 	entry->type = SAVE;
 	return 1;
@@ -98,6 +99,7 @@ int o_transaction_delete(struct o_operation_context * context, struct o_record *
 		//TODO:verify if unrelease already refferred record..
 		o_record_release(entry->record);
 	}
+	o_record_refer(record);
 	entry->record = record;
 	o_record_refer(entry->record);
 	return 1;
@@ -106,6 +108,14 @@ int o_transaction_delete(struct o_operation_context * context, struct o_record *
 struct o_record * o_transaction_load(struct o_operation_context * context, struct o_record_id * record_id)
 {
 	struct o_transaction * trans = (struct o_transaction *) context;
+	struct o_transaction_entry * entry = (struct o_transaction_entry *) o_map_get(trans->records, record_id);
+	if (entry != 0)
+	{
+		if (entry->type == REMOVE)
+			return 0;
+		else
+			return entry->record;
+	}
 	return trans->parent->type->load(context, record_id);
 }
 

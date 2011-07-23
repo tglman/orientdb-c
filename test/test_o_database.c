@@ -15,7 +15,7 @@ void test_o_database_new_open_close()
 	o_database_free(db);
 }
 
-void test_database_crud_opertation(struct o_database * db)
+void test_database_crud_opertation(struct o_database * db, void(*middle)(struct o_database *))
 {
 	struct o_record * record = o_database_record_new(db);
 	int size = strlen("content content");
@@ -28,7 +28,8 @@ void test_database_crud_opertation(struct o_database * db)
 	char * content = o_record_raw_content(load_rec, &load_size);
 	assert_true(size == load_size, "readed have not same size of writed");
 	assert_true(memcmp(content, "content content", load_size) == 0, "readed have not same content of writed");
-
+	if (middle != 0)
+		middle(db);
 	int test_size = strlen("test test");
 	o_record_raw_reset(load_rec, "test test", test_size);
 	o_database_save(db, load_rec, 0);
@@ -51,17 +52,23 @@ void test_o_database_new_open_crud_close()
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/demo", errorHandler);
 	o_database_open(db, "admin", "admin");
-	test_database_crud_opertation(db), o_database_close(db);
+	test_database_crud_opertation(db, 0);
+	o_database_close(db);
 	o_database_free(db);
 }
 
+void commit_and_begin(struct o_database * db)
+{
+	o_database_commit(db);
+	o_database_begin_transaction(db);
+}
 void test_o_database_transaction_commit()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/demo", errorHandler);
 	o_database_open(db, "admin", "admin");
 	o_database_begin_transaction(db);
-	test_database_crud_opertation(db);
+	test_database_crud_opertation(db, commit_and_begin);
 	o_database_commit(db);
 	o_database_close(db);
 	o_database_free(db);

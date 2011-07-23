@@ -180,20 +180,54 @@ struct o_record * o_database_record_new(struct o_database *db)
 
 void o_database_begin_transaction(struct o_database * db)
 {
-	struct o_transaction * new_trans = o_transaction_new(db->context);
-	db->context = o_transaction_to_operation_context(new_trans);
+	o_database_context_database_init(db);
+	try
+	{
+		struct o_transaction * new_trans = o_transaction_new(db->context);
+		db->context = o_transaction_to_operation_context(new_trans);
+	}
+	catch( struct o_exception, ex)
+	{
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	o_database_context_database_init(0);
 }
 
 void o_database_commit(struct o_database * db)
 {
-	o_operation_context_commit(db->context);
-	db->context = o_operation_context_release(db->context);
+	o_database_context_database_init(db);
+	try
+	{
+		o_operation_context_commit(db->context);
+		db->context = o_operation_context_release(db->context);
+	}
+	catch( struct o_exception, ex)
+	{
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	o_database_context_database_init(0);
+
 }
 
 void o_database_rollback(struct o_database * db)
 {
-	o_operation_context_rollback(db->context);
-	db->context = o_operation_context_release(db->context);
+	o_database_context_database_init(db);
+	try
+	{
+		o_operation_context_rollback(db->context);
+		db->context = o_operation_context_release(db->context);
+	}
+	catch( struct o_exception, ex)
+	{
+		DB_ERROR_NOTIFY(db, o_exception_code(ex), o_exception_message(ex));
+		o_exception_free(ex);
+	}
+	end_try;
+	o_database_context_database_init(0);
 }
 
 void o_database_free_internal(struct o_database * db)
