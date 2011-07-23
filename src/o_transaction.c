@@ -1,18 +1,14 @@
-#include "o_transaction.h"
+#include "o_transaction_internal.h"
 #include "o_map.h"
 #include "o_operation_context_internal.h"
 #include "o_record_internal.h"
 #include "o_memory.h"
+#include "o_raw_buffer_record.h"
 #include <string.h>
-
-enum record_operation_type
-{
-	SAVE, REMOVE, LOADED
-};
 
 struct o_transaction_entry
 {
-	enum record_operation_type type;
+	enum transaction_operation_type type;
 	struct o_record * record;
 };
 
@@ -119,6 +115,13 @@ int o_transaction_commit(struct o_operation_context * context)
 	return trans->parent->type->commit_transaction(trans->parent, trans);
 }
 
+int o_transaction_rollback(struct o_operation_context * context)
+{
+	struct o_transaction * trans = (struct o_transaction *) context;
+	o_map_clear(trans->records);
+	return 1;
+}
+
 int o_transaction_commit_transaction(struct o_operation_context * context, struct o_transaction * transaction)
 {
 	struct o_transaction * trans = (struct o_transaction *) context;
@@ -134,6 +137,26 @@ int o_transaction_commit_transaction(struct o_operation_context * context, struc
 	}
 	transaction->context.type->release(&transaction->context);
 	return 1;
+}
+
+struct o_transaction_entry ** o_transaction_get_entries(struct o_transaction *transaction, int * size)
+{
+	return (struct o_transaction_entry **) o_map_values(transaction->records, size);
+}
+
+enum transaction_operation_type o_transaction_entry_get_type(struct o_transaction_entry * entry)
+{
+	return entry->type;
+}
+
+struct o_record_id * o_transaction_entry_get_rid(struct o_transaction_entry * entry)
+{
+	return o_record_get_id(entry->record);
+}
+
+struct o_raw_buffer * o_transaction_entry_get_raw_buffer(struct o_transaction_entry * entry)
+{
+	return o_raw_buffer_record(entry->record);
 }
 
 int o_transaction_query(struct o_operation_context * context, struct o_query * query, void ** parameters, QueryHandler handler, void * handler_add_info)
@@ -157,7 +180,13 @@ struct o_operation_context * o_transaction_release(struct o_operation_context * 
 
 struct o_operation_context_class o_transaction_operation_context_instance =
 { .save = o_transaction_save, .delete = o_transaction_delete, .load = o_transaction_load, .commit = o_transaction_commit, .commit_transaction =
-		o_transaction_commit_transaction, .query = o_transaction_query, .release = o_transaction_release };
+		o_transaction_commit_transaction, .query = o_transaction_query, .release = o_transaction_release, .rollback = o_transaction_rollback };
+
+void o_transaction_update_id(struct o_transaction * transaction, struct o_record_id *old, struct o_record_id * new)
+{
+	struct o_transaction_entry * entry = o_transaction_resolve_entry(transaction, old);
+	o_record_reset_id(entry->record, new);
+}
 
 struct o_operation_context * o_transaction_to_operation_context(struct o_transaction *transaction)
 {

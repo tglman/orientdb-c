@@ -13,6 +13,8 @@
 #include "o_remote_protocol_specs.h"
 #include "o_query_engine_remote.h"
 #include "o_storage_factory_internal.h"
+#include "o_transaction_internal.h"
+#include "o_record_internal.h"
 #include <time.h>
 #include <stdio.h>
 
@@ -199,8 +201,96 @@ int o_storage_remote_get_cluster_id_by_name(struct o_storage * storage, char * n
 	return -1;
 }
 
+const char * o_storage_remote_get_cluster_name_by_id(struct o_storage * storage, int cluster_id)
+{
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	struct o_storage_remote_cluster * clusters_iterator = rs->clusters;
+	while (clusters_iterator != 0)
+	{
+		if (clusters_iterator->id == cluster_id)
+			return clusters_iterator->storage_name;
+		clusters_iterator = clusters_iterator->next;
+	}
+	return "";
+}
+
 void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_transaction * transaction)
 {
+	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
+	struct o_connection_remote * conn = o_storage_remote_begin_write(rs, TX_COMMIT);
+	//TODO:gen transaction id.
+	o_connection_remote_write_int(conn, 1);
+	o_connection_remote_write_byte(conn, 1);
+	int size = 0;
+	struct o_transaction_entry ** entries = o_transaction_get_entries(transaction, &size);
+	while (size-- > 0)
+	{
+		struct o_raw_buffer * buff = o_transaction_entry_get_raw_buffer(entries[size]);
+		struct o_record_id * rid = o_transaction_entry_get_rid(entries[size]);
+		enum transaction_operation_type type = o_transaction_entry_get_type(entries[size]);
+		if (type != SAVE && type != REMOVE)
+			continue;
+		o_connection_remote_write_byte(conn, 1);
+		if (type == SAVE)
+		{
+			if (o_record_id_is_new(rid))
+				o_connection_remote_write_byte(conn, 3);
+			else
+				o_connection_remote_write_byte(conn, 1);
+		}
+		else
+			o_connection_remote_write_byte(conn, 2);
+
+		o_connection_remote_write_short(conn, o_record_id_cluster_id(rid));
+		o_connection_remote_write_long64(conn, o_record_id_record_id(rid));
+		o_connection_remote_write_byte(conn, o_raw_buffer_type(buff));
+
+		if (type == SAVE)
+		{
+			if (o_record_id_is_new(rid))
+				o_connection_remote_write_string(conn, o_storage_remote_get_cluster_name_by_id(storage, o_record_id_cluster_id(rid)));
+			else
+				o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
+			unsigned char* bytes = o_raw_buffer_content(buff, &size);
+
+			o_connection_remote_write_bytes(conn, bytes, size);
+		}
+		else
+			o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
+		o_raw_buffer_free(buff);
+
+	}
+	o_storage_remote_end_write(rs, conn);
+
+	conn = o_storage_remote_begin_response(rs);
+	int created_records = o_connection_remote_read_int(conn);
+	struct o_record_id * old = 0;
+	struct o_record_id * new = 0;
+	int i;
+	for (i = 0; i < created_records; i++)
+	{
+		int old_cl = o_connection_remote_read_short(conn);
+		long long old_id = o_connection_remote_read_short(conn);
+		old = o_record_id_new(old_cl, old_id);
+		int new_cl = o_connection_remote_read_short(conn);
+		long long new_id = o_connection_remote_read_short(conn);
+		new = o_record_id_new(new_cl, new_id);
+		o_transaction_update_id(transaction, old, new);
+	}
+	int updated_records = o_connection_remote_read_int(conn);
+	struct o_operation_context * ctx = o_transaction_to_operation_context(transaction);
+	struct o_record_id * upd = 0;
+	for (i = 0; i < updated_records; ++i)
+	{
+		int cl = o_connection_remote_read_short(conn);
+		long long id = o_connection_remote_read_short(conn);
+		upd = o_record_id_new(cl, id);
+
+		struct o_record * rec = o_operation_context_load(ctx, upd);
+		int new_version = o_connection_remote_read_int(conn);
+		o_record_reset_version(rec, new_version);
+	}
+	o_storage_remote_end_read(rs, conn);
 
 }
 

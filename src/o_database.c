@@ -178,6 +178,24 @@ struct o_record * o_database_record_new(struct o_database *db)
 	return o_database_record_new_type(db, RAW_RECORD_TYPE);
 }
 
+void o_database_begin_transaction(struct o_database * db)
+{
+	struct o_transaction * new_trans = o_transaction_new(db->context);
+	db->context = o_transaction_to_operation_context(new_trans);
+}
+
+void o_database_commit(struct o_database * db)
+{
+	o_operation_context_commit(db->context);
+	db->context = o_operation_context_release(db->context);
+}
+
+void o_database_rollback(struct o_database * db)
+{
+	o_operation_context_rollback(db->context);
+	db->context = o_operation_context_release(db->context);
+}
+
 void o_database_free_internal(struct o_database * db)
 {
 }

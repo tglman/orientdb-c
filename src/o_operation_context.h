@@ -47,6 +47,13 @@ struct o_record * o_operation_context_load(struct o_operation_context * context,
  */
 int o_operation_context_commit(struct o_operation_context * context);
 
+/*! \brief rollback the current transaction.
+ *
+ * \param context to rollback.
+ * \return != 0 if rollback is ok.
+ */
+int o_operation_context_rollback(struct o_operation_context * context);
+
 /*! \brief Commit a transaction to the current transaction context.
  *
  * \param context where commit the transaction.

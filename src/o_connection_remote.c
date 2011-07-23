@@ -140,7 +140,7 @@ void o_connection_remote_write_bytes(struct o_connection_remote * connection, un
 	o_output_stream_write_bytes(connection->output, byte_array, length);
 }
 
-void o_connection_remote_write_string(struct o_connection_remote * connection, char *string)
+void o_connection_remote_write_string(struct o_connection_remote * connection, const char *string)
 {
 	o_connection_remote_write_bytes(connection, (unsigned char *) string, strlen(string));
 }

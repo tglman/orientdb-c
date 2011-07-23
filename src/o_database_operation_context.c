@@ -102,8 +102,15 @@ int o_database_operation_context_commit(struct o_operation_context * context)
 	return 0;
 }
 
+int o_database_operation_context_rollback(struct o_operation_context * context)
+{
+	return 0;
+}
+
 int o_database_operation_context_commit_transaction(struct o_operation_context * context, struct o_transaction * transaction)
 {
+	struct o_database_operation_context *db = (struct o_database_operation_context *) context;
+	o_storage_commit_transaction(db->storage, transaction);
 	return 0;
 }
 
@@ -135,7 +142,7 @@ struct o_operation_context * o_database_operation_context_release(struct o_opera
 struct o_operation_context_class o_database_operation_context_instance =
 { .save = o_database_operation_context_save, .delete = o_database_operation_context_delete, .load = o_database_operation_context_load, .commit =
 		o_database_operation_context_commit, .commit_transaction = o_database_operation_context_commit_transaction, .query = o_database_operation_context_query,
-		.release = o_database_operation_context_release };
+		.release = o_database_operation_context_release, .rollback = o_database_operation_context_rollback };
 
 struct o_operation_context * o_database_operation_context(struct o_storage * storage)
 {

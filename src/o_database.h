@@ -109,6 +109,31 @@ struct o_database * o_database_context_database();
  */
 void o_database_close(struct o_database * db);
 
+/*! \brief Begin a transaction on current database session.
+ *
+ * \param db where start transaction.
+ */
+void o_database_begin_transaction(struct o_database * db);
+
+/*! \brief Commit the current running transaction.
+ *
+ * \param db where commit transaction.
+ */
+void o_database_commit(struct o_database * db);
+
+/*! \brief Rollback current transaction.
+ *
+ * \param db where rollback transaction.
+ */
+void o_database_rollback(struct o_database * db);
+
+/*! \brief check if in the current database is active a transaction.
+ *
+ * \param db where check.
+ * \return != 0 if a transaction was active.s
+ */
+int o_datbase_transaction_active(struct o_database * db);
+
 /*! \brief retrieve the metadata of database.
  *
  * \param db to retrieve metadata.

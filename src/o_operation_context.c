@@ -21,6 +21,11 @@ int o_operation_context_commit(struct o_operation_context * context)
 	return context->type->commit(context);
 }
 
+int o_operation_context_rollback(struct o_operation_context * context)
+{
+	return context->type->rollback(context);
+}
+
 int o_operation_context_commit_transaction(struct o_operation_context * context, struct o_transaction * transaction)
 {
 	return context->type->commit_transaction(context, transaction);

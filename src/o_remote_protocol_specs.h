@@ -25,6 +25,8 @@
 #define RECORD_UPDATE 32
 #define RECORD_DELETE 33
 
+#define TX_COMMIT 60
+
 #define COUNT 40
 #define COMMAND 41
 
@@ -33,8 +35,6 @@
 #define DICTIONARY_REMOVE 52
 #define DICTIONARY_SIZE 53
 #define DICTIONARY_KEYS 54
-
-#define TX_COMMIT 100
 
 // STATUSES
 #define OK	 0

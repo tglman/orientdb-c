@@ -8,6 +8,7 @@ struct o_operation_context_class
 	int (*delete)(struct o_operation_context * context, struct o_record * record);
 	struct o_record * (*load)(struct o_operation_context * context, struct o_record_id * record_id);
 	int (*commit)(struct o_operation_context * context);
+	int (*rollback)(struct o_operation_context * context);
 	int (*commit_transaction)(struct o_operation_context * context, struct o_transaction * transaction);
 	int (*query)(struct o_operation_context * context, struct o_query * query, void ** parameters, QueryHandler handler, void * handler_add_info);
 	struct o_operation_context * (*release)(struct o_operation_context * context);

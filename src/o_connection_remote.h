@@ -131,7 +131,7 @@ void o_connection_remote_write_bytes(struct o_connection_remote * connection, un
  * \param connection where write.
  * \param string to write.
  */
-void o_connection_remote_write_string(struct o_connection_remote * connection, char *string);
+void o_connection_remote_write_string(struct o_connection_remote * connection, const char *string);
 
 /** Write an array of string null terminated to connection.
  *
