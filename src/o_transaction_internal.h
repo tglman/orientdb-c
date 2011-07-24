@@ -1,6 +1,7 @@
 #ifndef O_TRANSACTION_INTERNAL_H_
 #define O_TRANSACTION_INTERNAL_H_
 #include "o_transaction.h"
+#include "o_raw_buffer.h"
 
 /*! \brief Retrieve operation type of entry.
  *

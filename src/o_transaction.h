@@ -1,6 +1,5 @@
 #ifndef O_TRANSACTION_H_
 #define O_TRANSACTION_H_
-#include "o_raw_buffer.h"
 
 enum transaction_operation_type
 {

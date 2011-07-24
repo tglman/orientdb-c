@@ -1,7 +1,6 @@
 #ifndef O_DOCUMENT_VALUE_H_
 #define O_DOCUMENT_VALUE_H_
 #include "o_record.h"
-#include "o_string_printer.h"
 #include "o_input_stream.h"
 
 struct o_document;
