@@ -11,6 +11,7 @@ struct o_operation_context_class
 	int (*rollback)(struct o_operation_context * context);
 	int (*commit_transaction)(struct o_operation_context * context, struct o_transaction * transaction);
 	int (*query)(struct o_operation_context * context, struct o_query * query, void ** parameters, QueryHandler handler, void * handler_add_info);
+	int (*cluster_name_id)(struct o_operation_context * context, char * cluster_name);
 	struct o_operation_context * (*release)(struct o_operation_context * context);
 };
 

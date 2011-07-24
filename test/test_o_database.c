@@ -22,14 +22,16 @@ void test_database_crud_opertation(struct o_database * db, void(*middle)(struct 
 	o_record_raw_reset(record, "content content", size);
 	struct o_record_id *id;
 	o_database_save(db, record, &id);
+
+	if (middle != 0)
+		middle(db);
+	id = o_record_get_id(record);
 	struct o_record * load_rec = o_database_load(db, id);
 
 	int load_size;
 	char * content = o_record_raw_content(load_rec, &load_size);
 	assert_true(size == load_size, "readed have not same size of writed");
 	assert_true(memcmp(content, "content content", load_size) == 0, "readed have not same content of writed");
-	if (middle != 0)
-		middle(db);
 	int test_size = strlen("test test");
 	o_record_raw_reset(load_rec, "test test", test_size);
 	o_database_save(db, load_rec, 0);

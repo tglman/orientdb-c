@@ -71,7 +71,10 @@ int o_transaction_save(struct o_operation_context * context, struct o_record * r
 	{
 		if (o_record_id_record_id(id) == CLUSTER_POS_INVALID)
 		{
-			id = o_record_id_new(CLUSTER_ID_INVALID, trans->transaction_count++);
+			if (cluster_name == 0)
+				cluster_name = o_record_cluster_name(record);
+			int cluster_id = trans->parent->type->cluster_name_id(trans->parent, cluster_name);
+			id = o_record_id_new(cluster_id, trans->transaction_count--);
 			*rid = id;
 			o_record_reset_id(record, id);
 		}
@@ -116,7 +119,7 @@ struct o_record * o_transaction_load(struct o_operation_context * context, struc
 		else
 			return entry->record;
 	}
-	return trans->parent->type->load(context, record_id);
+	return trans->parent->type->load(trans->parent, record_id);
 }
 
 int o_transaction_commit(struct o_operation_context * context)
@@ -188,9 +191,16 @@ struct o_operation_context * o_transaction_release(struct o_operation_context * 
 	return parent;
 }
 
+int o_transaction_cluster_name_id(struct o_operation_context * context, char * cluster_name)
+{
+	struct o_transaction * trans = (struct o_transaction *) context;
+	return trans->parent->type->cluster_name_id(trans->parent, cluster_name);
+}
+
 struct o_operation_context_class o_transaction_operation_context_instance =
 { .save = o_transaction_save, .delete = o_transaction_delete, .load = o_transaction_load, .commit = o_transaction_commit, .commit_transaction =
-		o_transaction_commit_transaction, .query = o_transaction_query, .release = o_transaction_release, .rollback = o_transaction_rollback };
+		o_transaction_commit_transaction, .query = o_transaction_query, .release = o_transaction_release, .rollback = o_transaction_rollback, .cluster_name_id =
+		o_transaction_cluster_name_id };
 
 void o_transaction_update_id(struct o_transaction * transaction, struct o_record_id *old, struct o_record_id * new)
 {
@@ -208,6 +218,7 @@ struct o_transaction * o_transaction_new(struct o_operation_context * parent)
 	struct o_transaction * transaction = (struct o_transaction *) o_malloc(sizeof(struct o_transaction));
 	transaction->context.type = &o_transaction_operation_context_instance;
 	transaction->parent = parent;
+	transaction->transaction_count = -1;
 	transaction->records = o_map_new((unsigned int(*)(void *)) o_record_id_hash, o_entry_transaction_create, o_entry_transaction_free,
 			(int(*)(void *, void *)) o_record_id_compare);
 	return transaction;

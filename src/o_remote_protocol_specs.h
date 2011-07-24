@@ -27,6 +27,10 @@
 
 #define TX_COMMIT 60
 
+#define COMMIT_UPDATE 1
+#define COMMIT_DELETED 2
+#define COMMIT_CREATE 3
+
 #define COUNT 40
 #define COMMAND 41
 

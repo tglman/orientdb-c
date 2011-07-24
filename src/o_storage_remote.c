@@ -234,12 +234,12 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 		if (type == SAVE)
 		{
 			if (o_record_id_is_new(rid))
-				o_connection_remote_write_byte(conn, 3);
+				o_connection_remote_write_byte(conn, COMMIT_CREATE);
 			else
-				o_connection_remote_write_byte(conn, 1);
+				o_connection_remote_write_byte(conn, COMMIT_UPDATE);
 		}
 		else if (!o_record_id_is_new(rid))
-			o_connection_remote_write_byte(conn, 2);
+			o_connection_remote_write_byte(conn, COMMIT_DELETED);
 
 		o_connection_remote_write_short(conn, o_record_id_cluster_id(rid));
 		o_connection_remote_write_long64(conn, o_record_id_record_id(rid));
@@ -275,10 +275,10 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 	for (i = 0; i < created_records; i++)
 	{
 		int old_cl = o_connection_remote_read_short(conn);
-		long long old_id = o_connection_remote_read_short(conn);
+		long long old_id = o_connection_remote_read_long64(conn);
 		old = o_record_id_new(old_cl, old_id);
 		int new_cl = o_connection_remote_read_short(conn);
-		long long new_id = o_connection_remote_read_short(conn);
+		long long new_id = o_connection_remote_read_long64(conn);
 		new = o_record_id_new(new_cl, new_id);
 		o_transaction_update_id(transaction, old, new);
 	}

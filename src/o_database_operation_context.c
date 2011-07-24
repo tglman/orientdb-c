@@ -23,6 +23,17 @@ struct o_internal_result_handler
 	struct o_database_operation_context * db;
 };
 
+int o_database_operation_context_cluster_name_id(struct o_operation_context * context, char * cluster_name)
+{
+	struct o_database_operation_context *db = (struct o_database_operation_context *) context;
+	int cluster_id;
+	if (cluster_name != 0)
+		cluster_id = o_storage_get_cluster_id_by_name(db->storage, cluster_name);
+	else
+		cluster_id = o_storage_get_default_cluser_id(db->storage);
+	return cluster_id;
+}
+
 int o_database_operation_context_save(struct o_operation_context * context, struct o_record * record, char * cluster_name, struct o_record_id ** rid)
 {
 	struct o_database_operation_context *db = (struct o_database_operation_context *) context;
@@ -34,11 +45,7 @@ int o_database_operation_context_save(struct o_operation_context * context, stru
 	{
 		if (cluster_name == 0)
 			cluster_name = o_record_cluster_name(record);
-		int cluster_id;
-		if (cluster_name != 0)
-			cluster_id = o_storage_get_cluster_id_by_name(db->storage, cluster_name);
-		else
-			cluster_id = o_storage_get_default_cluser_id(db->storage);
+		int cluster_id = o_operation_context_cluster_name_id(context, cluster_name);
 
 		long long pos = o_storage_create_record(db->storage, cluster_id, buff);
 		struct o_record_id * new_rid = o_record_id_new(cluster_id, pos);
@@ -142,7 +149,8 @@ struct o_operation_context * o_database_operation_context_release(struct o_opera
 struct o_operation_context_class o_database_operation_context_instance =
 { .save = o_database_operation_context_save, .delete = o_database_operation_context_delete, .load = o_database_operation_context_load, .commit =
 		o_database_operation_context_commit, .commit_transaction = o_database_operation_context_commit_transaction, .query = o_database_operation_context_query,
-		.release = o_database_operation_context_release, .rollback = o_database_operation_context_rollback };
+		.release = o_database_operation_context_release, .rollback = o_database_operation_context_rollback, .cluster_name_id =
+				o_database_operation_context_cluster_name_id };
 
 struct o_operation_context * o_database_operation_context(struct o_storage * storage)
 {

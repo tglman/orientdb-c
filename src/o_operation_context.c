@@ -6,6 +6,11 @@ int o_operation_context_save(struct o_operation_context * context, struct o_reco
 	return context->type->save(context, record, cluster_name, rid);
 }
 
+int o_operation_context_cluster_name_id(struct o_operation_context * context, char * cluster_name)
+{
+	return context->type->cluster_name_id(context, cluster_name);
+}
+
 int o_operation_context_delete(struct o_operation_context * context, struct o_record * record)
 {
 	return context->type->delete(context, record);

@@ -24,6 +24,14 @@ typedef void (*QueryHandler)(void * add_info, struct o_record * record);
  */
 int o_operation_context_save(struct o_operation_context * context, struct o_record * record, char * cluster_name, struct o_record_id ** rid);
 
+/*! \brief Find the cluster id from the name.
+ *
+ * \param context context where find cluster id.
+ * \param cluster_name the name of cluster where find id.
+ * \return the id of cluster.
+ */
+int o_operation_context_cluster_name_id(struct o_operation_context * context, char * cluster_name);
+
 /*! \brief delete the record from the current context.
  *
  * \param context where delete the record.
