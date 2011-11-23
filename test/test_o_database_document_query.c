@@ -6,7 +6,7 @@
 void test_o_database_document_query()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
-	struct o_database_document * dd = o_database_document_new_error_handler("remote:127.0.0.1/demo", errorHandler);
+	struct o_database_document * dd = o_database_document_new_error_handler("remote:127.0.0.1/temp", errorHandler);
 	o_database_document_open(dd, "admin", "admin");
 
 	o_database_document_metadata(dd);

@@ -9,7 +9,7 @@
 void test_o_database_query()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
-	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/demo", errorHandler);
+	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
 	o_database_open(db, "admin", "admin");
 	struct o_query * q = o_query_sql("select * from OUser where name = \'admin\' ");
 	struct o_list_record * lr = o_database_query(db, q);

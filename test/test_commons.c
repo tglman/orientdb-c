@@ -5,8 +5,7 @@
 
 void o_db_error_handler_function(int code, char * error, void * custom_info)
 {
-	char message[512];
-	sprintf(message, "code:%i message:%s", code, error);
-	fail(message);
+	printf("code: message:%s",error);
+	fail_args("code: message:%s",error);
 }
 
