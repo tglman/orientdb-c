@@ -61,6 +61,8 @@ struct o_native_socket * o_native_socket_listen(char * site, short port)
 		struct hostent *he = gethostbyname(site);
 		memcpy(&listen_conf.sin_addr, he->h_addr, he->h_length);
 		listen_conf.sin_port = htons(port);
+		int val = 1;
+		setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(int));
 		res = bind(sock->socket, (struct sockaddr*) &listen_conf, sizeof(listen_conf));
 		if (res == -1)
 		{
