@@ -67,7 +67,7 @@ void commit_and_begin(struct o_database * db)
 void test_o_database_transaction_commit()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
-	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temo", errorHandler);
+	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
 	o_database_open(db, "admin", "admin");
 	o_database_begin_transaction(db);
 	test_database_crud_opertation(db, commit_and_begin);

@@ -4,12 +4,11 @@
 #include "o_input_stream_socket.h"
 #include "o_output_stream_socket.h"
 #include "o_native_lock.h"
+#include "o_remote_protocol_specs.h"
 #include "o_memory.h"
 #include <string.h>
 #include <netinet/in.h>
 #include "o_exceptions.h"
-
-#define CURRENT_PROTOCOL 5
 
 struct o_connection_remote
 {

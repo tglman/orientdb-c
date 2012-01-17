@@ -88,6 +88,7 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	unsigned char * buff = o_raw_buffer_content(content, &size);
 	o_connection_remote_write_bytes(conn, buff, size);
 	o_connection_remote_write_byte(conn, o_raw_buffer_type(content));
+	o_connection_remote_write_byte(conn, 0);
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
@@ -158,6 +159,7 @@ int o_storage_remote_update_record(struct o_storage * storage, struct o_record_i
 	o_connection_remote_write_bytes(conn, bytes, size);
 	o_connection_remote_write_int(conn, o_raw_buffer_version(content));
 	o_connection_remote_write_byte(conn, o_raw_buffer_type(content));
+	o_connection_remote_write_byte(conn, 0);
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
@@ -175,6 +177,7 @@ int o_storage_remote_delete_record(struct o_storage * storage, struct o_record_i
 	o_connection_remote_write_short(conn, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(conn, o_record_id_record_id(id));
 	o_connection_remote_write_int(conn, version);
+	o_connection_remote_write_byte(conn, 0);
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
@@ -372,6 +375,11 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		storage->exclusive_lock = o_native_lock_new();
 
 		struct o_connection_remote * conn = o_storage_remote_begin_write(storage, DB_OPEN);
+		o_connection_remote_write_string(conn, "orientdb-c client");
+		o_connection_remote_write_string(conn, "alpha");
+		o_connection_remote_write_short(conn, CURRENT_PROTOCOL);
+		//TODO:insert client identifier.
+		o_connection_remote_write_string(conn, "TODO");
 		o_connection_remote_write_string(conn, name);
 		o_connection_remote_write_string(conn, username);
 		o_connection_remote_write_string(conn, password);
@@ -379,14 +387,14 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 
 		conn = o_storage_remote_begin_response(storage);
 		storage->session_id = o_connection_remote_read_int(conn);
-		storage->n_cluster = o_connection_remote_read_int(conn);
+		storage->n_cluster = o_connection_remote_read_short(conn);
 		int i;
 		struct o_storage_remote_cluster **clusters = &storage->clusters;
 		for (i = 0; i < storage->n_cluster; i++)
 		{
 			struct o_storage_remote_cluster *cluster = o_malloc(sizeof(struct o_storage_remote_cluster));
 			cluster->storage_name = o_connection_remote_read_string(conn);
-			cluster->id = o_connection_remote_read_int(conn);
+			cluster->id = o_connection_remote_read_short(conn);
 			cluster->type = o_connection_remote_read_string(conn);
 			*clusters = cluster;
 			clusters = &cluster->next;

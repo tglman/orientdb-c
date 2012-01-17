@@ -36,30 +36,13 @@ void o_query_sql_serialize(struct o_query * query, struct o_output_stream * stre
 	o_output_stream_data_write_string(data, "com.orientechnologies.orient.core.sql.query.OSQLSynchQuery");
 	o_output_stream_data_write_string(data, qsql->sql);
 	o_output_stream_data_write_int(data, qsql->query.limit);
-	if (qsql->query.beginRange == 0)
-	{
-		o_output_stream_data_write_short(data, CLUSTER_ID_INVALID);
-		o_output_stream_data_write_long(data, CLUSTER_POS_INVALID);
-	}
-	else
-	{
-		o_output_stream_data_write_short(data, o_record_id_cluster_id(qsql->query.beginRange));
-		o_output_stream_data_write_long(data, o_record_id_record_id(qsql->query.beginRange));
-	}
-	if (qsql->query.endRange == 0)
-	{
-		o_output_stream_data_write_short(data, CLUSTER_ID_INVALID);
-		o_output_stream_data_write_long(data, CLUSTER_POS_INVALID);
-	}
-	else
-	{
-		o_output_stream_data_write_short(data, o_record_id_cluster_id(qsql->query.endRange));
-		o_output_stream_data_write_long(data, o_record_id_record_id(qsql->query.endRange));
-	}
 	o_output_stream_data_write_string(data, qsql->query.fetchPlan != 0 ? qsql->query.fetchPlan : "");
 	//Write an empty byte array of params.
 	o_output_stream_data_write_string(data, "");
-	o_output_stream_data_write_byte(data, 0);
+	//Write next record.
+	o_output_stream_data_write_string(data, "");
+	//Write next record params.
+	o_output_stream_data_write_string(data, "");
 	o_output_stream_data_free(data);
 }
 

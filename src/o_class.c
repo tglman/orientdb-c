@@ -10,6 +10,8 @@ struct o_class
 {
 	int id;
 	char * name;
+	char * shortName;
+	int overSize;
 	struct o_class * superclass;
 	struct o_map_string * properties;
 	int defaultClusterId;
@@ -21,8 +23,10 @@ struct o_class * o_class_new(char * name)
 {
 	struct o_class * cl = o_malloc(sizeof(struct o_class));
 	memset(cl, 0, sizeof(struct o_class));
-	cl->name = o_memdup(name, strlen(name)+1);
+	cl->name = o_memdup(name, strlen(name) + 1);
 	cl->properties = o_map_string_new();
+	cl->shortName = 0;
+	cl->overSize = 0;
 	return cl;
 }
 
@@ -87,16 +91,21 @@ struct o_class * o_class_new_from_document(struct o_document * doc)
 {
 	char * name = o_document_value_get_string(o_document_field_get(doc, "name"));
 	struct o_class * cl = o_class_new(name);
-	cl->id = o_document_value_get_int(o_document_field_get(doc, "id"));
+	//cl->id = o_document_value_get_int(o_document_field_get(doc, "id"));
+	struct o_document_value * shortName = o_document_field_get(doc, "shortName");
+	if (shortName != 0)
+		cl->shortName = o_document_value_get_string(shortName);
 	cl->defaultClusterId = o_document_value_get_int(o_document_field_get(doc, "defaultClusterId"));
-
+	struct o_document_value * overSizeValue = o_document_field_get(doc, "overSize");
+	if (overSizeValue != 0)
+		cl->overSize = o_document_value_get_int(overSizeValue);
 	struct o_document_value ** values = o_document_value_get_array(o_document_field_get(doc, "clusterIds"), &cl->n_clusterIds);
 	cl->clusterIds = o_malloc(sizeof(int) * (cl->n_clusterIds));
 	int i = cl->n_clusterIds;
 	while (i > 0)
 	{
 		--i;
-		cl ->clusterIds[i] = o_document_value_get_int(values[i]);
+		cl->clusterIds[i] = o_document_value_get_int(values[i]);
 	}
 
 	int n_properties;
