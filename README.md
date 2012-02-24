@@ -22,3 +22,8 @@ Execute in console
 
 `./waf install` or `sudo ./waf install` for non root users.
 
+
+**First Use:**
+[Start](https://github.com/tglman/orientdb-c/wiki/Start)
+
+
