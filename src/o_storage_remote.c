@@ -128,6 +128,7 @@ struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, s
 	o_connection_remote_write_short(conn, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(conn, o_record_id_record_id(id));
 	o_connection_remote_write_string(conn, "");
+	o_connection_remote_write_byte(conn, 0);//IGNORE CACHE
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
@@ -381,6 +382,7 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 		//TODO:insert client identifier.
 		o_connection_remote_write_string(conn, "TODO");
 		o_connection_remote_write_string(conn, name);
+		o_connection_remote_write_string(conn, "Document");
 		o_connection_remote_write_string(conn, username);
 		o_connection_remote_write_string(conn, password);
 		o_storage_remote_end_write(storage, conn);
