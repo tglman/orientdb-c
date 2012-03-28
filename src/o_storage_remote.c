@@ -251,9 +251,7 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 
 		if (type == SAVE)
 		{
-			if (o_record_id_is_new(rid))
-				o_connection_remote_write_string(conn, o_storage_remote_get_cluster_name_by_id(storage, o_record_id_cluster_id(rid)));
-			else
+			if (!o_record_id_is_new(rid))
 				o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
 			int buff_size = 0;
 			unsigned char* bytes = o_raw_buffer_content(buff, &buff_size);
