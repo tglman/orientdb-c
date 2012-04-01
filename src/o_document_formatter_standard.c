@@ -250,7 +250,6 @@ struct o_document_value * o_doc_for_std_value_bool_deserialize(struct o_input_st
 	o_input_stream_read(stream);
 	o_input_stream_read(stream);
 	o_input_stream_read(stream);
-	o_input_stream_read(stream);
 	if (istrue == 'f')
 	{
 		o_input_stream_read(stream);
