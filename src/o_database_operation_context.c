@@ -47,9 +47,11 @@ int o_database_operation_context_save(struct o_operation_context * context, stru
 			cluster_name = o_record_cluster_name(record);
 		int cluster_id = o_operation_context_cluster_name_id(context, cluster_name);
 
-		long long pos = o_storage_create_record(db->storage, cluster_id, buff);
-		struct o_record_id * new_rid = o_record_id_new(cluster_id, pos);
+		struct create_result * res = o_storage_create_record(db->storage, cluster_id, buff);
+		struct o_record_id * new_rid = o_record_id_new(cluster_id, res->rid);
 		o_record_reset_id(record, new_rid);
+		o_record_reset_version(record, res->version);
+		o_free(res);
 		if (rid != 0)
 			*rid = new_rid;
 	}

@@ -13,6 +13,11 @@
 #define DATA_DEFAULT_NAME "default"
 
 struct o_storage;
+struct create_result
+{
+	long long rid;
+	int version;
+};
 
 /**
  * Create a new record to the storage.
@@ -22,7 +27,7 @@ struct o_storage;
  * @param the record content.
  * @return the new identifier of created record.
  */
-long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
+struct create_result * o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
 
 /*! \brief Retrieve A query engine for current browser.
  *

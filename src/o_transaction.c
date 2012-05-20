@@ -204,13 +204,30 @@ struct o_operation_context_class o_transaction_operation_context_instance =
 
 void o_transaction_update_id(struct o_transaction * transaction, struct o_record_id *old, struct o_record_id * new)
 {
-	struct o_transaction_entry * entry = o_transaction_resolve_entry(transaction, old);
-	o_record_reset_id(entry->record, new);
+	struct o_transaction_entry * entry = (struct o_transaction_entry *) o_map_remove(transaction->records, old);
+	if (entry != 0)
+	{
+		o_record_reset_id(entry->record, new);
+		o_map_put(transaction->records, new, entry);
+	}
 }
 
 struct o_operation_context * o_transaction_to_operation_context(struct o_transaction *transaction)
 {
 	return &transaction->context;
+}
+
+struct o_record *o_transaction_get_record(struct o_transaction *transaction, struct o_record_id * id)
+{
+	struct o_transaction_entry * entry = (struct o_transaction_entry *) o_map_get(transaction->records, id);
+	if (entry != 0)
+	{
+		if (entry->type == REMOVE)
+			return 0;
+		else
+			return entry->record;
+	}
+	return 0;
 }
 
 struct o_transaction * o_transaction_new(struct o_operation_context * parent)
@@ -219,7 +236,7 @@ struct o_transaction * o_transaction_new(struct o_operation_context * parent)
 	transaction->context.type = &o_transaction_operation_context_instance;
 	transaction->parent = parent;
 	transaction->transaction_count = -1;
-	transaction->records = o_map_new((unsigned int(*)(void *)) o_record_id_hash, o_entry_transaction_create, o_entry_transaction_free,
-			(int(*)(void *, void *)) o_record_id_compare);
+	transaction->records = o_map_new((unsigned int (*)(void *)) o_record_id_hash, o_entry_transaction_create, o_entry_transaction_free,
+			(int (*)(void *, void *)) o_record_id_compare);
 	return transaction;
 }

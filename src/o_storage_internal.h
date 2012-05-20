@@ -10,7 +10,7 @@ struct o_storage
 	query_result_callback callback;
 	void * callback_addinfo;
 	struct o_storage_configuration * configuration;
-	long long (*o_storage_create_record)(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
+	struct create_result * (*o_storage_create_record)(struct o_storage * storage, int cluster, struct o_raw_buffer * content);
 	struct o_query_engine * (*o_storage_get_query_engine)(struct o_storage * storage);
 	struct o_raw_buffer * (*o_storage_read_record)(struct o_storage * storage, struct o_record_id * id);
 	int (*o_storage_update_record)(struct o_storage * storage, struct o_record_id * id, struct o_raw_buffer * content);

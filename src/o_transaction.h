@@ -34,4 +34,12 @@ struct o_operation_context * o_transaction_to_operation_context(struct o_transac
  */
 struct o_transaction_entry ** o_transaction_get_entries(struct o_transaction *transaction, int * size);
 
+/*! \brief Retrieve an record from an id if is present in transaction(created or update in the transaction).
+ *
+ * \param transaction where search record.
+ * \param id of record to find.
+ * \return the record found or 0 if not found.
+ */
+struct o_record *o_transaction_get_record(struct o_transaction *transaction, struct o_record_id * id);
+
 #endif /* O_TRANSACTION_H_ */

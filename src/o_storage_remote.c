@@ -79,10 +79,11 @@ struct o_connection_remote * o_storage_remote_begin_response(struct o_storage_re
 	return conn;
 }
 
-long long o_storage_remote_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
+struct create_result * o_storage_remote_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
 {
 	struct o_storage_remote *rs = (struct o_storage_remote *) storage;
 	struct o_connection_remote * conn = o_storage_remote_begin_write(rs, RECORD_CREATE);
+	o_connection_remote_write_int(conn, 0);
 	o_connection_remote_write_short(conn, cluster);
 	int size;
 	unsigned char * buff = o_raw_buffer_content(content, &size);
@@ -91,10 +92,12 @@ long long o_storage_remote_create_record(struct o_storage * storage, int cluster
 	o_connection_remote_write_byte(conn, 0);
 	o_storage_remote_end_write(rs, conn);
 
+	struct create_result * res = o_malloc(sizeof(struct create_result));
 	conn = o_storage_remote_begin_response(rs);
-	long long val = o_connection_remote_read_long64(conn);
+	res->rid = o_connection_remote_read_long64(conn);
+	res->version = o_connection_remote_read_int(conn);
 	o_storage_remote_end_read(rs, conn);
-	return val;
+	return res;
 }
 
 struct o_raw_buffer * o_storage_remote_build_matadata_record(struct o_storage_remote * storage)
@@ -128,7 +131,7 @@ struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, s
 	o_connection_remote_write_short(conn, o_record_id_cluster_id(id));
 	o_connection_remote_write_long64(conn, o_record_id_record_id(id));
 	o_connection_remote_write_string(conn, "");
-	o_connection_remote_write_byte(conn, 0);//IGNORE CACHE
+	o_connection_remote_write_byte(conn, 0); //IGNORE CACHE
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
@@ -255,7 +258,6 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 				o_connection_remote_write_int(conn, o_raw_buffer_version(buff));
 			int buff_size = 0;
 			unsigned char* bytes = o_raw_buffer_content(buff, &buff_size);
-
 			o_connection_remote_write_bytes(conn, bytes, buff_size);
 		}
 		else
@@ -285,20 +287,20 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 		o_transaction_update_id(transaction, old, new);
 	}
 	int updated_records = o_connection_remote_read_int(conn);
-	struct o_operation_context * ctx = o_transaction_to_operation_context(transaction);
+	//struct o_operation_context * ctx = o_transaction_to_operation_context(transaction);
 	struct o_record_id * upd = 0;
 	for (i = 0; i < updated_records; ++i)
 	{
 		int cl = o_connection_remote_read_short(conn);
 		long long id = o_connection_remote_read_short(conn);
-		upd = o_record_id_new(cl, id);
-
-		struct o_record * rec = o_operation_context_load(ctx, upd);
 		int new_version = o_connection_remote_read_int(conn);
-		o_record_reset_version(rec, new_version);
+		upd = o_record_id_new(cl, id);
+		struct o_record * rec = o_transaction_get_record(transaction, upd);
+		//struct o_record * rec = o_operation_context_load(ctx, upd);
+		if (rec != 0)
+			o_record_reset_version(rec, new_version);
 	}
 	o_storage_remote_end_read(rs, conn);
-
 }
 
 struct o_record_id * o_storage_remote_get_metadata_rid(struct o_storage * storage)
@@ -332,7 +334,6 @@ void o_storage_remote_close(struct o_storage * storage)
 
 	struct o_storage_remote * storage_remote = (struct o_storage_remote *) storage;
 	o_storage_factory_release_storage((struct o_storage_factory *) storage_remote->storage_factory, storage);
-
 }
 
 int o_storage_remote_get_default_cluster_id(struct o_storage * storage)
@@ -396,6 +397,7 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 			cluster->storage_name = o_connection_remote_read_string(conn);
 			cluster->id = o_connection_remote_read_short(conn);
 			cluster->type = o_connection_remote_read_string(conn);
+			cluster->dataSegmentId = o_connection_remote_read_short(conn);
 			*clusters = cluster;
 			clusters = &cluster->next;
 			cluster->next = 0;

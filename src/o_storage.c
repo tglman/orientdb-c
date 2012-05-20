@@ -3,7 +3,7 @@
 #include "o_memory.h"
 #include <string.h>
 
-long long o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
+struct create_result * o_storage_create_record(struct o_storage * storage, int cluster, struct o_raw_buffer * content)
 {
 	return storage->o_storage_create_record(storage, cluster, content);
 }

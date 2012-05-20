@@ -9,6 +9,7 @@ struct o_storage_remote_cluster
 	char * storage_name;
 	int id;
 	char * type;
+	int dataSegmentId;
 	struct o_storage_remote_cluster *next;
 };
 
