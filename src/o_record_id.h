@@ -25,14 +25,14 @@ struct o_record_id * o_record_id_new(int cluster_id, long long record_id);
  * @param o_id the record identifier where retrieve the cluster identifier.
  * @return the cluster identifier.
  */
-int o_record_id_cluster_id(struct o_record_id * o_id);
+const int o_record_id_cluster_id(struct o_record_id * o_id);
 
 /** Retrieve the identifier of record from a record id.
  *
  * @param o_id the record identifier where retrieve the in cluster record identifier.
  * @return the in cluster record identifier.
  */
-long long o_record_id_record_id(struct o_record_id * o_id);
+const long long o_record_id_record_id(struct o_record_id * o_id);
 
 /** Retrieve if the id represent a persistent or transient id.
  *

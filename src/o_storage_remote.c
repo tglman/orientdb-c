@@ -292,7 +292,7 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 	for (i = 0; i < updated_records; ++i)
 	{
 		int cl = o_connection_remote_read_short(conn);
-		long long id = o_connection_remote_read_short(conn);
+		long long id = o_connection_remote_read_long64(conn);
 		int new_version = o_connection_remote_read_int(conn);
 		upd = o_record_id_new(cl, id);
 		struct o_record * rec = o_transaction_get_record(transaction, upd);

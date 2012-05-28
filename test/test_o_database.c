@@ -23,10 +23,13 @@ void test_database_crud_opertation(struct o_database * db, void(*middle)(struct 
 	struct o_record_id *id;
 	o_database_save(db, record, &id);
 
+	o_record_refer(record);
+
 	if (middle != 0)
 		middle(db);
 	id = o_record_get_id(record);
 	struct o_record * load_rec = o_database_load(db, id);
+	o_record_release(record);
 
 	int load_size;
 	char * content = o_record_raw_content(load_rec, &load_size);

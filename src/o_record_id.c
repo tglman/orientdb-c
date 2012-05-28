@@ -27,12 +27,12 @@ struct o_record_id * o_record_id_new(int cluster_id, long long record_id)
 	return record;
 }
 
-int o_record_id_cluster_id(struct o_record_id * o_id)
+const int o_record_id_cluster_id(struct o_record_id * o_id)
 {
 	return o_id->cluster_id;
 }
 
-long long o_record_id_record_id(struct o_record_id * o_id)
+const long long o_record_id_record_id(struct o_record_id * o_id)
 {
 	return o_id->record_id;
 }
