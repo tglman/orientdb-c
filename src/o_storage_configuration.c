@@ -22,8 +22,11 @@ struct o_storage_configuration
 
 struct o_record_id * record_id_from_string(char * id)
 {
+	if (*id == '#')
+		id++;
 	char* pos = strchr(id, ':');
-	if(pos == 0) return 0;
+	if (pos == 0)
+		return 0;
 	*pos = 0;
 	pos++;
 	return o_record_id_new(atoi(id), atoi(pos));
