@@ -37,6 +37,9 @@ void o_storage_factory_remote_free(struct o_storage_factory * to_free)
 	o_native_cond_free(rem->cond);
 	o_native_lock_free(rem->cond_lock);
 	o_native_lock_free(rem->input_lock);
+	o_native_socket_selector_free(rem->selector);
+	o_free(rem->host);
+	o_free(rem);
 }
 
 enum o_url_type o_storage_factory_remote_get_type(struct o_storage_factory * storage_factory)

@@ -96,6 +96,7 @@ void test_o_document_serialize_deserialize_complex()
 	char * val = o_document_value_get_string(o_document_field_get(doc_emb, "string"));
 	assert_true(strcmp(val, "try") == 0, "Value writed in embedded not is the same readed.");
 	o_document_release(doc);
+	o_document_release(doc_emb);
 	o_output_stream_free(out);
 	o_input_stream_free(os);
 }

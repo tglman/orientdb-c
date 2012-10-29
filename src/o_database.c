@@ -232,6 +232,7 @@ void o_database_rollback(struct o_database * db)
 
 void o_database_free_internal(struct o_database * db)
 {
+	o_database_error_handler_free(db->error_handler);
 }
 
 void o_database_close(struct o_database * db)
@@ -244,9 +245,14 @@ void o_database_close(struct o_database * db)
 			while (count > 0)
 				*((struct o_database **) o_list_get(db->referrers, --count)) = 0;
 			o_list_free(db->referrers);
+			db->referrers=0;
 		}
 		if (db->storage != 0)
 			o_storage_close(db->storage);
+		if (db->context != 0)
+		{
+			o_database_operation_context_release(db->context);
+		}
 	}
 	catch(struct o_exception, ex)
 	{

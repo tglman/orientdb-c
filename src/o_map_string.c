@@ -77,6 +77,7 @@ void o_map_string_clear(struct o_map_string * map)
 
 void o_map_string_free(struct o_map_string * map)
 {
-	return o_map_free(map->map);
+	o_map_free(map->map);
+	o_free(map);
 }
 

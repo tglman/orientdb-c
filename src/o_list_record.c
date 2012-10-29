@@ -45,7 +45,6 @@ struct o_record * o_list_record_remove(struct o_list_record * list, struct o_rec
 
 void o_list_record_release(struct o_list_record * list)
 {
-
 	struct o_list_iterator * b = o_list_begin(list->list);
 	if (b != 0)
 	{
@@ -53,6 +52,8 @@ void o_list_record_release(struct o_list_record * list)
 		{
 			o_record_release((struct o_record *) o_list_iterator_current(b));
 		} while (o_list_iterator_next(b));
+		o_list_iterator_free(b);
 	}
 	o_list_free(list->list);
+	o_free(list);
 }

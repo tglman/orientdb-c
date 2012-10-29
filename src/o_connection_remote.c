@@ -157,41 +157,6 @@ void o_connection_remote_write_array_strings(struct o_connection_remote * connec
 	for (i = 0; i < length; i++)
 		o_connection_remote_write_string(connection, strings_array[i]);
 }
-/*
- int o_connection_remote_begin_read_session(struct o_connection_remote * connection, int session_id)
- {
- do
- {
- o_native_lock_lock(connection->input_lock);
- if (!connection->readed)
- {
- connection->readed = 1;
- connection->response_id = o_connection_remote_read_byte(connection);
- connection->session_id = o_connection_remote_read_int(connection);
- }
- if (connection->session_id == session_id)
- {
- connection->readed = 0;
- return connection->response_id;
- }
-
- o_native_lock_unlock(connection->input_lock);
- o_native_lock_lock(connection->cond_lock);
- o_native_cond_wait(connection->cond, connection->cond_lock);
- o_native_lock_unlock(connection->cond_lock);
- } while (1);
- return 0;
- }
-
- void o_connection_remote_end_read(struct o_connection_remote * connection)
- {
- connection->readed = 0;
- o_native_lock_unlock(connection->input_lock);
- o_native_lock_lock(connection->cond_lock);
- o_native_cond_broadcast(connection->cond);
- o_native_lock_unlock(connection->cond_lock);
- }
- */
 
 void o_connection_remote_free(struct o_connection_remote *connection)
 {

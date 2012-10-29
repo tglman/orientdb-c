@@ -37,7 +37,7 @@ void test_o_map_add_clear()
 	o_map_string_clear(mm);
 	size = o_map_string_size(mm);
 	assert_true(size == 0, "not correct size after clear");
-
+	o_map_string_free(mm);
 }
 
 void o_map_suite()

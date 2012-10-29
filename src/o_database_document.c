@@ -73,6 +73,7 @@ struct o_metadata * o_database_document_metadata(struct o_database_document * db
 		struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
 		o_database_context_database_init(db);
 		db->metadata = o_metadata_from_document((struct o_document *) meta);
+		o_record_release(meta);
 		o_database_context_database_init(0);
 	}
 	return db->metadata;
@@ -93,7 +94,7 @@ void o_query_engine_document_listener(void * add_info, struct o_record *record)
 
 struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query)
 {
-	o_database_context_database_init((struct o_database *)db);
+	o_database_context_database_init((struct o_database *) db);
 	struct o_document_rh rh;
 	rh.db = db;
 	rh.list = o_list_document_new();
@@ -107,6 +108,8 @@ void o_database_document_free(struct o_database_document * db)
 	o_database_free_internal(o_database_document_to_database(db));
 	if (db->metadata != 0)
 		o_metadata_free(db->metadata);
+	if (db->formatter != 0)
+		o_document_formatter_free(db->formatter);
 	o_free(db);
 }
 

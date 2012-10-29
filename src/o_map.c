@@ -43,8 +43,8 @@ unsigned int o_map_hash(struct o_map *map, void * key)
 {
 	return map->o_map_hash(key) % map->entries_size;
 }
-struct o_map * o_map_new(unsigned int(*o_map_hash)(void *), void(*o_entry_create)(void **, void **), void(*o_entry_free)(void **, void **),
-		int(*o_key_compare)(void * key1, void * key2))
+struct o_map * o_map_new(unsigned int (*o_map_hash)(void *), void (*o_entry_create)(void **, void **), void (*o_entry_free)(void **, void **),
+		int (*o_key_compare)(void * key1, void * key2))
 {
 	struct o_map * new_map = o_malloc(sizeof(struct o_map));
 	memset(new_map, 0, sizeof(struct o_map));
@@ -227,6 +227,7 @@ void * o_map_last_key(struct o_map * map)
 
 void o_map_free(struct o_map * map)
 {
+	o_map_clear_caches(map);
 	if (map->first != 0)
 	{
 		struct o_map_entry *iter = map->first;

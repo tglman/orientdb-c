@@ -37,7 +37,6 @@ void o_pool_test_limit_manage()
 	{
 		o_pool_release(pool, arr[i]);
 	}
-	o_pool_release(pool, obj);
 	o_pool_free(pool);
 }
 

@@ -44,6 +44,7 @@ void o_list_document_free(struct o_list_document * list)
 			struct o_document *doc = (struct o_document *) o_list_iterator_current(iter);
 			o_document_release(doc);
 		} while (o_list_iterator_next(iter));
+		o_list_iterator_free(iter);
 	}
 	o_list_free(list->list);
 	o_free(list);

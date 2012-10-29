@@ -151,8 +151,11 @@ void o_class_free(struct o_class * class)
 	int size;
 	struct o_property ** ps = o_class_properties(class, &size);
 	while (size > 0)
-		o_free(ps[--size]);
+		o_property_free(ps[--size]);
 	o_map_string_free(class->properties);
+	if (class->shortName != 0)
+		o_free(class->shortName);
+	o_free(class->clusterIds);
 	o_free(class->name);
 	o_free(class);
 }

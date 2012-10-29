@@ -215,7 +215,7 @@ struct o_document_value * o_doc_for_std_value_array_deserialize(struct o_input_s
 	do
 	{
 		struct o_document_value *cur = o_doc_for_std_value_deserialize(stream);
-		if(cur != 0)
+		if (cur != 0)
 		{
 			if (value_list == 0)
 				root = value_list = o_malloc(sizeof(struct o_document_value_list));
@@ -334,7 +334,7 @@ struct o_document_value * o_doc_for_std_value_plain_deserialize(struct o_input_s
 		}
 			break;
 		default:
-			if ((readed < '0' || readed > '9') && readed != '.')
+			if ((readed < '0' || readed > '9') && readed != '.' && readed != '-')
 			{
 				o_string_buffer_free(buff);
 				char message[50];
@@ -434,6 +434,19 @@ void o_document_formatter_standard_deserialize(struct o_document_formatter * fm,
 		}
 	} while (readed != -1 && readed != ')' && readed != '*');
 	o_string_buffer_free(buff);
+}
+
+void o_document_formatter_standard_free_default(struct o_document_formatter * fm)
+{
+}
+
+static struct o_document_formatter_standard default_form =
+{ .formatter.o_document_formatter_deserialize = o_document_formatter_standard_deserialize, .formatter.o_document_formatter_serialize =
+		o_document_formatter_standard_serialize, .formatter.o_document_formatter_free = o_document_formatter_standard_free_default };
+
+struct o_document_formatter * o_document_formatter_standard_default()
+{
+	return (struct o_document_formatter *)&default_form;
 }
 
 struct o_document_formatter * o_document_formatter_standard_new()

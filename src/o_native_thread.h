@@ -34,4 +34,10 @@ void o_native_thread_current_sleep(int time);
  */
 void o_native_thread_current_exit();
 
+/*! \brief Release the usage of current thread structure.
+ *
+ * \param to_release the structure to release.
+ */
+void o_native_thread_release(struct o_native_thread * to_release);
+
 #endif /* O_NATIVE_THREAD_H_ */

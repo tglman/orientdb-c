@@ -59,7 +59,7 @@ int o_pool_expand(struct o_pool * pool)
 	return 0;
 }
 
-struct o_pool * o_pool_new_size(void * obj, void * (*factory)(void *), void(*factory_free)(void *, void *), int min_size, int max_size)
+struct o_pool * o_pool_new_size(void * obj, void * (*factory)(void *), void (*factory_free)(void *, void *), int min_size, int max_size)
 {
 	struct o_pool * pool = o_malloc(sizeof(struct o_pool));
 	memset(pool, 0, sizeof(struct o_pool));
@@ -74,7 +74,7 @@ struct o_pool * o_pool_new_size(void * obj, void * (*factory)(void *), void(*fac
 	return pool;
 }
 
-struct o_pool * o_pool_new(void * obj, void * (*factory)(void *), void(*free)(void *, void *))
+struct o_pool * o_pool_new(void * obj, void * (*factory)(void *), void (*free)(void *, void *))
 {
 	return o_pool_new_size(obj, factory, free, 1, 10);
 }
@@ -98,7 +98,7 @@ void * o_pool_get(struct o_pool * pool)
 				return 0;
 			}
 		}
-		catch( struct o_exception ,ex)
+		catch( struct o_exception, ex)
 		{
 			o_native_lock_unlock(pool->lock);
 			throw(ex);
@@ -133,10 +133,14 @@ void o_pool_free(struct o_pool * to_free)
 		//TODO:throw an exception.
 	}
 	struct o_list_iterator * it = o_list_begin(to_free->free_instances);
-	do
+	if (it != 0)
 	{
-		to_free->free(to_free->factory_obj, o_list_iterator_current(it));
-	} while (o_list_iterator_next(it));
+		do
+		{
+			to_free->free(to_free->factory_obj, o_list_iterator_current(it));
+		} while (o_list_iterator_next(it));
+		o_list_iterator_free(it);
+	}
 	o_list_free(to_free->free_instances);
 	o_list_free(to_free->used_instances);
 	o_native_lock_free(to_free->lock);

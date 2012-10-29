@@ -240,6 +240,8 @@ int o_document_value_get_array_size(struct o_document_value * o_value)
 
 void o_document_value_free(struct o_document_value * to_free)
 {
+	if (to_free == 0)
+		return;
 	if (to_free->type == LINK)
 	{
 		struct o_document_value_link * val = VALUE(to_free,struct o_document_value_link *);
@@ -247,10 +249,28 @@ void o_document_value_free(struct o_document_value * to_free)
 			o_database_remove_referrer(val->db, &val->db);
 		if (val->rid != 0)
 			o_record_id_release(val->rid);
+		if (val->record != 0)
+			o_record_release(val->record);
 		o_free(val);
 	}
+	else if (to_free->type == EMBEDDED)
+	{
+		struct o_document * doc = VALUE_CHECK(to_free,struct o_document *,EMBEDDED);
+		if (doc != 0)
+			o_document_release(doc);
+	}
+	else if (to_free->type == ARRAY)
+	{
+		int i = ((struct o_document_value_array *) to_free->value)->size;
+		while (i > 0)
+		{
+			if (((struct o_document_value_array *) to_free->value)->array[--i] != 0)
+				o_document_value_free(((struct o_document_value_array *) to_free->value)->array[i]);
+		}
+		o_free(((struct o_document_value_array *) to_free->value)->array);
+	}
 	else if (to_free->type == STRING)
-		o_free(VALUE(to_free,char *));
+		o_free(VALUE(to_free,char *) );
 	o_free(to_free->value);
 	o_free(to_free);
 }

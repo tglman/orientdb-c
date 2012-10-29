@@ -44,11 +44,11 @@ void test_o_document_value_create()
 	val = o_document_value_embedded(doc);
 	assert_true(o_document_value_get_embedded(val) == doc, "embedded document value not is the expected");
 	o_document_value_free(val);
-	o_document_release(doc);
 
 	val = o_document_value_link((struct o_record *)doc);
 	assert_true(o_document_value_get_link(val) == (struct o_record *)doc, "link document value not is the expected");
 	o_document_value_free(val);
+	o_document_release(doc);
 
 	struct o_document_value * arr[3] =
 	{ 0, 0, 0 };

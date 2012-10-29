@@ -22,7 +22,7 @@ struct o_document_formatter * o_document_formatter_factory_default()
 {
 	if (default_formatter == 0)
 	{
-		default_formatter = o_document_formatter_standard_new();
+		default_formatter = o_document_formatter_standard_default();
 	}
 	return default_formatter;
 }

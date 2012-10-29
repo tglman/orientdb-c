@@ -56,6 +56,7 @@ void o_record_raw_free(struct o_record * record)
 	struct o_record_raw * raw = (struct o_record_raw *) record;
 	if (raw->content != 0)
 		o_free(raw->content);
+	o_free(raw);
 }
 
 char * o_record_raw_content(struct o_record * record, int *content_len)

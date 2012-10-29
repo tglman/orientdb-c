@@ -12,6 +12,7 @@ void o_string_buffer_test_append_string()
 	o_string_buffer_append(buffer, " app");
 	char * content = o_string_buffer_str(buffer);
 	assert_true(strcmp(content, "test_app app") == 0, "The content of buffer not is the same appended");
+	o_free(content);
 	o_string_buffer_free(buffer);
 }
 
@@ -22,6 +23,7 @@ void o_string_buffer_test_append_integer()
 	o_string_buffer_append_long(buffer, 30);
 	char * content = o_string_buffer_str(buffer);
 	assert_true(strcmp(content, "test_int 30") == 0, "The content of buffer not is the same appended");
+	o_free(content);
 	o_string_buffer_free(buffer);
 }
 
@@ -32,6 +34,7 @@ void o_string_buffer_test_append_double()
 	o_string_buffer_append_double(buffer, 30.25);
 	char * content = o_string_buffer_str(buffer);
 	assert_true(strcmp(content, "test_double 30.25") == 0, "The content of buffer not is the same appended");
+	o_free(content);
 	o_string_buffer_free(buffer);
 }
 

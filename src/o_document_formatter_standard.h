@@ -7,4 +7,5 @@
  */
 struct o_document_formatter * o_document_formatter_standard_new();
 
+struct o_document_formatter * o_document_formatter_standard_default();
 #endif /* O_DOCUMENT_FORMATTER_STANDARD_H_ */

@@ -20,7 +20,7 @@ void *o_native_write_thread(void * par)
 	catch(struct o_exception, ex)
 	{
 		printf("fail listen:%s", o_exception_message(ex));
-		o_free(ex);
+		o_exception_free(ex);
 		fflush(stdout);
 		return 0;
 	}
@@ -69,6 +69,8 @@ void o_native_socket_selector_simple_select()
 	assert_false(ret_sock == ret_sock1, "Error select return two time same socket.");
 	assert_true(ret_sock1 == 0, "The selector is valid");
 	o_native_socket_close(ret_sock);
+	o_native_socket_selector_free(sel);
+	o_native_thread_release(accept_th);
 }
 
 void o_native_socket_selector_suite()

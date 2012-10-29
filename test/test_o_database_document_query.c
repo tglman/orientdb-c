@@ -15,6 +15,8 @@ void test_o_database_document_query()
 	struct o_list_document * ld = o_database_document_query(dd, q);
 
 	assert_true(o_list_document_size(ld) == 1, "The query not return the expected number of record");
+	o_query_free(q);
+	o_list_document_free(ld);
 	o_database_document_close(dd);
 	o_database_document_free(dd);
 }
