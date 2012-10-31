@@ -145,7 +145,10 @@ int o_database_operation_context_query(struct o_operation_context * context, str
 
 struct o_operation_context * o_database_operation_context_release(struct o_operation_context * context)
 {
-	return context;
+	struct o_database_operation_context * ctx = (struct o_database_operation_context *) context;
+	o_record_cache_free(ctx->cache);
+	o_free(ctx);
+	return 0;
 }
 
 struct o_operation_context_class o_database_operation_context_instance =

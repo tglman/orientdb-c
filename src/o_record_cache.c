@@ -21,8 +21,9 @@ void o_entry_record_free(void ** key, void ** value)
 struct o_record_cache * o_record_cache_new()
 {
 	struct o_record_cache * cache = o_malloc(sizeof(struct o_record_cache));
-	cache->map = o_map_new((unsigned int(*)(void *)) o_record_id_hash, o_entry_record_create, o_entry_record_free,
-			(int(*)(void *, void *)) o_record_id_compare);
+	cache->map = o_map_new((unsigned int (*)(void *)) o_record_id_hash, o_entry_record_create, o_entry_record_free,
+			(int (*)(void *, void *)) o_record_id_compare);
+	cache->cache_size = 30;
 	return cache;
 }
 
@@ -46,4 +47,10 @@ void o_record_cache_clear(struct o_record_cache * cache)
 struct o_record * o_record_cache_get(struct o_record_cache * cache, struct o_record_id *id)
 {
 	return (struct o_record *) o_map_get(cache->map, id);
+}
+
+void o_record_cache_free(struct o_record_cache * cache)
+{
+	o_map_free(cache->map);
+	o_free(cache);
 }

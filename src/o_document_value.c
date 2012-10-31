@@ -104,6 +104,7 @@ struct o_document_value * o_document_value_string(char * val)
 struct o_document_value * o_document_value_embedded(struct o_document * doc)
 {
 	struct o_document_value * doc_val = o_document_value_new(EMBEDDED, sizeof(struct o_document *));
+	o_record_refer(doc);
 	VALUE(doc_val,struct o_document *) = doc;
 	return doc_val;
 }
@@ -112,6 +113,7 @@ struct o_document_value * o_document_value_link_ref(struct o_record_id *id)
 {
 	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
 	link->rid = id;
+	o_record_id_refer(id);
 	link->record = 0;
 	link->db = o_database_context_database();
 	o_database_add_referrer(link->db, &link->db);
@@ -126,6 +128,7 @@ struct o_document_value * o_document_value_link(struct o_record * rec)
 	struct o_document_value_link *link = o_malloc(sizeof(struct o_document_value_link));
 	memset(link, 0, sizeof(struct o_document_value_link));
 	link->record = rec;
+	o_record_refer(rec);
 	struct o_document_value * doc_val = o_document_value_new(LINK, sizeof(struct o_document_value_link *));
 	VALUE(doc_val,struct o_document_value_link *) = link;
 	return doc_val;

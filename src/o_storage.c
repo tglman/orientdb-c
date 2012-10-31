@@ -73,6 +73,8 @@ struct o_storage_configuration * o_storage_get_configuration(struct o_storage *s
 
 void o_storage_internal_free(struct o_storage *storage)
 {
+	if (storage->configuration != 0)
+		o_storage_configuration_free(storage->configuration);
 	o_free(storage->name);
 	o_free(storage->user);
 }

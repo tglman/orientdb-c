@@ -30,6 +30,8 @@ struct o_transaction_query_handler
 void o_entry_transaction_create(void ** key, void ** value)
 {
 	//TODO Verify what inc
+	if (((struct o_transaction_entry *) *value)->record != 0)
+		o_record_refer(((struct o_transaction_entry *) *value)->record);
 	o_record_id_refer((struct o_record_id *) *key);
 }
 
@@ -38,6 +40,7 @@ void o_entry_transaction_free(void ** key, void ** value)
 	//TODO Verify what dec
 	o_record_id_release((struct o_record_id *) *key);
 	o_record_release(((struct o_transaction_entry *) *value)->record);
+	o_free(*value);
 }
 
 struct o_transaction_entry * o_transaction_resolve_entry(struct o_transaction * trans, struct o_record_id *id)
@@ -83,10 +86,15 @@ int o_transaction_save(struct o_operation_context * context, struct o_record * r
 	if (entry == 0)
 	{
 		entry = o_malloc(sizeof(struct o_transaction_entry));
+		memset(entry, 0, sizeof(struct o_transaction_entry));
+		entry->record = record;
 		o_map_put(trans->records, id, entry);
 	}
-	o_record_refer(record);
-	entry->record = record;
+	else
+	{
+		entry->record = record;
+		o_record_refer(record);
+	}
 	entry->type = SAVE;
 	return 1;
 }
@@ -185,8 +193,8 @@ int o_transaction_query(struct o_operation_context * context, struct o_query * q
 struct o_operation_context * o_transaction_release(struct o_operation_context * context)
 {
 	struct o_transaction * trans = (struct o_transaction *) context;
-	o_map_free(trans->records);
 	struct o_operation_context * parent = trans->parent;
+	o_map_free(trans->records);
 	o_free(trans);
 	return parent;
 }

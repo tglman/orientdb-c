@@ -71,7 +71,7 @@ struct o_metadata * o_database_document_metadata(struct o_database_document * db
 	if (db->metadata == 0)
 	{
 		struct o_record * meta = o_database_metadata(o_database_document_to_database(db));
-		o_database_context_database_init(db);
+		o_database_context_database_init((struct o_database *) db);
 		db->metadata = o_metadata_from_document((struct o_document *) meta);
 		o_record_release(meta);
 		o_database_context_database_init(0);

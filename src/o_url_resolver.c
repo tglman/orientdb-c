@@ -89,7 +89,7 @@ int o_url_resolve_host_port_from_path(char * path, char ** host, int * port)
 	else
 	{
 		*host = o_malloc(size);
-		strcpy(*host, path);
+		*host = strcpy(*host, path);
 		return 1;
 	}
 }

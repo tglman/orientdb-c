@@ -84,9 +84,9 @@ unsigned char * o_connection_remote_read_bytes(struct o_connection_remote * conn
 	*byte_read = o_connection_remote_read_int(connection);
 	if (*byte_read > 0)
 	{
-		unsigned char * bytes = o_malloc(*byte_read * sizeof(unsigned char));
+		unsigned char * bytes = o_malloc(((*byte_read) + 1) * sizeof(unsigned char));
 		o_input_stream_read_bytes(connection->input, bytes, *byte_read);
-		bytes[*byte_read]=0;
+		bytes[*byte_read] = 0;
 		return bytes;
 	}
 	return 0;

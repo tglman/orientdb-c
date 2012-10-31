@@ -26,5 +26,10 @@ struct o_record_id * o_storage_configuration_get_schema(struct o_storage_configu
  */
 struct o_record_id * o_storage_configuration_get_dictionary(struct o_storage_configuration * conf);
 
+/*! \brief free the structure relative to storage configuration.
+ *
+ * \param conf to free.
+ */
+void o_storage_configuration_free(struct o_storage_configuration * conf);
 
 #endif /* O_STORAGE_CONFIGURATION_H_ */

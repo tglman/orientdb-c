@@ -52,6 +52,16 @@ struct o_storage_configuration * o_storage_configuration_load(struct o_raw_buffe
 	return conf;
 }
 
+void o_storage_configuration_free(struct o_storage_configuration * conf)
+{
+	o_free(conf->name);
+	if (conf->schema != 0)
+		o_record_id_release(conf->schema);
+	if (conf->dictionary != 0)
+		o_record_id_release(conf->dictionary);
+	o_free(conf);
+}
+
 struct o_record_id * o_storage_configuration_get_schema(struct o_storage_configuration * conf)
 {
 	return conf->schema;

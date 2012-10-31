@@ -43,7 +43,10 @@ struct o_storage * o_engine_get_storage(char * connection_url, char * username, 
 	char * db_name;
 	o_url_resolve_information(connection_url, &type, &path, &db_name);
 	struct o_storage_factory * conn = o_engine_get_factory(type, path);
-	return o_storage_factory_storage_open(conn, db_name, username, password);
+	struct o_storage * storage = o_storage_factory_storage_open(conn, db_name, username, password);
+	o_free(path);
+	o_free(db_name);
+	return storage;
 }
 
 void o_engine_release_factory(struct o_storage_factory * factory)

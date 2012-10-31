@@ -251,7 +251,7 @@ void o_database_close(struct o_database * db)
 			o_storage_close(db->storage);
 		if (db->context != 0)
 		{
-			o_database_operation_context_release(db->context);
+			o_operation_context_release(db->context);
 		}
 	}
 	catch(struct o_exception, ex)
@@ -288,6 +288,7 @@ struct o_record * o_database_metadata(struct o_database * db)
 	{
 		struct o_record_id * rid = o_storage_get_metadata_rid(db->storage);
 		metadata = o_database_load(db, rid);
+		o_record_id_release(rid);
 	}
 	catch( struct o_exception, ex)
 	{
