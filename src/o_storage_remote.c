@@ -285,6 +285,7 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 		long long new_id = o_connection_remote_read_long64(conn);
 		new = o_record_id_new(new_cl, new_id);
 		o_transaction_update_id(transaction, old, new);
+		o_record_id_release(old);
 	}
 	int updated_records = o_connection_remote_read_int(conn);
 	//struct o_operation_context * ctx = o_transaction_to_operation_context(transaction);
@@ -296,6 +297,7 @@ void o_storage_remote_commit_transaction(struct o_storage *storage, struct o_tra
 		int new_version = o_connection_remote_read_int(conn);
 		upd = o_record_id_new(cl, id);
 		struct o_record * rec = o_transaction_get_record(transaction, upd);
+		o_record_id_release(upd);
 		//struct o_record * rec = o_operation_context_load(ctx, upd);
 		if (rec != 0)
 			o_record_reset_version(rec, new_version);

@@ -19,7 +19,6 @@ void test_o_database_document_open_save_load_close()
 	struct o_document *readed_doc = o_database_document_load(db, id);
 	struct o_document_value* readed_val = o_document_field_get(doc, "prova");
 	assert_true(strcmp(o_document_value_get_string(readed_val), "prova") == 0, "the writed document not is the same of loaded");
-	o_record_id_release(id);
 	o_document_release(doc);
 	o_document_release(readed_doc);
 	o_database_document_close(db);

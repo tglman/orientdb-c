@@ -36,12 +36,12 @@ void test_o_list_iterator()
 	assert_true(o_list_iterator_current(iter) == (void *) 10, "First value after back fail");
 	o_list_iterator_free(iter);
 	struct o_list_iterator * back_iter = o_list_end(list);
-	assert_true(o_list_iterator_current(iter) == (void *) 20, "Second value not is the same of insert");
-	assert_true(o_list_iterator_next(iter), "Iterator Forward fail");
-	assert_true(o_list_iterator_current(iter) == (void *) 10, "First value not is the same of insert");
-	assert_true(!o_list_iterator_next(iter), "Second Iterator Forward fail");
-	assert_true(o_list_iterator_prev(iter), "Iterator backward fail");
-	assert_true(o_list_iterator_current(iter) == (void *) 20, "First value after back fail");
+	assert_true(o_list_iterator_current(back_iter) == (void *) 20, "Second value not is the same of insert");
+	assert_true(o_list_iterator_next(back_iter), "Iterator Forward fail");
+	assert_true(o_list_iterator_current(back_iter) == (void *) 10, "First value not is the same of insert");
+	assert_true(!o_list_iterator_next(back_iter), "Second Iterator Forward fail");
+	assert_true(o_list_iterator_prev(back_iter), "Iterator backward fail");
+	assert_true(o_list_iterator_current(back_iter) == (void *) 20, "First value after back fail");
 	o_list_iterator_free(back_iter);
 	o_list_free(list);
 }

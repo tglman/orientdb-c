@@ -33,6 +33,7 @@ void *o_native_write_thread(void * par)
 	o_native_socket_send(cur_sock, &val, size);
 	o_native_socket_close(cur_sock);
 	o_native_socket_close(sock_listen);
+	o_native_thread_current_exit();
 	return 0;
 }
 

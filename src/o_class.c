@@ -110,7 +110,6 @@ struct o_class * o_class_new_from_document(struct o_document * doc)
 
 	int n_properties;
 	struct o_document_value ** properties = o_document_value_get_array(o_document_field_get(doc, "properties"), &n_properties);
-	cl->clusterIds = o_malloc(sizeof(int) * (cl->n_clusterIds));
 	while (n_properties > 0)
 	{
 		--n_properties;

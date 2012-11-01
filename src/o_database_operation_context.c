@@ -65,7 +65,7 @@ int o_database_operation_context_save(struct o_operation_context * context, stru
 	}
 	o_raw_buffer_free(buff);
 	o_record_after_save(record);
-	o_record_cache_put(db->cache, record);
+	//o_record_cache_put(db->cache, record);
 	return 1;
 }
 
@@ -90,7 +90,7 @@ struct o_record * o_database_operation_context_record_from_content(struct o_data
 	o_record_deserialize(record, stream);
 	o_input_stream_free(stream);
 	o_raw_buffer_free(content);
-	o_record_cache_put(db->cache, record);
+	//o_record_cache_put(db->cache, record);
 	return record;
 }
 
@@ -103,6 +103,8 @@ struct o_record * o_database_operation_context_load(struct o_operation_context *
 		struct o_raw_buffer * row = o_storage_read_record(db->storage, record_id);
 		rec = o_database_operation_context_record_from_content(db, record_id, row);
 	}
+	else
+		o_record_refer(rec);
 	return rec;
 }
 
@@ -127,6 +129,7 @@ void o_c_query_engine_record_listener(void * add_info, struct o_record_id *id, s
 {
 	struct o_internal_result_handler *result_handler = (struct o_internal_result_handler *) add_info;
 	struct o_record * record = o_database_operation_context_record_from_content(result_handler->db, id, buffer);
+	o_record_id_release(id);
 	result_handler->handler(result_handler->handler_add_info, record);
 }
 
@@ -140,6 +143,7 @@ int o_database_operation_context_query(struct o_operation_context * context, str
 	result_handler.handler_add_info = handler_add_info;
 	struct o_query_engine * query_engine = o_storage_get_query_engine(db->storage);
 	o_query_engine_query(query_engine, query, &result_handler, o_c_query_engine_record_listener);
+	o_query_engine_free(query_engine);
 	return 1;
 }
 

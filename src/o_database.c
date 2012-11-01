@@ -136,6 +136,7 @@ void o_query_context_listener(void * add_info, struct o_record *record)
 {
 	struct o_db_internal_result_handler *result_handler = (struct o_db_internal_result_handler *) add_info;
 	o_list_record_add(result_handler->list, record);
+	o_record_release(record);
 }
 
 int o_database_query_internal(struct o_database * db, struct o_query * query, void ** parameters, QueryHandler callback, void *add_info)
@@ -245,7 +246,7 @@ void o_database_close(struct o_database * db)
 			while (count > 0)
 				*((struct o_database **) o_list_get(db->referrers, --count)) = 0;
 			o_list_free(db->referrers);
-			db->referrers=0;
+			db->referrers = 0;
 		}
 		if (db->storage != 0)
 			o_storage_close(db->storage);

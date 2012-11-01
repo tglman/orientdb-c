@@ -25,7 +25,7 @@ void o_list_document_add(struct o_list_document * list, struct o_document * to_a
 struct o_document * o_list_document_get(struct o_list_document * list, int pos)
 {
 	struct o_document * doc = o_list_get(list->list, pos);
-	o_document_refer(doc);
+	//o_document_refer(doc);
 	return doc;
 }
 

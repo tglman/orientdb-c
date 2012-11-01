@@ -157,7 +157,9 @@ struct o_document_value * o_doc_for_std_value_embedded_deserialize(struct o_inpu
 {
 	struct o_document *doc = o_document_new();
 	o_document_deserialize(doc, stream);
-	return o_document_value_embedded(doc);
+	struct o_document_value * val = o_document_value_embedded(doc);
+	o_document_release(doc);
+	return val;
 }
 
 struct o_document_value * o_doc_for_std_value_link_deserialize(struct o_input_stream * stream)
@@ -196,7 +198,9 @@ struct o_document_value * o_doc_for_std_value_link_deserialize(struct o_input_st
 	o_free(ca);
 	o_string_buffer_free(buff);
 	struct o_record_id * o_rid = o_record_id_new(cid, rid);
-	return o_document_value_link_ref(o_rid);
+	struct o_document_value * val = o_document_value_link_ref(o_rid);
+	o_record_id_release(o_rid);
+	return val;
 }
 
 struct o_document_value_list
@@ -446,7 +450,7 @@ static struct o_document_formatter_standard default_form =
 
 struct o_document_formatter * o_document_formatter_standard_default()
 {
-	return (struct o_document_formatter *)&default_form;
+	return (struct o_document_formatter *) &default_form;
 }
 
 struct o_document_formatter * o_document_formatter_standard_new()

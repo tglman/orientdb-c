@@ -40,7 +40,6 @@ void o_entry_transaction_free(void ** key, void ** value)
 	//TODO Verify what dec
 	o_record_id_release((struct o_record_id *) *key);
 	o_record_release(((struct o_transaction_entry *) *value)->record);
-	o_free(*value);
 }
 
 struct o_transaction_entry * o_transaction_resolve_entry(struct o_transaction * trans, struct o_record_id *id)
@@ -194,7 +193,13 @@ struct o_operation_context * o_transaction_release(struct o_operation_context * 
 {
 	struct o_transaction * trans = (struct o_transaction *) context;
 	struct o_operation_context * parent = trans->parent;
+	int size = 0;
+	struct o_transaction_entry ** entries = (struct o_transaction_entry **) o_map_values(trans->records, &size);
+	entries = o_memdup(entries, size * sizeof(struct o_transaction_entry *));
 	o_map_free(trans->records);
+	while (size > 0)
+		o_free(entries[--size]);
+	o_free(entries);
 	o_free(trans);
 	return parent;
 }

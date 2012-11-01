@@ -89,7 +89,7 @@ void o_query_engine_document_listener(void * add_info, struct o_record *record)
 {
 	struct o_document_rh * docr = (struct o_document_rh *) add_info;
 	o_list_document_add(docr->list, (struct o_document *) record);
-
+	o_document_release((struct o_document *) record);
 }
 
 struct o_list_document * o_database_document_query(struct o_database_document * db, struct o_query * query)

@@ -88,8 +88,7 @@ int o_url_resolve_host_port_from_path(char * path, char ** host, int * port)
 	}
 	else
 	{
-		*host = o_malloc(size);
-		*host = strcpy(*host, path);
+		*host = o_memdup(path, size+1);
 		return 1;
 	}
 }

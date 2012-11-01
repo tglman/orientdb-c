@@ -11,6 +11,7 @@ void test_o_database_document_query()
 
 	o_database_document_metadata(dd);
 
+
 	struct o_query * q = o_query_sql("select * from OUser where name = 'admin' ");
 	struct o_list_document * ld = o_database_document_query(dd, q);
 

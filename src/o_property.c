@@ -12,7 +12,7 @@ struct o_property
 
 struct o_property * o_property_new(char * name, enum o_document_value_type type)
 {
-	struct o_property * prop = o_malloc(sizeof(struct o_property *));
+	struct o_property * prop = o_malloc(sizeof(struct o_property));
 	prop->name = o_memdup(name, strlen(name)+1);
 	prop->type = type;
 	return prop;
@@ -24,7 +24,7 @@ struct o_property * o_property_new_from_document(struct o_document *doc)
 	int type = o_document_value_get_int(o_document_field_get(doc, "type"));
 	if (type == 11 || type == 14 || type == 15)
 		type = 0;
-	struct o_property * prop = o_property_new(name, type);
+	struct o_property * prop = o_property_new(name, (enum o_document_value_type)type);
 
 	return prop;
 }

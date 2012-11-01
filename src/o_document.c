@@ -188,7 +188,7 @@ void o_document_set_class(struct o_document * doc, struct o_class * cl)
 
 void o_document_set_class_by_name(struct o_document * doc, char * class_name)
 {
-	doc->class_name = o_memdup(class_name, strlen(class_name)+1);
+	doc->class_name = o_memdup(class_name, strlen(class_name) + 1);
 	o_document_init_by_class_name(doc);
 }
 
@@ -225,6 +225,8 @@ void o_document_free(struct o_document * doc)
 	o_map_string_free(doc->fields);
 	if (doc->fields_old_values != 0)
 		o_map_string_free(doc->fields_old_values);
+	if (doc->class_name != 0)
+		o_free(doc->class_name);
 	o_record_free_internal(&doc->record);
 	o_free(doc);
 }

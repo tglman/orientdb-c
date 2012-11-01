@@ -81,9 +81,9 @@ char * o_record_id_string(struct o_record_id * o_id)
 
 void o_record_id_release(struct o_record_id * o_id)
 {
+	if (o_id->string_id != 0)
+		o_free(o_id->string_id);
 	o_id->ref_count--;
 	if (o_id->ref_count == 0)
 		o_record_id_free(o_id);
-	if (o_id->string_id != 0)
-		o_free(o_id->string_id);
 }
