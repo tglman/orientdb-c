@@ -132,6 +132,7 @@ struct o_raw_buffer * o_storage_remote_read_record(struct o_storage * storage, s
 	o_connection_remote_write_long64(conn, o_record_id_record_id(id));
 	o_connection_remote_write_string(conn, "");
 	o_connection_remote_write_byte(conn, 0); //IGNORE CACHE
+	o_connection_remote_write_byte(conn, 0); //TOMBSTONES FALSE
 	o_storage_remote_end_write(rs, conn);
 
 	conn = o_storage_remote_begin_response(rs);
