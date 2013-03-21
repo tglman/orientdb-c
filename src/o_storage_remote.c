@@ -411,6 +411,8 @@ struct o_storage * o_storage_remote_new(struct o_storage_factory_remote * storag
 			o_free(content);
 		o_storage_remote_end_read(storage, conn);
 		storage->default_cluster_id = o_storage_remote_get_cluster_id_by_name(&storage->storage, CLUSTER_DEFAULT_NAME);
+		char * version_build = o_connection_remote_read_string(conn);
+		o_free(version_build);
 	}
 	catch(struct o_exception, ex)
 	{
