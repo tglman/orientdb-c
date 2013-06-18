@@ -185,14 +185,14 @@ struct o_document_value * o_doc_for_std_value_link_deserialize(struct o_input_st
 			//Remove the peek from stream
 			o_input_stream_read(stream);
 		}
-		else if (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '*')
+		else if (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '>' && readed != '*')
 		{
 			o_string_buffer_free(buff);
 			char message[50];
 			sprintf(message, "wrong link parsing char:%c", readed);
 			throw(o_exception_new(message, 0));
 		}
-	} while (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '*');
+	} while (readed != ',' && readed != -1 && readed != ')' && readed != ']' && readed != '>' && readed != '*');
 	char * ca = o_string_buffer_str(buff);
 	rid = atol(ca);
 	o_free(ca);
@@ -209,7 +209,7 @@ struct o_document_value_list
 	struct o_document_value_list * next;
 };
 
-struct o_document_value * o_doc_for_std_value_array_deserialize(struct o_input_stream * stream)
+struct o_document_value * o_doc_for_std_value_array_deserialize(struct o_input_stream * stream, char end)
 {
 	struct o_document_value_list *value_list = 0;
 	struct o_document_value_list *root = 0;
@@ -229,9 +229,9 @@ struct o_document_value * o_doc_for_std_value_array_deserialize(struct o_input_s
 			size++;
 		}
 		readed = o_input_stream_peek(stream);
-		if (readed == ',' || readed == ']')
+		if (readed == ',' || readed == end)
 			o_input_stream_read(stream);
-	} while (readed != ']');
+	} while (readed != end);
 
 	struct o_document_value ** array = o_malloc(sizeof(struct o_document_value *) * size);
 	int i = 0;
@@ -305,6 +305,7 @@ struct o_document_value * o_doc_for_std_value_plain_deserialize(struct o_input_s
 		{
 		case ')':
 		case ']':
+		case '>':
 		case ',':
 		case -1:
 		{
@@ -378,6 +379,7 @@ struct o_document_value * o_doc_for_std_value_deserialize(struct o_input_stream 
 		break;
 	case ')':
 	case ']':
+	case '>':
 	case ',':
 		break;
 	case '"':
@@ -388,9 +390,13 @@ struct o_document_value * o_doc_for_std_value_deserialize(struct o_input_stream 
 		o_input_stream_read(stream);
 		value = o_doc_for_std_value_link_deserialize(stream);
 		break;
+	case '<':
+		o_input_stream_read(stream);
+		value = o_doc_for_std_value_array_deserialize(stream, '>');
+		break;
 	case '[':
 		o_input_stream_read(stream);
-		value = o_doc_for_std_value_array_deserialize(stream);
+		value = o_doc_for_std_value_array_deserialize(stream, ']');
 		break;
 	case '{':
 		return o_document_value_map_deserialize(stream);
@@ -432,7 +438,7 @@ void o_document_formatter_standard_deserialize(struct o_document_formatter * fm,
 			o_free(str);
 			o_string_buffer_clear(buff);
 		}
-		else if (readed != -1 && readed != ')' && readed != '*' && readed != ']' && readed != ',')
+		else if (readed != -1 && readed != ')' && readed != '*' && readed != ']' && readed != '>' && readed != ',')
 		{
 			o_string_buffer_append_char(buff, readed);
 		}
