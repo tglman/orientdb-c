@@ -11,16 +11,8 @@ pthread
 `git clone git@github.com:tglman/orientdb-c.git`
 
 **Project Build:**
-Execute in console
 
-`./waf configure`
-
-`./waf`
-
-**Project Install:**
-Execute in console
-
-`./waf install` or `sudo ./waf install` for non root users.
+orientdb-c is now build with Autotools
 
 
 **First Use:**
