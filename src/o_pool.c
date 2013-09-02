@@ -90,20 +90,11 @@ void * o_pool_get(struct o_pool * pool)
 	o_native_lock_lock(pool->lock);
 	if (o_list_size(pool->free_instances) == 0)
 	{
-		try
-		{
-			if (!o_pool_expand(pool))
-			{
-				o_native_lock_unlock(pool->lock);
-				return 0;
-			}
-		}
-		catch( struct o_exception, ex)
+		if (!o_pool_expand(pool))
 		{
 			o_native_lock_unlock(pool->lock);
-			throw(ex);
+			return 0;
 		}
-		end_try;
 	}
 
 	inst = o_list_get(pool->free_instances, 0);
