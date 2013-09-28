@@ -33,6 +33,7 @@ struct o_database_document * o_database_document_new_error_handler(char * connec
 void o_database_document_open(struct o_database_document * db, char * username, char * password)
 {
 	o_database_open(o_database_document_to_database(db), username, password);
+	o_database_document_metadata(db);
 }
 
 void o_database_document_close(struct o_database_document * db)
