@@ -6,9 +6,6 @@
 #include "o_record.h"
 #include <string.h>
 
-#define CMD_CREATE "CREATE"
-#define CMD_UPDATE "UPDATE"
-
 struct o_query
 {
 	void (*o_query_free)(struct o_query *query);
@@ -37,26 +34,7 @@ void o_query_sql_serialize(struct o_query * query, struct o_output_stream * stre
 	struct o_query_sql * qsql = (struct o_query_sql *) query;
 	struct o_output_stream_data *data = o_output_stream_data_new(stream);
 	
-	// support create, update
-	char query_begin[6];
-	int i;
-	
-	strncpy(query_begin, qsql->sql, 6);
-	
-	for (i = 0; i < 6; i++)
-		query_begin[i] = toupper(query_begin[i]);
-	
-	int idempotent = ( strncmp(query_begin, CMD_CREATE, 6) || strncmp(query_begin, CMD_UPDATE, 6));
-	
-	if (idempotent == 1) {
-	  
-	  o_output_stream_data_write_string(data, "com.orientechnologies.orient.core.sql.OCommandSQL");
-	  
-	} else {
-	
-	  o_output_stream_data_write_string(data, "com.orientechnologies.orient.core.sql.query.OSQLSynchQuery");
-	
-	}
+	o_output_stream_data_write_string(data, "c");
 	
 	o_output_stream_data_write_string(data, qsql->sql);
 	o_output_stream_data_write_int(data, qsql->query.limit);
