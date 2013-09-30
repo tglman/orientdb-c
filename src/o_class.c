@@ -94,7 +94,7 @@ struct o_class * o_class_new_from_document(struct o_document * doc)
 	//cl->id = o_document_value_get_int(o_document_field_get(doc, "id"));
 	struct o_document_value * shortName = o_document_field_get(doc, "shortName");
 	if (shortName != 0)
-		cl->shortName = o_document_value_get_string(shortName);
+		cl->shortName = strdup( o_document_value_get_string(shortName));
 	cl->defaultClusterId = o_document_value_get_int(o_document_field_get(doc, "defaultClusterId"));
 	struct o_document_value * overSizeValue = o_document_field_get(doc, "overSize");
 	if (overSizeValue != 0)
