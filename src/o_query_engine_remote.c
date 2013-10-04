@@ -20,16 +20,33 @@ struct o_query_engine_remote
 void o_query_engine_remote_record_result(struct o_connection_remote * connection, void * add_info, query_result_callback callback)
 {
 	//CLASS!! RIQUERED FOR THE PROTOCOLL, I IGNORE
-	o_connection_remote_read_short(connection);
-	int size;
-	char type = o_connection_remote_read_byte(connection);
-	short rec_cl = o_connection_remote_read_short(connection);
-	long long rec_pos = o_connection_remote_read_long64(connection);
-	int version = o_connection_remote_read_int(connection);
-	unsigned char * o_p = o_connection_remote_read_bytes(connection, &size);
-	struct o_raw_buffer * buff = o_raw_buffer_byte(type, version, o_p, size);
-	callback(add_info, o_record_id_new(rec_cl, rec_pos), buff);
+	short s = o_connection_remote_read_short(connection);
+	if (s == -2)
+	{
+	}
+	else if (s == -3)
+	{
+		short rec_cl = o_connection_remote_read_short(connection);
+		long long rec_pos = o_connection_remote_read_long64(connection);
+		callback(add_info, o_record_id_new(rec_cl, rec_pos), 0);
+	}
+	if (s == 0)
+	{
+		int size;
+		char type = o_connection_remote_read_byte(connection);
+		short rec_cl = o_connection_remote_read_short(connection);
+		long long rec_pos = o_connection_remote_read_long64(connection);
+		int version = o_connection_remote_read_int(connection);
+		unsigned char * o_p = o_connection_remote_read_bytes(connection, &size);
+		struct o_raw_buffer * buff = o_raw_buffer_byte(type, version, o_p, size);
+		callback(add_info, o_record_id_new(rec_cl, rec_pos), buff);
+	}
 }
+
+void o_query_engine_remote_nothing_callback(void * add_info, struct o_record_id *id, struct o_raw_buffer * buffer){
+
+}
+
 void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struct o_query * query, struct o_document_value ** parameters, void * add_info,
 		query_result_callback callback)
 {
@@ -44,19 +61,13 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 	o_storage_remote_end_write(engine_remote->storage, conn);
 	o_output_stream_free(str);
 
-
-	conn =o_storage_remote_begin_response(engine_remote->storage);
+	conn = o_storage_remote_begin_response(engine_remote->storage);
 	char response = o_connection_remote_read_byte(conn);
 	try
 	{
 		switch (response)
 		{
 		case 'n':
-		{
-			int size;
-			unsigned char * readed = o_connection_remote_read_bytes(conn, &size);
-			o_free(readed);
-		}
 			break;
 		case 'r':
 		{
@@ -73,16 +84,25 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 
 		}
 			break;
+		case 'a':
+		{
+
+			char *s = o_connection_remote_read_string(conn);
+			o_free(s);
+		}
+		}
+		while (o_connection_remote_read_byte(conn) == 2)
+		{
+			o_query_engine_remote_record_result(conn, add_info, o_query_engine_remote_nothing_callback);
 		}
 		o_storage_remote_end_read(engine_remote->storage, conn);
 	}
-	catch( struct o_exception ,ex)
+	catch(struct o_exception, ex)
 	{
 		o_storage_remote_end_read(engine_remote->storage, conn);
 		throw(ex);
 	}
 	end_try;
-
 
 }
 

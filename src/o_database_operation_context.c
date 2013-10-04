@@ -128,9 +128,12 @@ int o_database_operation_context_commit_transaction(struct o_operation_context *
 void o_c_query_engine_record_listener(void * add_info, struct o_record_id *id, struct o_raw_buffer * buffer)
 {
 	struct o_internal_result_handler *result_handler = (struct o_internal_result_handler *) add_info;
-	struct o_record * record = o_database_operation_context_record_from_content(result_handler->db, id, buffer);
+	struct o_record * record = 0;
+	if (buffer != 0)
+		record = o_database_operation_context_record_from_content(result_handler->db, id, buffer);
 	o_record_id_release(id);
-	result_handler->handler(result_handler->handler_add_info, record);
+	if (record != 0)
+		result_handler->handler(result_handler->handler_add_info, record);
 }
 
 int o_database_operation_context_query(struct o_operation_context * context, struct o_query * query, void ** parameters, QueryHandler handler,
