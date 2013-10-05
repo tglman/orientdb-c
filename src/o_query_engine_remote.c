@@ -67,29 +67,31 @@ void o_query_engine_remote_query_parameter(struct o_query_engine * engine, struc
 	{
 		switch (response)
 		{
-		case 'n':
-			break;
-		case 'r':
-		{
-			o_query_engine_remote_record_result(conn, add_info, callback);
-		}
-			break;
-		case 'l':
-		{
-			int size = o_connection_remote_read_int(conn);
-			while (size-- > 0)
-			{
-				o_query_engine_remote_record_result(conn, add_info, callback);
-			}
-
-		}
-			break;
-		case 'a':
-		{
-
-			char *s = o_connection_remote_read_string(conn);
-			o_free(s);
-		}
+      case 'n':
+        break;
+      case 'r':
+      {
+        o_query_engine_remote_record_result(conn, add_info, callback);
+        break;
+      }
+      case 'l':
+      {
+        int size = o_connection_remote_read_int(conn);
+        while (size-- > 0)
+        {
+          o_query_engine_remote_record_result(conn, add_info, callback);
+        }
+        
+        break;
+  
+      }
+      case 'a':
+      {
+  
+        char *s = o_connection_remote_read_string(conn);
+        o_free(s);
+        break;
+      }
 		}
 		while (o_connection_remote_read_byte(conn) == 2)
 		{
