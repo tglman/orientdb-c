@@ -58,7 +58,6 @@ void o_query_sql_serialize(struct o_query * query, struct o_output_stream * stre
 	
 	}
 	
-	o_output_stream_data_write_string(data, "com.orientechnologies.orient.core.sql.query.OSQLSynchQuery");
 	o_output_stream_data_write_string(data, qsql->sql);
 	o_output_stream_data_write_int(data, qsql->query.limit);
 	o_output_stream_data_write_string(data, qsql->query.fetchPlan != 0 ? qsql->query.fetchPlan : "");
