@@ -29,8 +29,10 @@ void o_string_buffer_append(struct o_string_buffer * buff, char * to_append)
 	if (expected_cursor >= buff->size)
 	{
 		buff->size *= 2;
-		if (expected_cursor >= buff->size)
-			buff->size = expected_cursor;
+		do
+		{
+			buff->size *= 2;
+		} while (expected_cursor >= buff->size);
 		buff->buffer = o_realloc(buff->buffer, buff->size);
 	}
 	memcpy(buff->buffer + buff->cursor, to_append, size);

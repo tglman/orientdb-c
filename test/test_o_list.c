@@ -1,6 +1,5 @@
-#include "test_o_list.h"
+#include "suites.h"
 #include "../src/o_list.h"
-#include <ctesf.h>
 
 void test_o_list_create_destroy()
 {

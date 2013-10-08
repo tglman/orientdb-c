@@ -1,8 +1,8 @@
-#include "test_o_record.h"
+#include "suites.h"
 #include "../src/o_record.h"
 #include "../src/o_record_id.h"
 #include "../src/o_record_factory.h"
-#include <ctesf.h>
+
 
 void test_o_record_id_new()
 {

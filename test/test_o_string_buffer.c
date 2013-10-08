@@ -1,5 +1,4 @@
-#include "test_o_string_buffer.h"
-#include <ctesf.h>
+#include "suites.h"
 #include "../src/o_string_buffer.h"
 #include "../src/o_memory.h"
 #include <string.h>

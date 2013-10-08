@@ -1,23 +1,4 @@
-#include <ctesf.h>
-#include "test_o_map.h"
-#include "test_o_connection_remote.h"
-#include "test_o_exceptions.h"
-#include "test_o_url_resolver.h"
-#include "test_o_string_buffer.h"
-#include "test_o_document_value.h"
-#include "test_o_record.h"
-#include "test_o_document.h"
-#include "test_o_input_stream.h"
-#include "test_o_string_printer.h"
-#include "test_o_database.h"
-#include "test_o_database_document.h"
-#include "test_o_native_lock.h"
-#include "test_o_database_document_metadata.h"
-#include "test_o_list.h"
-#include "test_o_list_record.h"
-#include "test_o_database_query.h"
-#include "test_o_database_document_query.h"
-#include "test_o_pool.h"
+#include "suites.h"
 
 TEST_INITIALIZE
 {
@@ -40,5 +21,6 @@ TEST_INITIALIZE
 	ADD_SUITE(o_database_query_suite, "test execute query on database");
 	ADD_SUITE(o_database_document_query_suite, "test execute query on document database");
 	ADD_SUITE(o_pool_suite, "a suite of test on pool");
+	ADD_SUITE(o_output_stream_suite, "a suite of test on output stream");
 }
 

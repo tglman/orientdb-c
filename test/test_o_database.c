@@ -1,8 +1,6 @@
-#include "test_o_database.h"
-#include <ctesf.h>
+#include "suites.h"
 #include "../src/o_database.h"
 #include "../src/o_record_raw.h"
-#include "test_commons.h"
 #include <stdio.h>
 #include <string.h>
 

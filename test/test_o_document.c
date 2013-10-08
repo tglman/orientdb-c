@@ -1,5 +1,4 @@
-#include "test_o_document.h"
-#include <ctesf.h>
+#include "suites.h"
 #include "../src/o_document.h"
 #include "../src/o_document_value.h"
 #include <string.h>

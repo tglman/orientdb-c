@@ -1,8 +1,6 @@
-#include "test_o_database_document_metadata.h"
-#include <ctesf.h>
+#include "suites.h"
 #include "../src/o_database_document.h"
 #include "../src/o_metadata.h"
-#include "test_commons.h"
 #include <string.h>
 #include <stdio.h>
 

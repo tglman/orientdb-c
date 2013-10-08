@@ -1,6 +1,5 @@
-#include "test_o_native_lock.h"
+#include "suites.h"
 #include "../src/o_native_lock.h"
-#include <ctesf.h>
 
 void test_o_native_lock()
 {

@@ -1,6 +1,5 @@
-#include "test_o_pool.h"
+#include "suites.h"
 #include "../src/o_pool.h"
-#include <ctesf.h>
 #include "../src/o_memory.h"
 
 void * pool_test_factory(void * obj)

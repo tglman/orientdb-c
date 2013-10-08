@@ -1,5 +1,4 @@
-#include "test_o_native_socket_selector.h"
-#include <ctesf.h>
+#include "suites.h"
 #include "../src/o_native_socket.h"
 #include "../src/o_native_socket_selector.h"
 #include "../src/o_exceptions.h"

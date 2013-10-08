@@ -1,9 +1,7 @@
-#include "test_o_database_query.h"
+#include "suites.h"
 #include "../src/o_database_document.h"
 #include "../src/o_database.h"
 #include "../src/o_document.h"
-#include <ctesf.h>
-#include "test_commons.h"
 #include <stdio.h>
 
 void test_o_database_query()
@@ -41,7 +39,7 @@ void test_o_database_multi_query()
 	o_database_free(db);
 }
 
-void test_o_database_insert()
+void test_o_database_query_insert()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -63,7 +61,7 @@ void test_o_database_insert()
 
 }
 
-void test_o_database_update()
+void test_o_database_query_update()
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -86,13 +84,12 @@ void test_o_database_update()
 	o_query_free(q);
 	o_database_close(db);
 	o_database_free(db);
-
 }
 
 void o_database_query_suite()
 {
 	ADD_TEST(test_o_database_query, "test a query execution.");
-	ADD_TEST(test_o_database_insert, "test a insert query execution.");
-	ADD_TEST(test_o_database_update, "test a update query execution.");
+	ADD_TEST(test_o_database_query_insert, "test a insert query execution.");
+	ADD_TEST(test_o_database_query_update, "test a update query execution.");
 	ADD_TEST(test_o_database_multi_query, "test multiple query execution.");
 }

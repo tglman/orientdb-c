@@ -1,11 +1,9 @@
-#include "test_o_connection_remote.h"
+#include "suites.h"
 #include "../src/o_connection_remote.h"
 #include "../src/o_native_socket.h"
-#include <ctesf.h>
 #include "../src/o_native_thread.h"
 #include "../src/o_memory.h"
 #include "../src/o_exceptions.h"
-#include "test_o_native_socket_selector.h"
 #include <stdio.h>
 #include <string.h>
 #define HOST_TEST "127.0.0.1"

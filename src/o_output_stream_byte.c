@@ -15,9 +15,13 @@ struct o_output_stream_byte
 void o_output_stream_byte_write_bytes(struct o_output_stream * stream, void *bytes, int nbytes)
 {
 	struct o_output_stream_byte *buff = (struct o_output_stream_byte *) stream;
-	while (buff->cursor + nbytes >= buff->size)
+	if (buff->cursor + nbytes >= buff->size)
 	{
-		buff->size = buff->size * 2;
+		do
+		{
+			buff->size *= 2;
+		} while (buff->cursor + nbytes >= buff->size);
+
 		buff->content = o_realloc(buff->content, buff->size);
 	}
 	memcpy(buff->content + buff->cursor, bytes, nbytes);
