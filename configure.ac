@@ -6,6 +6,7 @@ AC_INIT([orientdb-c],[0.9])
 AC_CONFIG_SRCDIR([src/o_query_internal.h])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE()
+AC_CONFIG_MACRO_DIR([m4])
 
 LT_INIT([disable-static])
 # Checks for programs.
