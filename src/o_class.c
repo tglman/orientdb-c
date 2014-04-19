@@ -30,61 +30,61 @@ struct o_class * o_class_new(char * name)
 	return cl;
 }
 
-char * o_class_get_name(struct o_class * class)
+char * o_class_get_name(struct o_class * oclass)
 {
-	return class->name;
+	return oclass->name;
 }
 
-struct o_class * o_class_get_superclass(struct o_class * class)
+struct o_class * o_class_get_superclass(struct o_class * oclass)
 {
-	return class->superclass;
+	return oclass->superclass;
 }
 
-void o_class_set_superclass(struct o_class * class, struct o_class * superclass)
+void o_class_set_superclass(struct o_class * oclass, struct o_class * superclass)
 {
-	class->superclass = superclass;
+	oclass->superclass = superclass;
 }
 
-struct o_property * o_class_get_property(struct o_class * class, char * property_name)
+struct o_property * o_class_get_property(struct o_class * oclass, char * property_name)
 {
 	struct o_property * prop;
 	do
 	{
-		prop = (struct o_property *) o_map_string_get(class->properties, property_name);
-		class = class->superclass;
-	} while (prop == 0 && class != 0);
+		prop = (struct o_property *) o_map_string_get(oclass->properties, property_name);
+		oclass = oclass->superclass;
+	} while (prop == 0 && oclass != 0);
 	return prop;
 }
 
-struct o_property * o_class_create_property(struct o_class * class, char * property_name, enum o_document_value_type type)
+struct o_property * o_class_create_property(struct o_class * oclass, char * property_name, enum o_document_value_type type)
 {
 	struct o_property * prop = o_property_new(property_name, type);
-	o_map_string_put(class->properties, property_name, prop);
+	o_map_string_put(oclass->properties, property_name, prop);
 	return prop;
 }
 
-int o_class_exist_property(struct o_class * class, char * property_name)
+int o_class_exist_property(struct o_class * oclass, char * property_name)
 {
-	return o_map_string_get(class->properties, property_name) != 0;
+	return o_map_string_get(oclass->properties, property_name) != 0;
 }
 
-void o_class_remove_property(struct o_class * class, char * property_name)
+void o_class_remove_property(struct o_class * oclass, char * property_name)
 {
-	struct o_property * pro = (struct o_property *) o_map_string_remove(class->properties, property_name);
+	struct o_property * pro = (struct o_property *) o_map_string_remove(oclass->properties, property_name);
 	o_free(pro);
 }
 
-const int * o_class_get_clusters(struct o_class * class, int * n_cluster)
+const int * o_class_get_clusters(struct o_class * oclass, int * n_cluster)
 {
-	*n_cluster = class->n_clusterIds;
-	return class->clusterIds;
+	*n_cluster = oclass->n_clusterIds;
+	return oclass->clusterIds;
 }
 
-void o_class_add_cluster(struct o_class * class, int clusterId)
+void o_class_add_cluster(struct o_class * oclass, int clusterId)
 {
-	class->n_clusterIds++;
-	class->clusterIds = o_realloc(class->clusterIds, (class->n_clusterIds) * sizeof(int));
-	class->clusterIds[class->n_clusterIds - 1] = clusterId;
+	oclass->n_clusterIds++;
+	oclass->clusterIds = o_realloc(oclass->clusterIds, (oclass->n_clusterIds) * sizeof(int));
+	oclass->clusterIds[oclass->n_clusterIds - 1] = clusterId;
 }
 
 struct o_class * o_class_new_from_document(struct o_document * doc)
@@ -120,41 +120,41 @@ struct o_class * o_class_new_from_document(struct o_document * doc)
 	return cl;
 }
 
-struct o_property ** o_class_properties(struct o_class * class, int * n_properties)
+struct o_property ** o_class_properties(struct o_class * oclass, int * n_properties)
 {
-	return (struct o_property **) o_map_string_values(class->properties, n_properties);
+	return (struct o_property **) o_map_string_values(oclass->properties, n_properties);
 }
 
-int o_class_get_id(struct o_class * class)
+int o_class_get_id(struct o_class * oclass)
 {
-	return class->id;
+	return oclass->id;
 }
 
-void o_class_set_id(struct o_class * class, int id)
+void o_class_set_id(struct o_class * oclass, int id)
 {
-	class->id = id;
+	oclass->id = id;
 }
 
-int o_class_get_default_cluster_id(struct o_class * class)
+int o_class_get_default_cluster_id(struct o_class * oclass)
 {
-	return class->defaultClusterId;
+	return oclass->defaultClusterId;
 }
 
-void o_class_set_default_cluster_id(struct o_class * class, int cluster_id)
+void o_class_set_default_cluster_id(struct o_class * oclass, int cluster_id)
 {
-	class->defaultClusterId = cluster_id;
+	oclass->defaultClusterId = cluster_id;
 }
 
-void o_class_free(struct o_class * class)
+void o_class_free(struct o_class * oclass)
 {
 	int size;
-	struct o_property ** ps = o_class_properties(class, &size);
+	struct o_property ** ps = o_class_properties(oclass, &size);
 	while (size > 0)
 		o_property_free(ps[--size]);
-	o_map_string_free(class->properties);
-	if (class->shortName != 0)
-		o_free(class->shortName);
-	o_free(class->clusterIds);
-	o_free(class->name);
-	o_free(class);
+	o_map_string_free(oclass->properties);
+	if (oclass->shortName != 0)
+		o_free(oclass->shortName);
+	o_free(oclass->clusterIds);
+	o_free(oclass->name);
+	o_free(oclass);
 }
