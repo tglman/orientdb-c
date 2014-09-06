@@ -1,59 +1,62 @@
 #ifndef SUITES_H_
 #define SUITES_H_
-#include <ctesf.h>
+#include <check.h>
+
+#define assert_true(COND,MSG) ck_assert_msg(COND,MSG)
+#define assert_equals(ARG1,ARG2,MSG) ck_assert_msg(ARG1==ARG2,MSG)
 
 void o_db_error_handler_function(int code, char * error, void * custom_info);
 
-void o_connection_remote_suite();
+TCase * o_connection_remote_tests();
 
 /*! \brief Tests suite on document metadata management.
  */
-void o_database_document_metadata_suite();
+TCase * o_database_document_metadata_tests();
 
 /*! \brief Test on query on document database.
  *
  */
-void o_database_document_query_suite();
+TCase * o_database_document_query_tests();
 
 /*! \brief Document database test suite.
  *
  */
-void o_database_document_suite();
+TCase *  o_database_document_tests();
 
-void o_database_query_suite();
+TCase * o_database_query_tests();
 
 /*! \brief the suite of test on database.
  *
  */
-void o_database_suite();
+TCase * o_database_tests();
 
-void o_document_value_suite();
+TCase * o_document_value_tests();
 
-void o_document_suite();
+TCase * o_document_tests();
 
 void o_exceptions_suite();
 
-void o_input_stream_suite();
+TCase * o_input_stream_tests();
 
 /*! \brief Create a Record list suite.
  *
  */
-void o_list_record_suite();
+TCase * o_list_record_tests();
 
 /*! \brief the suite of test on list.
  *
  */
-void o_list_suite();
+TCase * o_list_tests();
 
 /*! \brief Suite of map test.
  *
  */
-void o_map_suite();
+TCase * o_map_tests();
 
 /*! \brief basic native lock test suite.
  *
  */
-void o_native_lock_suite();
+TCase* o_native_lock_tests();
 
 
 void o_native_socket_selector_suite();
@@ -61,20 +64,19 @@ void o_native_socket_selector_suite();
 /*! \brief the suite of test on pool
  *
  */
-void o_pool_suite();
+TCase* o_pool_tests();
 
-void o_record_suite();
+TCase * o_record_tests();
 
-void o_string_buffer_suite();
+TCase * o_string_buffer_tests();
 
 /*! \brief The suite  of test on string printer.
  *
  */
-void o_string_printer_suite();
+TCase * o_string_printer_tests();
 
+TCase *  o_url_resolve_tests();
 
-void o_url_resolve_suite();
-
-void o_output_stream_suite();
+TCase * o_output_stream_tests();
 
 #endif /* SUITES_H_ */

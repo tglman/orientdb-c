@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([orientdb-c],[0.9])
-AC_CONFIG_SRCDIR([src/o_query_internal.h])
+AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE()
 AC_CONFIG_MACRO_DIR([m4])
@@ -17,8 +17,10 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Checks for libraries.
+PKG_CHECK_MODULES([CHECK],[check >= 0.9.4])
 
 # Checks for header files.
 AC_CHECK_HEADERS([malloc.h memory.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])

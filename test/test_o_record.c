@@ -18,13 +18,6 @@ void test_o_record_id_managment()
 	o_record_id_release(id);
 }
 
-void o_record_id_suite()
-{
-	ADD_TEST(test_o_record_id_new, " test id creation and destroy");
-	ADD_TEST(test_o_record_id_managment, " test id creation with cluster id and rid and retrive it");
-
-}
-
 void test_o_record_new()
 {
 	struct o_record * rec = o_record_factory('d');
@@ -35,9 +28,12 @@ void test_o_record_new()
 	o_record_release(rec);
 }
 
-void o_record_suite()
+TCase * o_record_tests()
 {
-	ADD_SUITE(o_record_id_suite, "suite on record id");
-	ADD_TEST(test_o_record_new, "test creation of new simple record");
+	TCase *tc_core = tcase_create ("o_record");
+	tcase_add_test (tc_core, test_o_record_new);
+	tcase_add_test (tc_core, test_o_record_id_new);
+	tcase_add_test (tc_core, test_o_record_id_managment);
+	return tc_core;
 }
 

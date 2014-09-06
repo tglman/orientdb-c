@@ -8,13 +8,12 @@ liborientdb_c_la_SOURCES=src/o_class.c src/o_document_value.c src/o_map_string.c
 orientdb_cincludedir=$(includedir)/orientdb-c
 orientdb_cinclude_HEADERS=src/o_document.h src/o_document_value.h src/o_database_document.h src/o_database.h src/o_record.h src/o_record_id.h src/o_database_error_handler.h src/o_output_stream.h src/o_input_stream.h src/o_metadata.h src/o_schema.h src/o_class.h src/o_property.h src/o_transaction.h src/o_query.h src/o_list_record.h src/o_list_document.h src/o_operation_context.h
 
-check_LTLIBRARIES=liborientdb-c-test.la
-liborientdb_c_test_la_SOURCES=test/test.c test/test_o_database_document_metadata.c test/test_commons.c test/test_o_document_value.c test/test_o_list_record.c test/test_o_pool.c test/test_o_url_resolver.c  test/test_o_database_document_query.c test/test_o_connection_remote.c test/test_o_exceptions.c test/test_o_map.c test/test_o_record.c test/test_o_database.c test/test_o_database_query.c test/test_o_input_stream.c test/test_o_native_lock.c test/test_o_string_buffer.c test/test_o_database_document.c test/test_o_document.c test/test_o_list.c test/test_o_native_socket_selector.c test/test_o_string_printer.c test/test_o_output_stream.c
+TESTS=check_orientdb
+check_PROGRAMS=$(TESTS)
 
-liborientdb_c_test_la_CFLAGS=-I$(top_srcdir)/src -I/usr/include/ctesf-1.0
-liborientdb_c_test_la_LDFLAGS= -module -export-dynamic -disable-static -avoid-version -rpath $(libdir) 
-liborientdb_c_test_la_LIBADD=liborientdb-c.la
-
+check_orientdb_SOURCES=test/test.c test/test_o_map.c test/test_o_connection_remote.c test/test_o_url_resolver.c test/test_o_string_buffer.c test/test_o_document_value.c test/test_o_record.c test/test_o_string_printer.c test/test_o_document.c test/test_o_input_stream.c test/test_o_native_lock.c test/test_o_database.c test/test_commons.c test/test_o_database_document.c test/test_o_database_document_metadata.c test/test_o_list.c test/test_o_list_record.c test/test_o_database_query.c test/test_o_database_document_query.c test/test_o_pool.c test/test_o_output_stream.c
+check_orientdb_CFLAGS = @CHECK_CFLAGS@ 
+check_orientdb_LDADD = @CHECK_LIBS@ liborientdb-c.la
 #check-local:
 #	ctesf-console .libs/liborientdb-c-test.so
 

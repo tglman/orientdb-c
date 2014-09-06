@@ -2,13 +2,14 @@
 #include "../src/o_record_raw.h"
 #include "../src/o_list_record.h"
 
-void test_o_list_record_create()
+START_TEST( test_o_list_record_create)
 {
 	struct o_list_record * rec = o_list_record_new();
 	o_list_record_release(rec);
 }
+END_TEST
 
-void test_o_list_record_add_remove()
+START_TEST( test_o_list_record_add_remove)
 {
 	struct o_list_record * reclis = o_list_record_new();
 	struct o_record * rec0 = o_record_raw_new();
@@ -28,9 +29,12 @@ void test_o_list_record_add_remove()
 	o_record_release(rec0);
 	o_record_release(rec1);
 }
+END_TEST
 
-void o_list_record_suite()
+TCase * o_list_record_tests()
 {
-	ADD_TEST(test_o_list_record_create, "Base test of list creation and destroy");
-	ADD_TEST(test_o_list_record_add_remove, "Test of add remove and size");
+	TCase *tc_core = tcase_create ("o_list_record");
+	tcase_add_test (tc_core, test_o_list_record_create);
+	tcase_add_test (tc_core, test_o_list_record_add_remove);
+	return tc_core;
 }

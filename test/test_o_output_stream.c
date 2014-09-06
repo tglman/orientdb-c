@@ -2,7 +2,7 @@
 #include "../src/o_output_stream.h"
 #include "../src/o_output_stream_byte.h"
 
-void o_output_stream_test_buff_expand()
+START_TEST( o_output_stream_test_buff_expand)
 {
 	struct o_output_stream *stream = o_output_stream_byte_buffer();
 	o_output_stream_byte_write_bytes(stream,
@@ -10,8 +10,11 @@ void o_output_stream_test_buff_expand()
 			262);
 	o_output_stream_free(stream);
 }
+END_TEST
 
-void o_output_stream_suite()
+TCase * o_output_stream_tests()
 {
-	ADD_TEST(o_output_stream_test_buff_expand, "test the large expansion of the buffer");
+	TCase *tc_core = tcase_create ("o_output_stream");
+	tcase_add_test (tc_core, o_output_stream_test_buff_expand);
+	return tc_core;
 }

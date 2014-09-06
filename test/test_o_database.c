@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void test_o_database_new_open_close()
+START_TEST( test_o_database_new_open_close)
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -12,6 +12,7 @@ void test_o_database_new_open_close()
 	o_database_close(db);
 	o_database_free(db);
 }
+END_TEST
 
 void test_database_crud_opertation(struct o_database * db, void(*middle)(struct o_database *))
 {
@@ -50,7 +51,7 @@ void test_database_crud_opertation(struct o_database * db, void(*middle)(struct 
 
 }
 
-void test_o_database_new_open_crud_close()
+START_TEST( test_o_database_new_open_crud_close)
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -59,13 +60,14 @@ void test_o_database_new_open_crud_close()
 	o_database_close(db);
 	o_database_free(db);
 }
+END_TEST
 
 void commit_and_begin(struct o_database * db)
 {
 	o_database_commit(db);
 	o_database_begin_transaction(db);
 }
-void test_o_database_transaction_commit()
+START_TEST( test_o_database_transaction_commit)
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database * db = o_database_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -76,10 +78,13 @@ void test_o_database_transaction_commit()
 	o_database_close(db);
 	o_database_free(db);
 }
+END_TEST
 
-void o_database_suite()
+TCase * o_database_tests()
 {
-	ADD_TEST(test_o_database_new_open_close, "Test a database new open close and free");
-	ADD_TEST(test_o_database_new_open_crud_close, "Test a database new open write read close and free");
-	ADD_TEST(test_o_database_transaction_commit, "Test a database crud operation in a commited transaction");
+	TCase *tc_core = tcase_create ("o_database");
+	tcase_add_test (tc_core, test_o_database_new_open_close);
+	tcase_add_test (tc_core, test_o_database_new_open_crud_close);
+	tcase_add_test (tc_core, test_o_database_transaction_commit);
+	return tc_core;
 }

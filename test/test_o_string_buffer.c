@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void o_string_buffer_test_append_string()
+START_TEST (o_string_buffer_test_append_string)
 {
 	struct o_string_buffer * buffer = o_string_buffer_new();
 	o_string_buffer_append(buffer, "test_app");
@@ -14,8 +14,9 @@ void o_string_buffer_test_append_string()
 	o_free(content);
 	o_string_buffer_free(buffer);
 }
+END_TEST
 
-void o_string_buffer_test_append_integer()
+START_TEST( o_string_buffer_test_append_integer)
 {
 	struct o_string_buffer * buffer = o_string_buffer_new();
 	o_string_buffer_append(buffer, "test_int ");
@@ -25,8 +26,9 @@ void o_string_buffer_test_append_integer()
 	o_free(content);
 	o_string_buffer_free(buffer);
 }
+END_TEST
 
-void o_string_buffer_test_append_double()
+START_TEST(o_string_buffer_test_append_double)
 {
 	struct o_string_buffer * buffer = o_string_buffer_new();
 	o_string_buffer_append(buffer, "test_double ");
@@ -36,8 +38,9 @@ void o_string_buffer_test_append_double()
 	o_free(content);
 	o_string_buffer_free(buffer);
 }
+END_TEST
 
-void o_string_buffer_test_append_char()
+START_TEST( o_string_buffer_test_append_char)
 {
 	struct o_string_buffer * buffer = o_string_buffer_new();
 	o_string_buffer_append(buffer, "test_char ");
@@ -47,12 +50,15 @@ void o_string_buffer_test_append_char()
 	o_free(content);
 	o_string_buffer_free(buffer);
 }
+END_TEST
 
-void o_string_buffer_suite()
+TCase *  o_string_buffer_tests()
 {
-	ADD_TEST(o_string_buffer_test_append_string, "Test an append of string to string buffer");
-	ADD_TEST(o_string_buffer_test_append_integer, "Test an append of integer to string buffer");
-	ADD_TEST(o_string_buffer_test_append_double, "Test an append of double to string buffer");
-	ADD_TEST(o_string_buffer_test_append_char, "Test an append of char to string buffer");
+	TCase *tc_core = tcase_create ("o_string_buffer");
+	tcase_add_test (tc_core, o_string_buffer_test_append_string);
+	tcase_add_test (tc_core, o_string_buffer_test_append_integer);
+	tcase_add_test (tc_core, o_string_buffer_test_append_double);
+	tcase_add_test (tc_core, o_string_buffer_test_append_char);
+	return tc_core;
 
 }

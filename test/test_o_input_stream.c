@@ -1,7 +1,7 @@
 #include "suites.h"
 #include "../src/o_input_stream.h"
 
-void test_o_input_simple_read()
+START_TEST( test_o_input_simple_read)
 {
 	unsigned char bytes[] =
 	{ 1, 2, 3, -1, -1 };
@@ -14,7 +14,9 @@ void test_o_input_simple_read()
 	assert_true(o_input_stream_read(inp) == -1, "Error reading end byte");
 	o_input_stream_free(inp);
 }
-void test_o_input_bytes_read()
+END_TEST
+
+START_TEST( test_o_input_bytes_read)
 {
 	unsigned char bytes[] =
 	{ 1, 2, 3 };
@@ -29,10 +31,13 @@ void test_o_input_bytes_read()
 	o_input_stream_free(inp);
 
 }
+END_TEST
 
-void o_input_stream_suite()
+TCase * o_input_stream_tests()
 {
-	ADD_TEST(test_o_input_simple_read, "Test simple read from an byte array input stream");
-	ADD_TEST(test_o_input_bytes_read, "Test multiple bytes read from an byte array input stream");
+	TCase *tc_core = tcase_create ("o_input_stream");
+	tcase_add_test (tc_core, test_o_input_simple_read);
+	tcase_add_test (tc_core, test_o_input_bytes_read);
+	return tc_core;
 
 }

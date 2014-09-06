@@ -1,13 +1,14 @@
 #include "suites.h"
 #include "../src/o_list.h"
 
-void test_o_list_create_destroy()
+START_TEST( test_o_list_create_destroy)
 {
 	struct o_list * list = o_list_new();
 	o_list_free(list);
 }
+END_TEST
 
-void test_o_list_functions()
+START_TEST( test_o_list_functions)
 {
 	struct o_list * list = o_list_new();
 	o_list_add(list, (void *) 10);
@@ -20,8 +21,9 @@ void test_o_list_functions()
 	assert_true(((long) o_list_get(list, 1)) == 0, "the second value not removed as asked.");
 	o_list_free(list);
 }
+END_TEST
 
-void test_o_list_iterator()
+START_TEST( test_o_list_iterator)
 {
 	struct o_list * list = o_list_new();
 	o_list_add(list, (void *) 10);
@@ -44,10 +46,13 @@ void test_o_list_iterator()
 	o_list_iterator_free(back_iter);
 	o_list_free(list);
 }
+END_TEST
 
-void o_list_suite()
+TCase * o_list_tests()
 {
-	ADD_TEST(test_o_list_create_destroy, "base list create and destroy test");
-	ADD_TEST(test_o_list_functions, "list function test");
-	ADD_TEST(test_o_list_iterator, "list function test");
+	TCase *tc_core = tcase_create ("o_list");
+	tcase_add_test (tc_core, test_o_list_create_destroy);
+	tcase_add_test (tc_core, test_o_list_functions);
+	tcase_add_test (tc_core, test_o_list_iterator);
+	return tc_core;
 }

@@ -1,15 +1,18 @@
 #include "suites.h"
 #include "../src/o_native_lock.h"
 
-void test_o_native_lock()
+START_TEST( test_o_native_lock)
 {
 	struct o_native_lock * lock = o_native_lock_new();
 	o_native_lock_lock(lock);
 	o_native_lock_unlock(lock);
 	o_native_lock_free(lock);
 }
+END_TEST
 
-void o_native_lock_suite()
+TCase *  o_native_lock_tests()
 {
-	ADD_TEST(test_o_native_lock,"native lock create lock unlock free tests.");
+	TCase *tc_core = tcase_create ("o_record");
+	tcase_add_test (tc_core, test_o_native_lock);
+	return tc_core;
 }

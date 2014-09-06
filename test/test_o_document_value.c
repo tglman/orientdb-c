@@ -3,7 +3,7 @@
 #include "../src/o_document.h"
 #include <string.h>
 
-void test_o_document_value_create()
+START_TEST( test_o_document_value_create)
 {
 
 	struct o_document_value *val = o_document_value_bool(1);
@@ -62,8 +62,11 @@ void test_o_document_value_create()
 	o_document_value_free(val);
 
 }
+END_TEST
 
-void o_document_value_suite()
+TCase * o_document_value_tests()
 {
-	ADD_TEST(test_o_document_value_create, "test creation of document value");
+	TCase *tc_core = tcase_create ("o_document_value");
+	tcase_add_test (tc_core, test_o_document_value_create);
+	return tc_core;
 }

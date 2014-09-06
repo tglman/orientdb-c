@@ -7,13 +7,15 @@
 #include "../src/o_string_printer.h"
 #include "../src/o_string_printer_stream.h"
 #include "../src/o_output_stream_byte.h"
-void test_o_document_new()
+
+START_TEST( test_o_document_new)
 {
 	struct o_document * doc = o_document_new();
 	o_document_release(doc);
 }
+END_TEST
 
-void test_o_document_property_managment()
+START_TEST( test_o_document_property_managment)
 {
 	struct o_document * doc = o_document_new();
 	o_document_field_set(doc, "prova", o_document_value_int(30));
@@ -34,8 +36,9 @@ void test_o_document_property_managment()
 	assert_true(o_document_value_get_int(val2) == 31, "the get of value of key 'prova1' fail ");
 	o_document_release(doc);
 }
+END_TEST
 
-void test_o_document_serialize()
+START_TEST( test_o_document_serialize)
 {
 	struct o_document * doc = o_document_new();
 	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
@@ -52,8 +55,9 @@ void test_o_document_serialize()
 	o_output_stream_free(out);
 	o_document_release(doc);
 }
+END_TEST
 
-void test_o_document_serialize_deserialize()
+START_TEST( test_o_document_serialize_deserialize)
 {
 	struct o_document * doc = o_document_new();
 	o_document_field_set(doc, "boolVal", o_document_value_bool(1));
@@ -74,8 +78,9 @@ void test_o_document_serialize_deserialize()
 	o_output_stream_free(out);
 	o_input_stream_free(os);
 }
+END_TEST
 
-void test_o_document_serialize_deserialize_complex()
+START_TEST( test_o_document_serialize_deserialize_complex)
 {
 	struct o_document * doc = o_document_new();
 	struct o_document * doc_emb = o_document_new();
@@ -98,14 +103,16 @@ void test_o_document_serialize_deserialize_complex()
 	o_output_stream_free(out);
 	o_input_stream_free(os);
 }
+END_TEST
 
-void o_document_suite()
+TCase * o_document_tests()
 {
-	ADD_TEST(test_o_document_new, "test a simple o_document new and free");
-	ADD_TEST(test_o_document_property_managment, "test property  management on o_document ");
-	ADD_TEST(test_o_document_serialize, "test o_document native serialization");
-	ADD_TEST(test_o_document_serialize_deserialize, "test a base o_document native serialization and deserialization");
-	ADD_TEST(test_o_document_serialize_deserialize_complex, "test a complex o_document native serialization and deserialization");
-
+	TCase *tc_core = tcase_create ("o_document");
+	tcase_add_test (tc_core, test_o_document_new);
+	tcase_add_test (tc_core, test_o_document_property_managment);
+	tcase_add_test (tc_core, test_o_document_serialize);
+	tcase_add_test (tc_core, test_o_document_serialize_deserialize);
+	tcase_add_test (tc_core, test_o_document_serialize_deserialize_complex);
+	return tc_core;
 }
 

@@ -1,7 +1,7 @@
 #include "suites.h"
 #include "../src/o_database_document.h"
 
-void test_o_database_document_query()
+START_TEST( test_o_database_document_query)
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database_document * dd = o_database_document_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -19,8 +19,11 @@ void test_o_database_document_query()
 	o_database_document_close(dd);
 	o_database_document_free(dd);
 }
+END_TEST
 
-void o_database_document_query_suite()
+TCase * o_database_document_query_tests()
 {
-	ADD_TEST(test_o_database_document_query, "a test on execution of query on document database ");
+	TCase *tc_core = tcase_create ("o_database_document_query");
+	tcase_add_test (tc_core, test_o_database_document_query);
+	return tc_core;
 }

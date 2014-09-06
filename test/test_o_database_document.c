@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 
-void test_o_database_document_open_save_load_close()
+START_TEST(test_o_database_document_open_save_load_close)
 {
 	struct o_database_error_handler *errorHandler = o_database_error_handler_new(o_db_error_handler_function, 0);
 	struct o_database_document * db = o_database_document_new_error_handler("remote:127.0.0.1/temp", errorHandler);
@@ -22,8 +22,11 @@ void test_o_database_document_open_save_load_close()
 	o_database_document_close(db);
 	o_database_document_free(db);
 }
+END_TEST
 
-void o_database_document_suite()
+TCase * o_database_document_tests()
 {
-	ADD_TEST(test_o_database_document_open_save_load_close, "Test an document open save and close");
+	TCase *tc_core = tcase_create ("o_database_document");
+	tcase_add_test (tc_core, test_o_database_document_open_save_load_close);
+	return tc_core;
 }

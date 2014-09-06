@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void o_string_buffer_test_print()
+START_TEST(o_string_buffer_test_print)
 {
 	struct o_output_stream *o = o_output_stream_byte_buffer();
 	struct o_string_printer * buffer = o_string_printer_stream_new(o);
@@ -23,8 +23,9 @@ void o_string_buffer_test_print()
 	o_output_stream_free(o);
 	o_free(mem);
 }
+END_TEST
 
-void o_string_buffer_test_print_integer()
+START_TEST( o_string_buffer_test_print_integer)
 {
 	struct o_output_stream *o = o_output_stream_byte_buffer();
 	struct o_string_printer * buffer = o_string_printer_stream_new(o);
@@ -41,8 +42,9 @@ void o_string_buffer_test_print_integer()
 	o_output_stream_free(o);
 	o_free(mem);
 }
+END_TEST
 
-void o_string_buffer_test_print_double()
+START_TEST(o_string_buffer_test_print_double)
 {
 	struct o_output_stream *o = o_output_stream_byte_buffer();
 	struct o_string_printer * buffer = o_string_printer_stream_new(o);
@@ -59,8 +61,9 @@ void o_string_buffer_test_print_double()
 	o_output_stream_free(o);
 	o_free(mem);
 }
+END_TEST
 
-void o_string_buffer_test_print_char()
+START_TEST( o_string_buffer_test_print_char)
 {
 	struct o_output_stream *o = o_output_stream_byte_buffer();
 	struct o_string_printer * buffer = o_string_printer_stream_new(o);
@@ -77,11 +80,14 @@ void o_string_buffer_test_print_char()
 	o_output_stream_free(o);
 	o_free(mem);
 }
+END_TEST
 
-void o_string_printer_suite()
+TCase * o_string_printer_tests()
 {
-	ADD_TEST(o_string_buffer_test_print, "Test on simple printer print");
-	ADD_TEST(o_string_buffer_test_print_integer, "Test on simple printer print of integer ");
-	ADD_TEST(o_string_buffer_test_print_double, "Test on simple printer print of double ");
-	ADD_TEST(o_string_buffer_test_print_char, "Test on simple printer print of char ");
+	TCase *tc_core = tcase_create ("o_string_buffer");
+	tcase_add_test (tc_core, o_string_buffer_test_print);
+	tcase_add_test (tc_core, o_string_buffer_test_print_integer);
+	tcase_add_test (tc_core, o_string_buffer_test_print_double);
+	tcase_add_test (tc_core, o_string_buffer_test_print_char);
+	return tc_core;
 }

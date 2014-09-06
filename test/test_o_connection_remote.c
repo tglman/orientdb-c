@@ -54,7 +54,7 @@ void *test_o_connection_private_listen_thread(void * par)
 	return par;
 }
 
-void test_o_connection_local_data_transfer()
+START_TEST( test_o_connection_local_data_transfer)
 {
 	try
 	{
@@ -111,8 +111,9 @@ void test_o_connection_local_data_transfer()
 	}
 	end_try;
 }
+END_TEST
 
-void test_o_connection_remote_data_transfer()
+START_TEST(test_o_connection_remote_data_transfer)
 {
 	try
 	{
@@ -164,15 +165,12 @@ void test_o_connection_remote_data_transfer()
 	}
 	end_try;
 }
+END_TEST
 
-void o_connection_remote_data_suite()
+TCase * o_connection_remote_tests()
 {
-	//ADD_TEST(test_o_connection_local_data_transfer, " test a connection client server data transfer");
-	//Remote test commented for unaviable server.
-	//ADD_TEST(test_o_connection_remote_data_transfer, " test a connection to java server with data transfer");
-}
-void o_connection_remote_suite()
-{
-	ADD_SUITE(o_connection_remote_data_suite, "test data transfere on connection");
-	ADD_SUITE(o_native_socket_selector_suite, "test the selector on data receive.");
+	TCase *tc_core = tcase_create ("o_map");
+	tcase_add_test (tc_core, test_o_connection_local_data_transfer);
+	tcase_add_test (tc_core, test_o_connection_remote_data_transfer);
+	return tc_core;
 }

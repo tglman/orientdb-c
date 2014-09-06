@@ -12,15 +12,16 @@ void pool_test_free(void * obj, void * to_free)
 	return o_free(to_free);
 }
 
-void o_pool_test_create_destroy()
+START_TEST(o_pool_test_create_destroy)
 {
 	struct o_pool * pool = o_pool_new(0, pool_test_factory, pool_test_free);
 	void * obj = o_pool_get(pool);
 	o_pool_release(pool, obj);
 	o_pool_free(pool);
 }
+END_TEST
 
-void o_pool_test_limit_manage()
+START_TEST(o_pool_test_limit_manage)
 {
 	struct o_pool * pool = o_pool_new_size(0, pool_test_factory, pool_test_free, 2, 10);
 	int i = 10;
@@ -38,9 +39,12 @@ void o_pool_test_limit_manage()
 	}
 	o_pool_free(pool);
 }
+END_TEST
 
-void o_pool_suite()
+TCase * o_pool_tests()
 {
-	ADD_TEST(o_pool_test_create_destroy, "Test simple pool create and destroy");
-	ADD_TEST(o_pool_test_limit_manage, "Test pool limits");
+	TCase *tc_core = tcase_create ("o_pool");
+	tcase_add_test (tc_core, o_pool_test_create_destroy);
+	tcase_add_test (tc_core, o_pool_test_limit_manage);
+	return tc_core;
 }

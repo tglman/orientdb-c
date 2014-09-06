@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void test_o_map()
+START_TEST(test_o_map)
 {
 	struct o_map_string *mm = o_map_string_new();
 	void * put_val = (void *) 20;
@@ -12,8 +12,9 @@ void test_o_map()
 	assert_true(val == put_val, "Error on retrieving value from map ");
 	o_map_string_free(mm);
 }
+END_TEST
 
-void test_o_map_keys_iteration()
+START_TEST(test_o_map_keys_iteration)
 {
 	struct o_map_string *mm = o_map_string_new();
 	o_map_string_put(mm, "aaa", 0);
@@ -25,8 +26,9 @@ void test_o_map_keys_iteration()
 	assert_true(strcmp(keys[1], "bbb") == 0, "wrong second key");
 	o_map_string_free(mm);
 }
+END_TEST
 
-void test_o_map_add_clear()
+START_TEST(test_o_map_add_clear)
 {
 	struct o_map_string *mm = o_map_string_new();
 	o_map_string_put(mm, "cccc", 0);
@@ -38,11 +40,14 @@ void test_o_map_add_clear()
 	assert_true(size == 0, "not correct size after clear");
 	o_map_string_free(mm);
 }
+END_TEST
 
-void o_map_suite()
+TCase * o_map_tests()
 {
-	ADD_TEST(test_o_map, "creation and put test");
-	ADD_TEST(test_o_map_keys_iteration, "test key add and iterate");
-	ADD_TEST(test_o_map_add_clear, "test key add and iterate");
+	TCase *tc_core = tcase_create ("o_map");
+	tcase_add_test (tc_core, test_o_map);
+	tcase_add_test (tc_core, test_o_map_keys_iteration);
+	tcase_add_test (tc_core, test_o_map_add_clear);
+	return tc_core;
 }
 
